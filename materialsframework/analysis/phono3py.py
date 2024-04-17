@@ -1,0 +1,139 @@
+"""
+This module provides a class to calculate phonon properties of a structure using Phono3py.
+"""
+import os
+from typing import List, Optional
+
+import numpy as np
+from numpy.typing import ArrayLike
+from pymatgen.core import Structure
+
+from materialsframework.calculators import M3GNetCalculator
+from materialsframework.transformations import Phono3pyDisplacementTransformation
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
+
+__author__ = "Doguhan Sariturk"
+__email__ = "dogu.sariturk@gmail.com"
+
+
+class Phono3pyAnalyzer:
+    """
+    A class used to represent a Phono3py Analyzer.
+
+    This class provides methods to calculate phonon properties of a structure.
+    """
+
+    def __init__(self,
+                 calculator: Optional[M3GNetCalculator] = None,
+                 phono3py_transformation: Optional[Phono3pyDisplacementTransformation] = None) -> None:
+        """
+        Initializes the Phono3pyAnalyzer.
+
+        Args:
+            calculator (M3GNetCalculator): The calculator to use for calculating energies and forces.
+            phono3py_transformation (Phono3pyDisplacementTransformation): The Phono3pyDisplacementTransformation object.
+        """
+        self._calculator = calculator
+        self._phono3py_transformation = phono3py_transformation
+
+        self.phonon = None
+        self.thermal_conductivity = None
+
+    def calculate(self,
+                  structure: Structure,
+                  is_relaxed: bool = False,
+                  distance: float = 0.01,
+                  supercell_matrix: Optional[List] = None,
+                  primitive_matrix: Optional[List] = None,
+                  phonon_supercell_matrix: Optional[List] = None,
+                  mesh: Optional[ArrayLike | float] = None,
+                  is_lbte: bool = False,
+                  t_min: Optional[float] = 0,
+                  t_max: Optional[float] = 1000,
+                  t_step: Optional[float] = 10,
+                  log_level: int = 0) -> None:
+        """
+        Calculates the phonon properties of the given structure.
+
+        Args:
+            structure (Structure): The structure to calculate phonon properties.
+            is_relaxed (bool): Whether the structure is relaxed. Defaults to False.
+            distance (float): The distance to displace atoms for forces. Defaults to 0.01.
+            supercell_matrix (List): The supercell matrix. Defaults to None.
+            primitive_matrix (List): The primitive matrix. Defaults to None.
+            phonon_supercell_matrix (List): The phonon supercell matrix. Defaults to None.
+            mesh (ArrayLike | float): The mesh numbers for phonon calculations. Defaults to None.
+            is_lbte (bool): Whether to use LBTE for thermal conductivity. Defaults to False.
+            t_min (float): The minimum temperature for thermal conductivity. Defaults to 0.
+            t_max (float): The maximum temperature for thermal conductivity. Defaults to 1000.
+            t_step (float): The temperature step for thermal conductivity. Defaults to 10.
+            log_level (int): The log level for the calculations. Defaults to 0.
+        """
+        mesh = mesh or [20, 20, 20]
+
+        self.phono3py_transformation.apply_transformation(structure=structure,
+                                                          distance=distance,
+                                                          supercell_matrix=supercell_matrix,
+                                                          primitive_matrix=primitive_matrix,
+                                                          is_relaxed=is_relaxed,
+                                                          phonon_supercell_matrix=phonon_supercell_matrix,
+                                                          log_level=log_level)
+
+        self.phonon = self.phono3py_transformation.phonon
+        self._produce_force_constants()
+
+        self.phonon.mesh_numbers = mesh
+        self.phonon.init_phph_interaction()
+
+        # Thermal Conductivity
+        self.phonon.run_thermal_conductivity(is_LBTE=is_lbte,
+                                             temperatures=range(t_min, t_max + 1, t_step))
+        self.thermal_conductivity = self.phonon.thermal_conductivity
+
+        return {
+            "thermal_conductivity": self.thermal_conductivity
+        }
+
+    @property
+    def calculator(self) -> M3GNetCalculator:
+        """
+        Gets the calculator used for calculating potential energies.
+
+        Returns:
+            M3GNetCalculator: The calculator object.
+        """
+        if self._calculator is None:
+            self._calculator = M3GNetCalculator()
+        return self._calculator
+
+    @property
+    def phono3py_transformation(self) -> Phono3pyDisplacementTransformation:
+        """
+        Gets the Phono3py transformation object.
+
+        Returns:
+            Phono3pyDisplacementTransformation: The Phono3py transformation object.
+        """
+        if self._phono3py_transformation is None:
+            self._phono3py_transformation = Phono3pyDisplacementTransformation()
+        return self._phono3py_transformation
+
+    def _produce_force_constants(self) -> None:
+        """
+        Produces the force constants using the forces calculated from the calculator.
+        """
+        if self.phonon is None:
+            raise RuntimeError("phono3py_transformation has to be called before trying to produce force constants.")
+
+        forces = np.array([self.calculator.calculate(displaced_structure)["forces"]
+                           for displaced_structure in
+                           self.phono3py_transformation.phonon_supercells_with_displacements])
+        self.phonon.forces = forces
+        self.phonon.produce_fc3()
+
+        phonon_forces = np.array([self.calculator.calculate(displaced_structure)["forces"]
+                                  for displaced_structure in
+                                  self.phono3py_transformation.supercell_displacements])
+        self.phonon.phonon_forces = phonon_forces
+        self.phonon.produce_fc2()

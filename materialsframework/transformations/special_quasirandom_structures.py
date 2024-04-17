@@ -1,0 +1,213 @@
+"""
+This module contains classes for generating special quasirandom structures (SQS).
+"""
+import operator
+import os
+from functools import reduce
+from typing import Dict, List, Optional
+
+import numpy as np
+from numpy import ndarray
+from pymatgen.core import Composition, Lattice, Structure
+from sqsgenerator import sqs_optimize
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
+
+__author__ = "Doguhan Sariturk"
+__email__ = "dogu.sariturk@gmail.com"
+
+
+class SqsgenTransformation:
+    """
+    A class used to represent a SQS (Special Quasirandom Structures) Calculator.
+
+    This class provides methods to generate SQS structures using the SQS method implemented in "sqsgenerator".
+    """
+
+    def __init__(
+            self,
+            iterations: int = 1000,
+            make_structures: bool = True,
+            mode: str = "random",
+            structure_format: str = "pymatgen",
+    ) -> None:
+        """
+        Initializes the SQSCalculator object.
+
+        Parameters:
+            iterations (int): The number of iterations for the SQS generation. Default is 1000.
+            make_structures (bool): Whether to make structures. Default is True.
+            mode (str): The mode for the SQS generation. The "random" or "systematic" can be used. Default is "random".
+            structure_format (str): The structure format. Default is "pymatgen".
+        """
+        self._iterations = iterations
+        self._make_structures = make_structures
+        self._mode = mode
+        self._structure_format = structure_format
+
+        self._lattice = self._coords = self._multiplier = self._supercell_size = self._composition = None
+
+        self._sqs = self._objective = None
+        self.results = None
+        self.timings = None
+
+    def generate(
+            self,
+            composition: Composition,
+            crystal_structure: str = "FCC",
+            supercell_size: int = (5, 5, 5),
+            shell_weights: Optional[Dict[int, float]] = None,
+    ) -> Structure:
+        """
+        Generates a supercell using the SQS (Special Quasirandom Structures) method.
+
+        Args:
+            composition (Composition): The composition of the supercell.
+            crystal_structure (str): The crystal structure of the supercell. Default is "FCC".
+            supercell_size (int): The size of the supercell. Default is (5, 5, 5).
+            shell_weights (Optional[Dict[int, float]]): The weights for the coordination shells. Default is None.
+
+        Returns:
+            sqs_structure (Structure): The generated SQS structure.
+        """
+        self._supercell_size = supercell_size
+        self._lattice = self._get_lattice(composition=composition)
+        self._coords = self._get_coords(crystal_structure=crystal_structure)
+        self._multiplier = self._get_multiplier(crystal_structure=crystal_structure)
+        self._composition = self._determine_composition(supercell_size=self._supercell_size, composition=composition)
+
+        if shell_weights is None:
+            shell_weights: Dict[int, float] = {
+                    1: 1.0,
+                    2: 0.5,
+            }  # Will use first and second coordination shells by default
+
+        configuration = {
+                "structure": {
+                        "lattice": self._lattice,
+                        "coords": self._coords,
+                        "species": ["W"] * self._multiplier,
+                        "supercell": self._supercell_size,
+                },
+                "iterations": self._iterations,
+                "shell_weights": shell_weights,
+                "composition": self._composition,
+                "mode": self._mode,
+        }
+
+        self.results, self.timings = sqs_optimize(
+                settings=configuration,
+                make_structures=self._make_structures,
+                structure_format=self._structure_format,
+        )
+
+        self._sqs = self._parse_results_for_structure()
+        self._objective = self._parse_results_for_objective()
+
+        return self._sqs
+
+    @staticmethod
+    def _get_lattice(composition) -> ndarray:
+        """
+        Calculates and returns the lattice for the given composition.
+
+        Returns:
+            Lattice: The calculated lattice.
+        """
+        avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
+        lattice = Lattice.cubic(avg_radius)
+
+        return lattice.matrix
+
+    @staticmethod
+    def _get_coords(crystal_structure) -> List:
+        """
+        Returns the coordinates of atoms based on the crystal structure.
+
+        Returns:
+            List: A list of coordinates of atoms.
+        Raises:
+            ValueError: If the crystal structure is invalid.
+        """
+        return {"fcc": [[0.0, 0.0, 0.0], [0.5, 0.5, 0], [0.5, 0, 0.5], [0.0, 0.5, 0.5]],
+                "bcc": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]],
+                "sc": [[0.0, 0.0, 0.0]]}.get(crystal_structure.lower(), ValueError("Invalid crystal structure."))
+
+    @staticmethod
+    def _get_multiplier(crystal_structure) -> int:
+        """
+        Returns the multiplier for the given crystal structure.
+
+        Args:
+            crystal_structure (str): The crystal structure.
+
+        Returns:
+            int: The multiplier for the given crystal structure.
+
+        Raises:
+            ValueError: If the crystal structure is invalid.
+        """
+        return {"fcc": 4, "bcc": 2, "sc": 1}.get(crystal_structure.lower(), ValueError("Invalid crystal structure."))
+
+    def _determine_composition(self, supercell_size, composition) -> Dict[str, int]:
+        """
+        Determines the composition of the supercell.
+
+        Returns:
+            Dict[str, int]: A dictionary containing the element symbols as keys and the corresponding
+            number of atoms as values.
+        """
+        result = self._multiplier * reduce(operator.mul, supercell_size)
+
+        return {
+                el: int(amt * result)
+                for el, amt in composition.to_reduced_dict.items()
+        }
+
+    def _parse_results_for_structure(self) -> Structure:
+        """
+        Parses the results dictionary from the generate function.
+
+        This function takes the results dictionary generated by the generate function and
+        parses it to extract the SQS structure.
+
+        Returns:
+            Structure: The SQS structure generated by the calculator.
+        """
+        return next(iter(self.results.values()))["structure"].sort()
+
+    def _parse_results_for_objective(self) -> float:
+        """
+        Parses the results dictionary from the generate function.
+
+        This function takes the results dictionary generated by the generate function and
+        parses it to extract the objective value.
+
+        Returns:
+            float: The objective value of the SQS structure.
+        """
+        return next(iter(self.results.values()))["objective"]
+
+    @property
+    def sqs(self) -> Structure:
+        """
+        Returns the SQS (Special Quasirandom Structure) generated by the calculator.
+
+        Raises:
+            ValueError: If the SQS has not been generated yet.
+
+        Returns:
+            Structure: The SQS structure.
+        """
+        if self._sqs is None:
+            raise ValueError("SQS has not been generated yet.")
+
+        return self._sqs
+
+
+class AtatCalculator:
+    pass
+
+
+class IcetCalculator:
+    pass
