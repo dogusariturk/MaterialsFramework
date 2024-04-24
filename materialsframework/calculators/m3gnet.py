@@ -7,9 +7,11 @@ from typing import Dict, Tuple, Union
 import matgl
 import numpy as np
 from matgl.apps.pes import Potential
-from matgl.ext.ase import PESCalculator, Relaxer
+from matgl.ext.ase import PESCalculator, Relaxer as AseM3GNetRelaxer
 from numpy import ndarray
 from pymatgen.core import Structure
+
+from materialsframework.calculators import Calculator, Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -17,7 +19,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class M3GNetRelaxer:
+class M3GNetRelaxer(Relaxer):
     """
     A class used to represent a M3GNet Relaxer.
 
@@ -31,7 +33,7 @@ class M3GNetRelaxer:
             verbose: bool = False,
             steps: int = 1000,
             model: str = "M3GNet-MP-2021.2.8-PES",
-    ):
+    ) -> None:
         """
         Initializes the M3GNet calculator.
 
@@ -41,6 +43,14 @@ class M3GNetRelaxer:
             verbose (bool): Whether to print verbose output during calculations. Defaults to False.
             steps (int): The maximum number of optimization steps. Defaults to 1000.
             model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
+
+        Examples:
+            >>> relaxer = M3GNetRelaxer()
+            >>> relaxer = M3GNetRelaxer(fmax=0.001, relax_cell=True, verbose=False, steps=1000,
+            ...                         model="M3GNet-MP-2021.2.8-PES")
+
+        Note:
+            The remaining values for the arguments are set to the default values for the M3GNet potential.
         """
         self._fmax = fmax
         self._relax_cell = relax_cell
@@ -56,7 +66,8 @@ class M3GNetRelaxer:
         """
         Returns the M3GNet potential associated with this instance.
 
-        If the potential has not been initialized yet, it will be loaded using the model attribute of this instance.
+        If the potential has not been initialized yet, it will be loaded
+        using the model attribute of this instance.
 
         Returns:
             Potential: The M3GNet potential associated with this instance.
@@ -66,7 +77,7 @@ class M3GNetRelaxer:
         return self._potential
 
     @property
-    def relaxer(self) -> Relaxer:
+    def relaxer(self) -> AseM3GNetRelaxer:
         """
         Returns the Relaxer object associated with this instance.
 
@@ -74,13 +85,13 @@ class M3GNetRelaxer:
         potential and relax_cell attributes of this instance.
 
         Returns:
-            Relaxer: The Relaxer object associated with this instance.
+            AseRelaxer: The AseM3GNetRelaxer object associated with this instance.
         """
         if self._relaxer is None:
-            self._relaxer = Relaxer(potential=self.potential, relax_cell=self._relax_cell)
+            self._relaxer = AseM3GNetRelaxer(potential=self.potential, relax_cell=self._relax_cell)
         return self._relaxer
 
-    def calculate(
+    def relax(
             self,
             structure: Structure,
     ) -> Tuple[Structure, float]:
@@ -92,12 +103,20 @@ class M3GNetRelaxer:
 
         Returns:
             Tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
+
+        Examples:
+            >>> relaxer = M3GNetRelaxer()
+            >>> struct = Structure.from_file("POSCAR")
+            >>> relaxation_results = relaxer.relax(structure=struct)
         """
         relax_results = self.relaxer.relax(structure, fmax=self._fmax, steps=self._steps, verbose=self._verbose)
-        return relax_results["final_structure"], float(relax_results["trajectory"].energies[-1])
+        return {
+                'final_structure': relax_results["final_structure"],
+                'energy': float(relax_results["trajectory"].energies[-1])
+        }
 
 
-class M3GNetCalculator:
+class M3GNetCalculator(Calculator):
     """
     A class representing the M3GNet calculator.
 
@@ -105,16 +124,32 @@ class M3GNetCalculator:
     of a given structure using the M3GNet potential.
     """
 
-    def __init__(self, model: str = "M3GNet-MP-2021.2.8-PES"):
+    def __init__(self, model: str = "M3GNet-MP-2021.2.8-PES") -> None:
+        """
+        Initializes the M3GNet calculator.
+
+        Args:
+            model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
+
+        Examples:
+            >>> calculator = M3GNetCalculator()
+            >>> calculator = M3GNetCalculator(model="M3GNet-MP-2021.2.8-PES")
+
+        Note:
+            The remaining values for the arguments are set to the default values for the M3GNet potential.
+        """
         self._model: str = model
-        self._potential = self._calculator = None
+
+        self._calculator = None
+        self._potential = None
 
     @property
     def potential(self) -> Potential:
         """
         Returns the M3GNet potential associated with this instance.
 
-        If the potential has not been initialized yet, it will be loaded using the model attribute of this instance.
+        If the potential has not been initialized yet, it will be loaded
+        using the model attribute of this instance.
 
         Returns:
             Potential: The M3GNet potential associated with this instance.
@@ -151,6 +186,11 @@ class M3GNetCalculator:
 
         Returns:
             Dict[str, Any]: A dictionary containing the calculated properties.
+
+        Examples:
+            >>> calculator = M3GNetCalculator()
+            >>> struct = Structure.from_file("POSCAR")
+            >>> calculation_results = calculator.calculate(structure=struct)
         """
         atoms = structure.to_ase_atoms()
         atoms.calc = self.calculator

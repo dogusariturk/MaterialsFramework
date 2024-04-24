@@ -9,7 +9,7 @@ from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.analysis.eos import EOS
 from pymatgen.core import Structure
 
-from materialsframework.calculators import M3GNetCalculator
+from materialsframework.calculators import Calculator, M3GNetCalculator
 from materialsframework.transformations import CubicElasticConstantsDeformationTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -27,16 +27,20 @@ class CubicElasticConstantsAnalyzer:
     This class provides methods to calculate the cubic elastic constants for a given relaxed structure.
     """
 
-    def __init__(self,
-                 eos_name: str = "birch_murnaghan",
-                 calculator: Optional[M3GNetCalculator] = None,
-                 cubic_transformation: Optional[CubicElasticConstantsDeformationTransformation] = None) -> None:
+    def __init__(
+            self,
+            eos_name: str = "birch_murnaghan",
+            calculator: Optional[Calculator] = None,
+            cubic_transformation: Optional[CubicElasticConstantsDeformationTransformation] = None
+    ) -> None:
         """
         Initializes the CubicElasticConstantsAnalyzer.
 
         Parameters:
             eos_name (str): The name of the equation of state (EOS) to use for fitting energy-volume data.
                             Default is "birch_murnaghan".
+            calculator (Optional[Calculator]): The calculator object to use for calculating potential energies.
+            cubic_transformation (Optional[CubicElasticConstantsDeformationTransformation]): The cubic transformation object.
         """
         self._eos_name = eos_name
 
@@ -83,12 +87,13 @@ class CubicElasticConstantsAnalyzer:
         }
 
     @property
-    def calculator(self) -> M3GNetCalculator:
+    def calculator(self) -> Calculator:
         """
         Gets the calculator used for calculating potential energies.
+        If not set, initializes a new M3GNetCalculator.
 
         Returns:
-            M3GNetCalculator: The calculator object.
+            Calculator: The calculator object.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -106,7 +111,11 @@ class CubicElasticConstantsAnalyzer:
             self._cubic_transformation = CubicElasticConstantsDeformationTransformation()
         return self._cubic_transformation
 
-    def _fit_eos(self, volumes: List[float], energies: List[float]) -> float:
+    def _fit_eos(
+            self,
+            volumes: List[float],
+            energies: List[float]
+    ) -> float:
         """
         Fits the equation of state (EOS) to the given volumes and energies
         and returns the bulk modulus.
@@ -122,7 +131,11 @@ class CubicElasticConstantsAnalyzer:
         return eos_fit.b0_GPa
 
     @staticmethod
-    def _fit_poly(deltas: List[float], energies: List[float], degree: int = 2) -> float:
+    def _fit_poly(
+            deltas: List[float],
+            energies: List[float],
+            degree: int = 2
+    ) -> float:
         """
         Fits a polynomial curve to the given deltas and energies data points
         and calculates the second order coefficient.
@@ -182,9 +195,11 @@ class CubicElasticConstantsAnalyzer:
         return eV_A3_to_GPa * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
     @staticmethod
-    def _build_cubic_elastic_tensor(c11: float,
-                                    c12: float,
-                                    c44: float) -> ElasticTensor:
+    def _build_cubic_elastic_tensor(
+            c11: float,
+            c12: float,
+            c44: float
+    ) -> ElasticTensor:
         """
         Builds the 6x6 cubic elastic tensor from the given elastic constants.
 
@@ -198,5 +213,5 @@ class CubicElasticConstantsAnalyzer:
         """
         elastic_tensor = np.zeros([6, 6])
         elastic_tensor[:3, :3].fill(c12)
-        np.fill_diagonal(elastic_tensor, [c11]*3 + [c44]*3)
+        np.fill_diagonal(elastic_tensor, [c11] * 3 + [c44] * 3)
         return ElasticTensor.from_voigt(elastic_tensor)

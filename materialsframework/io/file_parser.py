@@ -20,7 +20,7 @@ class FileParser:
     This class provides methods to parse files and extract compositions of elements.
     """
 
-    def __init__(self, ) -> None:
+    def __init__(self) -> None:
         """
         Initializes the Parser object.
         """

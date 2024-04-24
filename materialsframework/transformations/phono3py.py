@@ -24,12 +24,14 @@ class Phono3pyDisplacementTransformation:
     This class provides methods to generate displaced structures for Phono3py calculations.
     """
 
-    def __init__(self,
-                 fmax: float = 1e-5,
-                 relax_cell: bool = True,
-                 verbose: bool = False,
-                 steps: int = 1000,
-                 model: str = "M3GNet-MP-2021.2.8-PES"):
+    def __init__(
+            self,
+            fmax: float = 1e-5,
+            relax_cell: bool = True,
+            verbose: bool = False,
+            steps: int = 1000,
+            model: str = "M3GNet-MP-2021.2.8-PES"
+    ) -> None:
         """
         Initializes the Phono3pyDisplacementTransformation.
 
@@ -59,15 +61,17 @@ class Phono3pyDisplacementTransformation:
         self.supercell_displacements = None
         self.supercells_with_displacements = None
 
-    def apply_transformation(self,
-                             structure: Structure,
-                             distance: float = 0.03,
-                             supercell_matrix: Optional[List] = None,
-                             primitive_matrix: Optional[List] = None,
-                             phonon_supercell_matrix: Optional[List] = None,
-                             is_relaxed: bool = False,
-                             log_level: int = 0,
-                             **kwargs) -> None:
+    def apply_transformation(
+            self,
+            structure: Structure,
+            distance: float = 0.03,
+            supercell_matrix: Optional[List] = None,
+            primitive_matrix: Optional[List] = None,
+            phonon_supercell_matrix: Optional[List] = None,
+            is_relaxed: bool = False,
+            log_level: int = 0,
+            **kwargs
+    ) -> None:
         """
         Applies the transformation to generate displaced supercells using Phono3py.
 
@@ -147,13 +151,14 @@ class Phono3pyDisplacementTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        relaxed_structure, _ = self.relaxer.calculate(structure)
-        return relaxed_structure
+        return self.relaxer.relax(structure)['final_structure']
 
-    def _get_displaced_structures(self,
-                                  distance: float = 0.03,
-                                  is_plusminus: bool | str = "auto",
-                                  is_diagonal: bool = True) -> Tuple[List[Structure], List[Structure]]:
+    def _get_displaced_structures(
+            self,
+            distance: float = 0.03,
+            is_plusminus: bool | str = "auto",
+            is_diagonal: bool = True
+    ) -> Tuple[List[Structure], List[Structure]]:
         """
         This method generates displaced structures using Phono3py.
 

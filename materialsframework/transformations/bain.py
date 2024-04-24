@@ -23,15 +23,17 @@ class BainDisplacementTransformation:
     This class provides a class to generate displaced structures along the Bain Path.
     """
 
-    def __init__(self,
-                 start: float = 0.89,
-                 stop: float = 1.4,
-                 step: float = 0.01,
-                 fmax: float = 1e-5,
-                 relax_cell: bool = True,
-                 verbose: bool = False,
-                 steps: int = 1000,
-                 model: str = "M3GNet-MP-2021.2.8-PES"):
+    def __init__(
+            self,
+            start: float = 0.89,
+            stop: float = 1.4,
+            step: float = 0.01,
+            fmax: float = 1e-5,
+            relax_cell: bool = True,
+            verbose: bool = False,
+            steps: int = 1000,
+            model: str = "M3GNet-MP-2021.2.8-PES"
+    ) -> None:
         """
         Initializes the BainDisplacementTransformation.
 
@@ -56,9 +58,11 @@ class BainDisplacementTransformation:
         self.c_a_ratios: np.ndarray = np.arange(start=start, stop=stop, step=step)
         self.displaced_structures: Dict[float, Structure] = {}
 
-    def apply_transformation(self,
-                             structure: Structure,
-                             is_relaxed: bool = False):
+    def apply_transformation(
+            self,
+            structure: Structure,
+            is_relaxed: bool = False
+    ) -> None:
         """
         Applies the transformation to generate displaced structures along the Bain path.
         """
@@ -99,12 +103,13 @@ class BainDisplacementTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        relaxed_structure, _ = self.relaxer.calculate(structure)
-        return relaxed_structure
+        return self.relaxer.relax(structure)['final_structure']
 
     @staticmethod
-    def _get_displaced_structures(delta: float,
-                                  structure: Structure) -> Structure:
+    def _get_displaced_structures(
+            delta: float,
+            structure: Structure
+    ) -> Structure:
         """
         Applies the transformation to generate a displaced structure.
 

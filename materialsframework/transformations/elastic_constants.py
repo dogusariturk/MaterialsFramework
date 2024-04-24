@@ -25,13 +25,15 @@ class CubicElasticConstantsDeformationTransformation:
     This class provides methods to generate the deformed structures for the cubic elastic constant calculations.
     """
 
-    def __init__(self,
-                 delta_max: float = 0.05,
-                 fmax: float = 1e-5,
-                 relax_cell: bool = True,
-                 verbose: bool = False,
-                 steps: int = 1000,
-                 model: str = "M3GNet-MP-2021.2.8-PES") -> None:
+    def __init__(
+            self,
+            delta_max: float = 0.05,
+            fmax: float = 1e-5,
+            relax_cell: bool = True,
+            verbose: bool = False,
+            steps: int = 1000,
+            model: str = "M3GNet-MP-2021.2.8-PES"
+    ) -> None:
         """
         Initializes the CubicElasticConstantsDeformationTransformation.
 
@@ -60,9 +62,11 @@ class CubicElasticConstantsDeformationTransformation:
         self.orthorhombic_distorted_structures: Dict[float, Structure] = {}
         self.monoclinic_distorted_structures: Dict[float, Structure] = {}
 
-    def apply_transformation(self,
-                             structure: Structure,
-                             is_relaxed: bool = False) -> None:
+    def apply_transformation(
+            self,
+            structure: Structure,
+            is_relaxed: bool = False
+    ) -> None:
         """
         Applies the transformation to generate distorted structures.
 
@@ -109,8 +113,7 @@ class CubicElasticConstantsDeformationTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        relaxed_structure, _ = self.relaxer.calculate(structure)
-        return relaxed_structure
+        return self.relaxer.relax(structure)['final_structure']
 
     def _apply_monoclinic_distortion(self, delta: float, structure: Structure) -> None:
         """

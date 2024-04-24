@@ -6,7 +6,7 @@ from typing import Dict, Optional
 
 from pymatgen.core import Structure
 
-from materialsframework.calculators import M3GNetCalculator
+from materialsframework.calculators import Calculator, M3GNetCalculator
 from materialsframework.transformations import BainDisplacementTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -24,13 +24,14 @@ class BainPathAnalyzer:
 
     def __init__(
             self,
-            calculator: Optional[M3GNetCalculator] = None,
-            bain_transformation: Optional[BainDisplacementTransformation] = None) -> None:
+            calculator: Optional[Calculator] = None,
+            bain_transformation: Optional[BainDisplacementTransformation] = None
+    ) -> None:
         """
         Initializes the BainPathAnalyzer.
 
         Parameters:
-            calculator (Optional[M3GNetCalculator]): The calculator object to use for calculating potential energies.
+            calculator (Optional[Calculator]): The calculator object to use for calculating potential energies.
             bain_transformation (Optional[BainDisplacementTransformation]): The bain displacement transformation object.
         """
         self._calculator = calculator
@@ -58,12 +59,13 @@ class BainPathAnalyzer:
         }
 
     @property
-    def calculator(self) -> M3GNetCalculator:
+    def calculator(self) -> Calculator:
         """
         Gets the calculator used for calculating potential energies.
+        If not set, initializes a new M3GNetCalculator.
 
         Returns:
-            M3GNetCalculator: The calculator object.
+            Calculator: The calculator object.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()

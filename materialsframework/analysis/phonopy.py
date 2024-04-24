@@ -8,7 +8,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 from pymatgen.core import Structure
 
-from materialsframework.calculators import M3GNetCalculator
+from materialsframework.calculators import Calculator, M3GNetCalculator
 from materialsframework.transformations import PhonopyDisplacementTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -24,14 +24,16 @@ class PhonopyAnalyzer:
     This class provides methods to calculate phonon properties of a structure.
     """
 
-    def __init__(self,
-                 calculator: Optional[M3GNetCalculator] = None,
-                 phonopy_transformation: Optional[PhonopyDisplacementTransformation] = None) -> None:
+    def __init__(
+            self,
+            calculator: Optional[Calculator] = None,
+            phonopy_transformation: Optional[PhonopyDisplacementTransformation] = None
+    ) -> None:
         """
         Initializes the PhonopyAnalyzer.
 
         Args:
-            calculator (M3GNetCalculator): The calculator to use for calculating energies and forces.
+            calculator (Calculator): The calculator to use for calculating energies and forces.
             phonopy_transformation (PhonopyDisplacementTransformation): The PhonopyDisplacementTransformation object.
         """
         self._calculator = calculator
@@ -42,22 +44,24 @@ class PhonopyAnalyzer:
         self.projected_dos = None
         self.thermal_properties = None
 
-    def calculate(self,
-                  structure: Structure,
-                  is_relaxed: bool = False,
-                  distance: float = 0.01,
-                  supercell_matrix: Optional[List] = None,
-                  primitive_matrix: Optional[List] = None,
-                  mesh: Optional[ArrayLike | float] = None,
-                  pdos_mesh: Optional[ArrayLike | float] = None,
-                  sigma: Optional[float] = None,
-                  freq_min: Optional[float] = None,
-                  freq_max: Optional[float] = None,
-                  freq_pitch: Optional[float] = None,
-                  t_min: Optional[float] = 0,
-                  t_max: Optional[float] = 1000,
-                  t_step: Optional[float] = 10,
-                  log_level: int = 0) -> None:
+    def calculate(
+            self,
+            structure: Structure,
+            is_relaxed: bool = False,
+            distance: float = 0.01,
+            supercell_matrix: Optional[List] = None,
+            primitive_matrix: Optional[List] = None,
+            mesh: Optional[ArrayLike | float] = None,
+            pdos_mesh: Optional[ArrayLike | float] = None,
+            sigma: Optional[float] = None,
+            freq_min: Optional[float] = None,
+            freq_max: Optional[float] = None,
+            freq_pitch: Optional[float] = None,
+            t_min: Optional[float] = 0,
+            t_max: Optional[float] = 1000,
+            t_step: Optional[float] = 10,
+            log_level: int = 0
+    ) -> None:
         """
         Calculates the phonon properties of the given structure.
 
@@ -113,18 +117,19 @@ class PhonopyAnalyzer:
         projected_dos = self.phonon.get_projected_dos_dict()
 
         return {
-            "total_dos": total_dos,
-            "thermal_properties": thermal_properties,
-            "projected_dos": projected_dos
+                "total_dos": total_dos,
+                "thermal_properties": thermal_properties,
+                "projected_dos": projected_dos
         }
 
     @property
-    def calculator(self) -> M3GNetCalculator:
+    def calculator(self) -> Calculator:
         """
         Gets the calculator used for calculating potential energies.
+        If not set, initializes a new M3GNetCalculator.
 
         Returns:
-            M3GNetCalculator: The calculator object.
+            Calculator: The calculator object.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()

@@ -24,12 +24,14 @@ class PhonopyDisplacementTransformation:
     This class provides methods to generate displaced structures for Phonopy calculations.
     """
 
-    def __init__(self,
-                 fmax: float = 1e-5,
-                 relax_cell: bool = True,
-                 verbose: bool = False,
-                 steps: int = 1000,
-                 model: str = "M3GNet-MP-2021.2.8-PES"):
+    def __init__(
+            self,
+            fmax: float = 1e-5,
+            relax_cell: bool = True,
+            verbose: bool = False,
+            steps: int = 1000,
+            model: str = "M3GNet-MP-2021.2.8-PES"
+    ) -> None:
         """
         Initializes the PhonopyDisplacementTransformation.
 
@@ -53,14 +55,16 @@ class PhonopyDisplacementTransformation:
         self.displacements = None
         self.displaced_structures = None
 
-    def apply_transformation(self,
-                             structure: Structure,
-                             distance: float = 0.01,
-                             supercell_matrix: Optional[List] = None,
-                             primitive_matrix: Optional[List] = None,
-                             is_relaxed: bool = False,
-                             log_level: int = 0,
-                             **kwargs) -> None:
+    def apply_transformation(
+            self,
+            structure: Structure,
+            distance: float = 0.01,
+            supercell_matrix: Optional[List] = None,
+            primitive_matrix: Optional[List] = None,
+            is_relaxed: bool = False,
+            log_level: int = 0,
+            **kwargs
+    ) -> None:
         """
         Applies the transformation to generate displaced supercells using Phonopy.
 
@@ -134,8 +138,7 @@ class PhonopyDisplacementTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        relaxed_structure, _ = self.relaxer.calculate(structure)
-        return relaxed_structure
+        return self.relaxer.relax(structure)['final_structure']
 
     def _get_displaced_structures(self, distance: float = 0.01, **kwargs) -> List[Structure]:
         """
