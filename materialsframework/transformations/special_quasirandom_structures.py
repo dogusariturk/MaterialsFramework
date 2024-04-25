@@ -1,15 +1,20 @@
 """
 This module contains classes for generating special quasirandom structures (SQS).
 """
+from __future__ import annotations
+
 import operator
 import os
 from functools import reduce
-from typing import Dict, List, Optional
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
-from numpy import ndarray
-from pymatgen.core import Composition, Lattice, Structure
+from pymatgen.core import Lattice
 from sqsgenerator import sqs_optimize
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+    from pymatgen.core import Composition, Structure
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -56,7 +61,7 @@ class SqsgenTransformation:
             composition: Composition,
             crystal_structure: str = "FCC",
             supercell_size: int = (5, 5, 5),
-            shell_weights: Optional[Dict[int, float]] = None,
+            shell_weights: Optional[dict[int, float]] = None,
     ) -> Structure:
         """
         Generates a supercell using the SQS (Special Quasirandom Structures) method.
@@ -65,7 +70,7 @@ class SqsgenTransformation:
             composition (Composition): The composition of the supercell.
             crystal_structure (str): The crystal structure of the supercell. Default is "FCC".
             supercell_size (int): The size of the supercell. Default is (5, 5, 5).
-            shell_weights (Optional[Dict[int, float]]): The weights for the coordination shells. Default is None.
+            shell_weights (Optional[dict[int, float]]): The weights for the coordination shells. Default is None.
 
         Returns:
             sqs_structure (Structure): The generated SQS structure.
@@ -77,7 +82,7 @@ class SqsgenTransformation:
         self._composition = self._determine_composition(supercell_size=self._supercell_size, composition=composition)
 
         if shell_weights is None:
-            shell_weights: Dict[int, float] = {
+            shell_weights: dict[int, float] = {
                     1: 1.0,
                     2: 0.5,
             }  # Will use first and second coordination shells by default
@@ -107,12 +112,12 @@ class SqsgenTransformation:
         return self._sqs
 
     @staticmethod
-    def _get_lattice(composition) -> ndarray:
+    def _get_lattice(composition) -> ArrayLike:
         """
         Calculates and returns the lattice for the given composition.
 
         Returns:
-            Lattice: The calculated lattice.
+            ArrayLike: The calculated lattice.
         """
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
         lattice = Lattice.cubic(avg_radius)
@@ -120,12 +125,12 @@ class SqsgenTransformation:
         return lattice.matrix
 
     @staticmethod
-    def _get_coords(crystal_structure) -> List:
+    def _get_coords(crystal_structure) -> dict[str, list[float]]:
         """
         Returns the coordinates of atoms based on the crystal structure.
 
         Returns:
-            List: A list of coordinates of atoms.
+            dict[str, list[float]: The coordinates of atoms based on the crystal structure.
         Raises:
             ValueError: If the crystal structure is invalid.
         """
@@ -149,12 +154,12 @@ class SqsgenTransformation:
         """
         return {"fcc": 4, "bcc": 2, "sc": 1}.get(crystal_structure.lower(), ValueError("Invalid crystal structure."))
 
-    def _determine_composition(self, supercell_size, composition) -> Dict[str, int]:
+    def _determine_composition(self, supercell_size, composition) -> dict[str, int]:
         """
         Determines the composition of the supercell.
 
         Returns:
-            Dict[str, int]: A dictionary containing the element symbols as keys and the corresponding
+            dict[str, int]: A dictionary containing the element symbols as keys and the corresponding
             number of atoms as values.
         """
         result = self._multiplier * reduce(operator.mul, supercell_size)

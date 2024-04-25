@@ -1,15 +1,20 @@
 """
 This module contains a class to calculate the cubic elastic constants of a given relaxed structure.
 """
+from __future__ import annotations
+
 import os
-from typing import Dict, List, Optional
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.analysis.eos import EOS
-from pymatgen.core import Structure
 
-from materialsframework.calculators import Calculator, M3GNetCalculator
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Calculator
+
+from materialsframework.calculators import M3GNetCalculator
 from materialsframework.transformations import CubicElasticConstantsDeformationTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -47,7 +52,7 @@ class CubicElasticConstantsAnalyzer:
         self._calculator = calculator
         self._cubic_transformation = cubic_transformation
 
-    def calculate(self, undeformed_structure: Structure) -> Dict:
+    def calculate(self, undeformed_structure: Structure) -> dict:
         """
         Calculates the cubic elastic constants for the given undeformed structure.
 
@@ -55,7 +60,7 @@ class CubicElasticConstantsAnalyzer:
             undeformed_structure (Structure): The undeformed relaxed structure.
 
         Returns:
-            Dict: A dictionary containing the calculated cubic elastic constants.
+            dict: A dictionary containing the calculated cubic elastic constants.
         """
         initial_volume: float = undeformed_structure.volume
 
@@ -113,16 +118,16 @@ class CubicElasticConstantsAnalyzer:
 
     def _fit_eos(
             self,
-            volumes: List[float],
-            energies: List[float]
+            volumes: list[float, ...],
+            energies: list[float, ...]
     ) -> float:
         """
         Fits the equation of state (EOS) to the given volumes and energies
         and returns the bulk modulus.
 
         Parameters:
-            volumes (List[float]): A list of volumes.
-            energies (List[float]): A list of energies.
+            volumes (list[float, ...]): A list of volumes.
+            energies (list[float, ...]): A list of energies.
 
         Returns:
             float: The bulk modulus obtained from the EOS fit in GPa.
@@ -132,8 +137,8 @@ class CubicElasticConstantsAnalyzer:
 
     @staticmethod
     def _fit_poly(
-            deltas: List[float],
-            energies: List[float],
+            deltas: list[float, ...],
+            energies: list[float, ...],
             degree: int = 2
     ) -> float:
         """
@@ -141,8 +146,8 @@ class CubicElasticConstantsAnalyzer:
         and calculates the second order coefficient.
 
         Parameters:
-            deltas (List[float]): The array of delta values.
-            energies (List[float]): The array of energy values.
+            deltas (list[float, ...]): The array of delta values.
+            energies (list[float, ...]): The array of energy values.
             degree (int): The degree of the polynomial to fit. Default is 2.
 
         Returns:

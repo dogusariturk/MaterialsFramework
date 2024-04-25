@@ -1,12 +1,17 @@
 """
 This module provides classes to perform calculations using the MEGNet potential.
 """
-import matgl
-from matgl.models import MEGNet
-from pymatgen.core import Structure
-from torch import Tensor
+from __future__ import annotations
 
-from materialsframework.calculators import Calculator
+from typing import TYPE_CHECKING
+
+import matgl
+
+if TYPE_CHECKING:
+    from matgl.models import MEGNet
+    from pymatgen.core import Structure
+
+from materialsframework.calculators.typing import Calculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -52,7 +57,7 @@ class MEGNetCalculator(Calculator):
             self._potential = matgl.load_model(self._model)
         return self._potential
 
-    def calculate(self, structure: Structure) -> Tensor:
+    def calculate(self, structure: Structure) -> dict[str, float]:
         """
         Calculate the formation energy of a structure using the MEGNet potential.
 
@@ -60,7 +65,7 @@ class MEGNetCalculator(Calculator):
             structure: The input structure.
 
         Returns:
-            Tensor: The formation energy of the structure.
+            dict[str, float]: A dictionary containing the formation energy of the structure.
 
         Examples:
             >>> calculator = MEGNetCalculator()

@@ -1,14 +1,19 @@
 """
 This module provides a class to calculate phonon properties of a structure using Phonopy.
 """
+from __future__ import annotations
+
 import os
-from typing import List, Optional
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import ArrayLike
-from pymatgen.core import Structure
 
-from materialsframework.calculators import Calculator, M3GNetCalculator
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Calculator
+
+from materialsframework.calculators import M3GNetCalculator
 from materialsframework.transformations import PhonopyDisplacementTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -49,8 +54,8 @@ class PhonopyAnalyzer:
             structure: Structure,
             is_relaxed: bool = False,
             distance: float = 0.01,
-            supercell_matrix: Optional[List] = None,
-            primitive_matrix: Optional[List] = None,
+            supercell_matrix: Optional[list] = None,
+            primitive_matrix: Optional[list] = None,
             mesh: Optional[ArrayLike | float] = None,
             pdos_mesh: Optional[ArrayLike | float] = None,
             sigma: Optional[float] = None,
@@ -69,8 +74,8 @@ class PhonopyAnalyzer:
             structure (Structure): The structure to calculate the phonon properties.
             is_relaxed (bool): Whether the structure is relaxed. Defaults to False.
             distance (float): The distance to displace the atoms for the force calculations. Defaults to 0.01.
-            supercell_matrix (List): The supercell matrix to use for the phonon calculations.
-            primitive_matrix (List): The primitive matrix to use for the phonon calculations.
+            supercell_matrix (list): The supercell matrix to use for the phonon calculations.
+            primitive_matrix (list): The primitive matrix to use for the phonon calculations.
             mesh (ArrayLike | float): The mesh to use for the phonon calculations.
             pdos_mesh (ArrayLike | float): The mesh to use for the phonon calculations for PDOS.
             sigma (float): The smearing width for smearing method to use for the total DOS.

@@ -1,12 +1,16 @@
 """
 This module provides a class to perform a Bain transformation on a given structure.
 """
+from __future__ import annotations
+
 import os
-from typing import Dict, Optional
+from typing import Optional, TYPE_CHECKING
 
-from pymatgen.core import Structure
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Calculator
 
-from materialsframework.calculators import Calculator, M3GNetCalculator
+from materialsframework.calculators import M3GNetCalculator
 from materialsframework.transformations import BainDisplacementTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -37,7 +41,7 @@ class BainPathAnalyzer:
         self._calculator = calculator
         self._bain_transformation = bain_transformation
 
-    def calculate(self, undeformed_structure: Structure) -> Dict:
+    def calculate(self, undeformed_structure: Structure) -> dict:
         """
         Calculates the potential energies along the Bain Path for the given undeformed structure.
 
@@ -45,7 +49,7 @@ class BainPathAnalyzer:
             undeformed_structure (Structure): The undeformed relaxed structure.
 
         Returns:
-            Dict: A dictionary containing the c_a ratios and calculated potential energies along the Bain Path.
+            dict: A dictionary containing the c_a ratios and calculated potential energies along the Bain Path.
         """
         self.bain_transformation.apply_transformation(structure=undeformed_structure)
 

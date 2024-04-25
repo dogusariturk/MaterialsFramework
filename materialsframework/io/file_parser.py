@@ -2,7 +2,6 @@
 This module provides a class to parse files and extract compositions of elements.
 """
 import os
-from typing import List
 
 import pandas as pd
 from pymatgen.core import Composition, Element
@@ -24,7 +23,7 @@ class FileParser:
         """
         Initializes the Parser object.
         """
-        self._element_list: List[str] = [Element.from_Z(i).symbol for i in range(1, 103)]
+        self._element_list: list[str, ...] = [Element.from_Z(i).symbol for i in range(1, 103)]
 
     def parse(self, filename: str) -> pd.DataFrame:
         """

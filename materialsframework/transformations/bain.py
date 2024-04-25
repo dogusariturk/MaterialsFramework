@@ -1,12 +1,17 @@
 """
 This module provides a class to generate displaced structures along the Bain Path.
 """
+from __future__ import annotations
+
 import os
-from typing import Dict
+from typing import TYPE_CHECKING
 
 import numpy as np
-from pymatgen.core import Structure
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Relaxer
 
 from materialsframework.calculators import M3GNetRelaxer
 
@@ -56,7 +61,7 @@ class BainDisplacementTransformation:
         self._relaxer = None
 
         self.c_a_ratios: np.ndarray = np.arange(start=start, stop=stop, step=step)
-        self.displaced_structures: Dict[float, Structure] = {}
+        self.displaced_structures: dict[float, Structure] = {}
 
     def apply_transformation(
             self,
@@ -74,15 +79,15 @@ class BainDisplacementTransformation:
             self.displaced_structures[c_a] = self._get_displaced_structures(delta, structure)
 
     @property
-    def relaxer(self) -> M3GNetRelaxer:
+    def relaxer(self) -> Relaxer:
         """
-        Returns the M3GNetRelaxer instance.
+        Returns the Relaxer instance.
 
         If the relaxer instance is not already created, it creates a new M3GNetRelaxer instance
         and returns it. Otherwise, it returns the existing relaxer instance.
 
         Returns:
-            M3GNetRelaxer: The M3GNetRelaxer instance.
+            Relaxer: The Relaxer instance.
         """
         if self._relaxer is None:
             self._relaxer = M3GNetRelaxer(fmax=self._fmax,
@@ -120,9 +125,9 @@ class BainDisplacementTransformation:
         Returns:
             Structure: The displaced structure.
         """
-        transformation_matrix = np.array([[1 + delta, 0, 0],
-                                          [0, 1 + delta, 0],
-                                          [0, 0, 1 / (1 + delta) ** 2]])
+        transformation_matrix = ([[1 + delta, 0, 0],
+                                  [0, 1 + delta, 0],
+                                  [0, 0, 1 / (1 + delta) ** 2]])
 
         deformation = DeformStructureTransformation(deformation=transformation_matrix)
         return deformation.apply_transformation(structure)

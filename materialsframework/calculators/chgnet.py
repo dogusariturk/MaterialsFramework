@@ -1,13 +1,17 @@
 """
 This module provides classes to perform calculations using the CHGNet potential.
 """
-from typing import Dict, Optional, Tuple, Union
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING, Union
 
 from chgnet.model import CHGNet, CHGNetCalculator as CHGNetCalc, StructOptimizer
-from numpy import ndarray
-from pymatgen.core import Structure
 
-from materialsframework.calculators import Calculator, Relaxer
+if TYPE_CHECKING:
+    from numpy import ndarray
+    from pymatgen.core import Structure
+
+from materialsframework.calculators.typing import Calculator, Relaxer
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -98,7 +102,7 @@ class CHGNetRelaxer(Relaxer):
                                             use_device=self._use_device)
         return self._relaxer
 
-    def relax(self, structure: Structure) -> Tuple[Structure, float]:
+    def relax(self, structure: Structure) -> tuple[Structure, float]:
         """
         Performs the relaxation of the structure using the CHGNet calculator.
 
@@ -106,7 +110,7 @@ class CHGNetRelaxer(Relaxer):
             structure (Structure): The input structure.
 
         Returns:
-            Tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
+            tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
 
         Examples:
             >>> relaxer = CHGNetRelaxer()
@@ -201,7 +205,7 @@ class CHGNetCalculator(Calculator):
     def calculate(
             self,
             structure: Structure
-    ) -> Dict[str, Union[float, ndarray]]:
+    ) -> dict[str, Union[float, ndarray]]:
         """
         Calculates the potential energy, forces, stresses, and magmoms of the given structure.
 
@@ -209,7 +213,7 @@ class CHGNetCalculator(Calculator):
             structure (Structure): The structure for which the properties will be calculated.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the calculated properties.
+            dict[str, Any]: A dictionary containing the calculated properties.
 
         Examples:
             >>> calculator = CHGNetCalculator()

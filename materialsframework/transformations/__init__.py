@@ -1,3 +1,4 @@
+""" This module contains the transformation classes for generating structures."""
 from .bain import BainDisplacementTransformation
 from .elastic_constants import CubicElasticConstantsDeformationTransformation
 from .phono3py import Phono3pyDisplacementTransformation

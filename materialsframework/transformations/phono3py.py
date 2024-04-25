@@ -1,13 +1,18 @@
 """
 This module provides a class to generate distorted structures for Phono3py calculations.
 """
+from __future__ import annotations
+
 import os
-from typing import List, Optional, Tuple
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 from phono3py import Phono3py
-from pymatgen.core import Structure
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Calculator, Relaxer
 
 from materialsframework.calculators import M3GNetCalculator, M3GNetRelaxer
 
@@ -65,9 +70,9 @@ class Phono3pyDisplacementTransformation:
             self,
             structure: Structure,
             distance: float = 0.03,
-            supercell_matrix: Optional[List] = None,
-            primitive_matrix: Optional[List] = None,
-            phonon_supercell_matrix: Optional[List] = None,
+            supercell_matrix: Optional[list] = None,
+            primitive_matrix: Optional[list] = None,
+            phonon_supercell_matrix: Optional[list] = None,
             is_relaxed: bool = False,
             log_level: int = 0,
             **kwargs
@@ -78,9 +83,9 @@ class Phono3pyDisplacementTransformation:
         Args:
             structure (Structure): The input structure to be displaced.
             distance (float): The maximum distance to displace the atoms. Defaults to 0.03.
-            supercell_matrix (List): Supercell matrix used for second-order force constant calculations.
-            primitive_matrix (List): Primitive matrix used for second-order force constant calculations.
-            phonon_supercell_matrix (List): Supercell matrix used for third-order force constant calculations.
+            supercell_matrix (list): Supercell matrix used for second-order force constant calculations.
+            primitive_matrix (list): Primitive matrix used for second-order force constant calculations.
+            phonon_supercell_matrix (list): Supercell matrix used for third-order force constant calculations.
             is_relaxed (bool): Whether the input structure is already relaxed. Defaults to False.
             log_level (int): The log level to use for Phono3py. Defaults to 0.
             **kwargs: Additional keyword arguments to pass to the Phono3py.generate_displacement method.
@@ -106,15 +111,15 @@ class Phono3pyDisplacementTransformation:
         self.supercell_displacements = self.phonon.displacements
 
     @property
-    def relaxer(self) -> M3GNetRelaxer:
+    def relaxer(self) -> Relaxer:
         """
-        Returns the M3GNetRelaxer instance.
+        Returns the Relaxer instance.
 
         If the relaxer instance is not already created, it creates a new M3GNetRelaxer instance
         and returns it. Otherwise, it returns the existing relaxer instance.
 
         Returns:
-            M3GNetRelaxer: The M3GNetRelaxer instance.
+            Relaxer: The Relaxer instance.
         """
         if self._relaxer is None:
             self._relaxer = M3GNetRelaxer(fmax=self._fmax,
@@ -125,16 +130,16 @@ class Phono3pyDisplacementTransformation:
         return self._relaxer
 
     @property
-    def calculator(self) -> M3GNetCalculator:
+    def calculator(self) -> Calculator:
         """
-        Returns the M3GNetCalculator instance.
+        Returns the Calculator instance.
 
         If the calculator instance is not already created, it creates a new M3GNetCalculator
         instance with the specified potential and returns it. Otherwise, it returns the existing
         calculator instance.
 
         Returns:
-            M3GNetCalculator: The M3GNetCalculator instance.
+            Calculator: The Calculator instance.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator(model=self._model)
@@ -158,14 +163,14 @@ class Phono3pyDisplacementTransformation:
             distance: float = 0.03,
             is_plusminus: bool | str = "auto",
             is_diagonal: bool = True
-    ) -> Tuple[List[Structure], List[Structure]]:
+    ) -> tuple[list[Structure, ...], list[Structure, ...]]:
         """
         This method generates displaced structures using Phono3py.
 
         Args:
             distance (float): The maximum distance to displace the atoms.
         Returns:
-            List[Structure]: A list of displaced structures.
+            tuple[list[Structure, ...], list[Structure, ...]]: Two lists of displaced structures.
         """
         self.phonon.generate_displacements(distance=distance,
                                            is_plusminus=is_plusminus,

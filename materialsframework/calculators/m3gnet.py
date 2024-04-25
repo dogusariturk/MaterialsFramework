@@ -1,17 +1,21 @@
 """
 This module provides classes to perform calculations using the M3GNet potential.
 """
+from __future__ import annotations
+
 import os
-from typing import Dict, Tuple, Union
+from typing import TYPE_CHECKING, Union
 
 import matgl
 import numpy as np
-from matgl.apps.pes import Potential
 from matgl.ext.ase import PESCalculator, Relaxer as AseM3GNetRelaxer
-from numpy import ndarray
-from pymatgen.core import Structure
 
-from materialsframework.calculators import Calculator, Relaxer
+if TYPE_CHECKING:
+    from matgl.apps.pes import Potential
+    from numpy.typing import ArrayLike
+    from pymatgen.core import Structure
+
+from materialsframework.calculators.typing import Calculator, Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -94,7 +98,7 @@ class M3GNetRelaxer(Relaxer):
     def relax(
             self,
             structure: Structure,
-    ) -> Tuple[Structure, float]:
+    ) -> tuple[Structure, float]:
         """
         Performs the relaxation of the structure using the M3GNet calculator.
 
@@ -102,7 +106,7 @@ class M3GNetRelaxer(Relaxer):
             structure (Structure): The input structure.
 
         Returns:
-            Tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
+            tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
 
         Examples:
             >>> relaxer = M3GNetRelaxer()
@@ -177,7 +181,7 @@ class M3GNetCalculator(Calculator):
     def calculate(
             self,
             structure: Structure,
-    ) -> Dict[str, Union[float, ndarray]]:
+    ) -> dict[str, Union[float, ArrayLike]]:
         """
         Calculates the potential energy, forces, and stresses of the given structure.
 
@@ -185,7 +189,7 @@ class M3GNetCalculator(Calculator):
             structure (Structure): The structure for which the properties will be calculated.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the calculated properties.
+            dict[str, ArrayLike]: A dictionary containing the calculated properties.
 
         Examples:
             >>> calculator = M3GNetCalculator()

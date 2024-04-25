@@ -1,14 +1,19 @@
 """
 This module provides a class to generate distorted structures for elastic constant calculations.
 """
+from __future__ import annotations
+
 import os
-from typing import Dict, List, Tuple
+from typing import TYPE_CHECKING
 
 import numpy as np
-from pymatgen.core import Structure
 from pymatgen.transformations.standard_transformations import (
     DeformStructureTransformation,
 )
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Relaxer
 
 from materialsframework.calculators import M3GNetRelaxer
 
@@ -58,9 +63,9 @@ class CubicElasticConstantsDeformationTransformation:
                                               stop=delta_max,
                                               num=int(2 * delta_max / 0.01) + 1)
 
-        self.uniform_distorted_structures: Dict[float, Structure] = {}
-        self.orthorhombic_distorted_structures: Dict[float, Structure] = {}
-        self.monoclinic_distorted_structures: Dict[float, Structure] = {}
+        self.uniform_distorted_structures: dict[float, Structure] = {}
+        self.orthorhombic_distorted_structures: dict[float, Structure] = {}
+        self.monoclinic_distorted_structures: dict[float, Structure] = {}
 
     def apply_transformation(
             self,
@@ -84,15 +89,15 @@ class CubicElasticConstantsDeformationTransformation:
                 self._apply_monoclinic_distortion(delta, structure)
 
     @property
-    def relaxer(self) -> M3GNetRelaxer:
+    def relaxer(self) -> Relaxer:
         """
-        Returns the M3GNetRelaxer instance.
+        Returns the Relaxer instance.
 
         If the relaxer instance is not already created, it creates a new M3GNetRelaxer instance
         and returns it. Otherwise, it returns the existing relaxer instance.
 
         Returns:
-            M3GNetRelaxer: The M3GNetRelaxer instance.
+            Relaxer: The Relaxer instance.
         """
         if self._relaxer is None:
             self._relaxer = M3GNetRelaxer(fmax=self._fmax,
@@ -164,13 +169,13 @@ class CubicElasticConstantsDeformationTransformation:
         )
 
     @staticmethod
-    def _apply_deformation(structure: Structure, deformation: Tuple) -> Structure:
+    def _apply_deformation(structure: Structure, deformation: tuple) -> Structure:
         """
         Applies the deformation to the structure.
 
         Args:
             structure (Structure): The input structure to be deformed.
-            deformation (List): The deformation matrix to be applied.
+            deformation (tuple): The deformation matrix to be applied.
 
         Returns:
             Structure: The deformed structure.

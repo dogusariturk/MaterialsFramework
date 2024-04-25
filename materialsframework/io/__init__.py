@@ -1,3 +1,4 @@
+""" This module provides tools for parsing and writing files. """
 from .file_parser import FileParser
 
 __author__ = "Doguhan Sariturk"

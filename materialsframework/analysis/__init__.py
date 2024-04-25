@@ -1,3 +1,4 @@
+""" This module contains the analysis tools for MaterialsFramework. """
 from .bain import BainPathAnalyzer
 from .elastic_constants import CubicElasticConstantsAnalyzer
 from .phono3py import Phono3pyAnalyzer

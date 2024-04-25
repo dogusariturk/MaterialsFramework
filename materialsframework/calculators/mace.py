@@ -1,14 +1,18 @@
 """
 This module provides classes to perform calculations using the MACE potential.
 """
+from __future__ import annotations
+
 import os
-from typing import Dict, Optional, Union
+from typing import Optional, TYPE_CHECKING, Union
 
 from mace.calculators import MACECalculator as ASEMACECalculator
-from numpy import ndarray
-from pymatgen.core import Structure
 
-from materialsframework.calculators import Calculator
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+    from pymatgen.core import Structure
+
+from materialsframework.calculators.typing import Calculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -91,7 +95,7 @@ class MACECalculator(Calculator):
     def calculate(
             self,
             structure: Structure
-    ) -> Dict[str, Union[float, ndarray]]:
+    ) -> dict[str, Union[float, ArrayLike]]:
         """
         Calculate the potential energy, free energy, forces, and stresses
         of a structure using the MACE potential.
@@ -100,7 +104,7 @@ class MACECalculator(Calculator):
             structure: The input structure.
 
         Returns:
-            Dict[str, Union[float, ndarray]]: A dictionary containing the calculated properties.
+            dict[str, Union[float, ArrayLike]]: A dictionary containing the calculated properties.
 
         Examples:
             >>> calculator = MACECalculator(device="cuda", default_dtype="float64")

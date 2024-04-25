@@ -1,14 +1,19 @@
 """
 This module provides a class to calculate phonon properties of a structure using Phono3py.
 """
+from __future__ import annotations
+
 import os
-from typing import List, Optional
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import ArrayLike
-from pymatgen.core import Structure
 
-from materialsframework.calculators import Calculator, M3GNetCalculator
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+    from pymatgen.core import Structure
+    from materialsframework.calculators import Calculator
+
+from materialsframework.calculators import M3GNetCalculator
 from materialsframework.transformations import Phono3pyDisplacementTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -47,9 +52,9 @@ class Phono3pyAnalyzer:
             structure: Structure,
             is_relaxed: bool = False,
             distance: float = 0.01,
-            supercell_matrix: Optional[List] = None,
-            primitive_matrix: Optional[List] = None,
-            phonon_supercell_matrix: Optional[List] = None,
+            supercell_matrix: Optional[list] = None,
+            primitive_matrix: Optional[list] = None,
+            phonon_supercell_matrix: Optional[list] = None,
             mesh: Optional[ArrayLike | float] = None,
             is_lbte: bool = False,
             t_min: Optional[float] = 0,
@@ -64,9 +69,9 @@ class Phono3pyAnalyzer:
             structure (Structure): The structure to calculate phonon properties.
             is_relaxed (bool): Whether the structure is relaxed. Defaults to False.
             distance (float): The distance to displace atoms for forces. Defaults to 0.01.
-            supercell_matrix (List): The supercell matrix. Defaults to None.
-            primitive_matrix (List): The primitive matrix. Defaults to None.
-            phonon_supercell_matrix (List): The phonon supercell matrix. Defaults to None.
+            supercell_matrix (list): The supercell matrix. Defaults to None.
+            primitive_matrix (list): The primitive matrix. Defaults to None.
+            phonon_supercell_matrix (list): The phonon supercell matrix. Defaults to None.
             mesh (ArrayLike | float): The mesh numbers for phonon calculations. Defaults to None.
             is_lbte (bool): Whether to use LBTE for thermal conductivity. Defaults to False.
             t_min (float): The minimum temperature for thermal conductivity. Defaults to 0.

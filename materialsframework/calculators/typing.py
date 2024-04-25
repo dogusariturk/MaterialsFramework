@@ -1,8 +1,11 @@
-"""Base class for all calculators"""
+"""Base class for calculators, relaxers"""
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from pymatgen.core import Structure
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
 
 
 class Calculator(ABC):
@@ -16,3 +19,11 @@ class Calculator(ABC):
     @abstractmethod
     def calculate(self, structure: Structure):
         """Performs the calculation on the input structure and returns the results."""
+
+
+class Relaxer(ABC):
+    """Base class for all relaxers"""
+
+    @abstractmethod
+    def relax(self, structure: Structure):
+        """Relaxes the input structure and returns the relaxed structure and other information."""
