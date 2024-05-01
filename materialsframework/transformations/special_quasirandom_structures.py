@@ -166,7 +166,7 @@ class SqsgenTransformation:
 
         return {
                 el: int(amt * result)
-                for el, amt in composition.to_reduced_dict.items()
+                for el, amt in composition.fractional_composition.to_reduced_dict.items()
         }
 
     def _parse_results_for_structure(self) -> Structure:
