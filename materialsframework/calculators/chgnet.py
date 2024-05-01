@@ -7,11 +7,11 @@ from typing import Optional, TYPE_CHECKING, Union
 
 from chgnet.model import CHGNet, CHGNetCalculator as CHGNetCalc, StructOptimizer
 
+from materialsframework.calculators.typing import Calculator, Relaxer
+
 if TYPE_CHECKING:
     from numpy import ndarray
     from pymatgen.core import Structure
-
-from materialsframework.calculators.typing import Calculator, Relaxer
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

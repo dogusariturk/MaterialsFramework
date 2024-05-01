@@ -11,11 +11,11 @@ from pymatgen.transformations.standard_transformations import (
     DeformStructureTransformation,
 )
 
+from materialsframework.calculators import M3GNetRelaxer
+
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.calculators import Relaxer
-
-from materialsframework.calculators import M3GNetRelaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

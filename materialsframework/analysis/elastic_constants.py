@@ -10,12 +10,12 @@ import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.analysis.eos import EOS
 
+from materialsframework.calculators import M3GNetCalculator
+from materialsframework.transformations import CubicElasticConstantsDeformationTransformation
+
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.calculators import Calculator
-
-from materialsframework.calculators import M3GNetCalculator
-from materialsframework.transformations import CubicElasticConstantsDeformationTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

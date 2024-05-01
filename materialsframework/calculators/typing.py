@@ -1,4 +1,4 @@
-"""Base class for calculators, relaxers"""
+"""Base classes for calculators, relaxers"""
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
+
+__author__ = "Doguhan Sariturk"
+__email__ = "dogu.sariturk@gmail.com"
 
 
 class Calculator(ABC):

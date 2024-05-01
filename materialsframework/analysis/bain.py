@@ -6,12 +6,12 @@ from __future__ import annotations
 import os
 from typing import Optional, TYPE_CHECKING
 
+from materialsframework.calculators import M3GNetCalculator
+from materialsframework.transformations import BainDisplacementTransformation
+
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.calculators import Calculator
-
-from materialsframework.calculators import M3GNetCalculator
-from materialsframework.transformations import BainDisplacementTransformation
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
