@@ -165,7 +165,7 @@ class SqsgenTransformation:
         result = self._multiplier * reduce(operator.mul, supercell_size)
 
         return {
-                el: int(amt * result)
+                el: int(round(amt, 3) * result)
                 for el, amt in composition.fractional_composition.to_reduced_dict.items()
         }
 
