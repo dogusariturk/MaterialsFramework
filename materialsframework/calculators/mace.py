@@ -8,11 +8,11 @@ from typing import Optional, TYPE_CHECKING, Union
 
 from mace.calculators import MACECalculator as ASEMACECalculator
 
+from materialsframework.calculators.typing import Calculator
+
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
     from pymatgen.core import Structure
-
-from materialsframework.calculators.typing import Calculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

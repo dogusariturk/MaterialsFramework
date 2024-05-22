@@ -8,13 +8,13 @@ from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 
+from materialsframework.calculators import M3GNetCalculator
+from materialsframework.transformations import PhonopyDisplacementTransformation
+
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
     from pymatgen.core import Structure
-    from materialsframework.calculators import Calculator
-
-from materialsframework.calculators import M3GNetCalculator
-from materialsframework.transformations import PhonopyDisplacementTransformation
+    from materialsframework.calculators.typing import Calculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

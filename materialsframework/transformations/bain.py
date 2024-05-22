@@ -13,7 +13,7 @@ from materialsframework.calculators import M3GNetRelaxer
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.calculators import Relaxer
+    from materialsframework.calculators.typing import Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

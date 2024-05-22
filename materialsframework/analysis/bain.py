@@ -11,7 +11,7 @@ from materialsframework.transformations import BainDisplacementTransformation
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.calculators import Calculator
+    from materialsframework.calculators.typing import Calculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

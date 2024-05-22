@@ -10,11 +10,11 @@ import numpy as np
 from phono3py import Phono3py
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
 
+from materialsframework.calculators import M3GNetCalculator, M3GNetRelaxer
+
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.calculators import Calculator, Relaxer
-
-from materialsframework.calculators import M3GNetCalculator, M3GNetRelaxer
+    from materialsframework.calculators.typing import Calculator, Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

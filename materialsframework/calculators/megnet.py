@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING
 
 import matgl
 
+from materialsframework.calculators.typing import Calculator
+
 if TYPE_CHECKING:
     from matgl.models import MEGNet
     from pymatgen.core import Structure
-
-from materialsframework.calculators.typing import Calculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

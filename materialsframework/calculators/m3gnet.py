@@ -10,12 +10,12 @@ import matgl
 import numpy as np
 from matgl.ext.ase import PESCalculator, Relaxer as AseM3GNetRelaxer
 
+from materialsframework.calculators.typing import Calculator, Relaxer
+
 if TYPE_CHECKING:
     from matgl.apps.pes import Potential
     from numpy.typing import ArrayLike
     from pymatgen.core import Structure
-
-from materialsframework.calculators.typing import Calculator, Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
