@@ -66,7 +66,7 @@ class PhonopyAnalyzer:
             t_max: Optional[float] = 1000,
             t_step: Optional[float] = 10,
             log_level: int = 0
-    ) -> None:
+    ) -> dict:
         """
         Calculates the phonon properties of the given structure.
 
@@ -86,6 +86,9 @@ class PhonopyAnalyzer:
             t_max (float): The maximum temperature to use for the thermal properties.
             t_step (float): The step to use for the thermal properties.
             log_level (int): The log level to use for the phonon calculations. Defaults to 0.
+
+        Returns:
+            dict: A dictionary containing the calculated total DOS, thermal properties, and projected DOS.
         """
         mesh = mesh or [20, 20, 20]
         pdos_mesh = pdos_mesh or [10, 10, 10]

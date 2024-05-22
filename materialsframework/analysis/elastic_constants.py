@@ -52,19 +52,21 @@ class CubicElasticConstantsAnalyzer:
         self._calculator = calculator
         self._cubic_transformation = cubic_transformation
 
-    def calculate(self, undeformed_structure: Structure) -> dict:
+    def calculate(self, undeformed_structure: Structure, is_relaxed: bool = False) -> dict:
         """
         Calculates the cubic elastic constants for the given undeformed structure.
 
         Parameters:
             undeformed_structure (Structure): The undeformed relaxed structure.
+            is_relaxed (bool): Whether the undeformed structure is already relaxed. Default is False.
 
         Returns:
             dict: A dictionary containing the calculated cubic elastic constants.
         """
         initial_volume: float = undeformed_structure.volume
 
-        self.cubic_transformation.apply_transformation(structure=undeformed_structure)
+        self.cubic_transformation.apply_transformation(structure=undeformed_structure,
+                                                       is_relaxed=is_relaxed)
 
         bulk_modulus = self._get_bulk_modulus()
         tetragonal_shear_modulus = self._get_tetragonal_shear_modulus(initial_volume)

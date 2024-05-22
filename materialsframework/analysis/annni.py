@@ -45,7 +45,7 @@ class ANNNIStackingFaultAnalyzer:
         self._relaxer = relaxer
         self._annni_transformation = annni_transformation
 
-    def calculate(self, composition: Composition):
+    def calculate(self, composition: Composition) -> dict:
         """
         Calculates the intrinsic and extrinsic stacking fault energies using the second-order ANNNI formulae.
 

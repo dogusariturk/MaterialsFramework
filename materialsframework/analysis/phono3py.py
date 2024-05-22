@@ -61,7 +61,7 @@ class Phono3pyAnalyzer:
             t_max: Optional[float] = 1000,
             t_step: Optional[float] = 10,
             log_level: int = 0
-    ) -> None:
+    ) -> dict:
         """
         Calculates the phonon properties of the given structure.
 
@@ -78,6 +78,9 @@ class Phono3pyAnalyzer:
             t_max (float): The maximum temperature for thermal conductivity. Defaults to 1000.
             t_step (float): The temperature step for thermal conductivity. Defaults to 10.
             log_level (int): The log level for the calculations. Defaults to 0.
+
+        Returns:
+            dict: A dictionary containing the calculated thermal conductivity.
         """
         mesh = mesh or [20, 20, 20]
 

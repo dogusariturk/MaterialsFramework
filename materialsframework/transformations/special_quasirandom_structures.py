@@ -62,7 +62,7 @@ class SqsgenTransformation:
             crystal_structure: str = "FCC",
             supercell_size: int = (5, 5, 5),
             shell_weights: Optional[dict[int, float]] = None,
-    ) -> Structure:
+    ) -> dict[Structure, float]:
         """
         Generates a supercell using the SQS (Special Quasirandom Structures) method.
 
@@ -144,6 +144,8 @@ class SqsgenTransformation:
             if crystal_structure in ['bcc', 'b2']:
                 avg_radius *= 4 / np.sqrt(3)
             lattice = Lattice.cubic(avg_radius)
+        else:
+            raise ValueError("Invalid crystal structure.")
 
         return lattice.matrix
 

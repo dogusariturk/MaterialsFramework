@@ -28,7 +28,8 @@ class ANNNIStackingFaultTransformation:
 
     def __init__(
             self,
-            sqs_transformation: Optional[SqsgenTransformation] = None):
+            sqs_transformation: Optional[SqsgenTransformation] = None
+    ) -> None:
         """
         Initializes the ANNNIStackingFaultTransformation object.
 
@@ -47,7 +48,8 @@ class ANNNIStackingFaultTransformation:
             dhcp_supercell_size: int = (5, 5, 5),
             fcc_shell_weights: Optional[dict[int, float]] = None,
             hcp_shell_weights: Optional[dict[int, float]] = None,
-            dhcp_shell_weights: Optional[dict[int, float]] = None):
+            dhcp_shell_weights: Optional[dict[int, float]] = None
+    ) -> None:
         """
         Applies the transformation to generate ANNNI stacking fault structures.
 
@@ -81,7 +83,7 @@ class ANNNIStackingFaultTransformation:
         self.structures['dhcp'] = dhcp['structure']
 
     @property
-    def sqs_transformation(self):
+    def sqs_transformation(self) -> SqsgenTransformation:
         """
         The SqsgenTransformation object used to generate SQS structures.
         Returns the SqsgenTransformation instance.
