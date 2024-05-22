@@ -4,7 +4,7 @@ This module provides a class to generate distorted structures for elastic consta
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
@@ -31,30 +31,16 @@ class CubicElasticConstantsDeformationTransformation:
     def __init__(
             self,
             delta_max: float = 0.05,
-            fmax: float = 1e-5,
-            relax_cell: bool = True,
-            verbose: bool = False,
-            steps: int = 1000,
-            model: str = "M3GNet-MP-2021.2.8-PES"
+            relaxer: Optional[Relaxer] = None,
     ) -> None:
         """
         Initializes the CubicElasticConstantsDeformationTransformation.
 
         Args:
             delta_max (float): The maximum delta value for distortions. Defaults to 0.05.
-            fmax (float): The maximum force tolerance for relaxation. Defaults to 1e-5.
-            relax_cell (bool): Whether to relax the lattice cell. Defaults to True.
-            verbose (bool): Whether to print verbose output during relaxation. Defaults to False.
-            steps (int): The maximum number of relaxation steps. Defaults to 1000.
-            model (str): The potential model to use for relaxation. Defaults to "M3GNet-MP-2021.2.8-PES".
+            relaxer (Optional[Relaxer]): The Relaxer object to use for relaxation. Default is M3GNetRelaxer.
         """
-        self._fmax = fmax
-        self._relax_cell = relax_cell
-        self._verbose = verbose
-        self._steps = steps
-        self._model = model
-
-        self._relaxer = None
+        self._relaxer = relaxer
 
         # TODO: The step size of 0.01 can be an input parameter
         self.deltas: np.ndarray = np.linspace(start=-1 * delta_max,
@@ -98,11 +84,7 @@ class CubicElasticConstantsDeformationTransformation:
             Relaxer: The Relaxer instance.
         """
         if self._relaxer is None:
-            self._relaxer = M3GNetRelaxer(fmax=self._fmax,
-                                          relax_cell=self._relax_cell,
-                                          verbose=self._verbose,
-                                          steps=self._steps,
-                                          model=self._model)
+            self._relaxer = M3GNetRelaxer()
         return self._relaxer
 
     def _relax_structure(self, structure: Structure) -> Structure:

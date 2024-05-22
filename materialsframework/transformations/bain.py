@@ -4,7 +4,7 @@ This module provides a class to generate displaced structures along the Bain Pat
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
@@ -33,11 +33,7 @@ class BainDisplacementTransformation:
             start: float = 0.89,
             stop: float = 1.4,
             step: float = 0.01,
-            fmax: float = 1e-5,
-            relax_cell: bool = True,
-            verbose: bool = False,
-            steps: int = 1000,
-            model: str = "M3GNet-MP-2021.2.8-PES"
+            relaxer: Optional[Relaxer] = None,
     ) -> None:
         """
         Initializes the BainDisplacementTransformation.
@@ -46,19 +42,9 @@ class BainDisplacementTransformation:
             start (float): The starting displacement value. Defaults to 0.89.
             stop (float): The stopping displacement value. Defaults to 1.4.
             step (float): The step size for the displacement values. Defaults to 0.01.
-            fmax (float): The maximum force tolerance for relaxation. Defaults to 1e-5.
-            relax_cell (bool): Whether to relax the lattice cell. Defaults to True.
-            verbose (bool): Whether to print verbose output. Defaults to False.
-            steps (int): The maximum number of relaxation steps. Defaults to 1000.
-            model (str): The potential model to use for relaxation. Defaults to "M3GNet-MP-2021.2.8-PES".
+            relaxer (Optional[Relaxer]): The Relaxer object to use for relaxation. Default is M3GNetRelaxer.
         """
-        self._fmax = fmax
-        self._relax_cell = relax_cell
-        self._verbose = verbose
-        self._steps = steps
-        self._model = model
-
-        self._relaxer = None
+        self._relaxer = relaxer
 
         self.c_a_ratios: np.ndarray = np.arange(start=start, stop=stop, step=step)
         self.displaced_structures: dict[float, Structure] = {}
@@ -90,11 +76,7 @@ class BainDisplacementTransformation:
             Relaxer: The Relaxer instance.
         """
         if self._relaxer is None:
-            self._relaxer = M3GNetRelaxer(fmax=self._fmax,
-                                          relax_cell=self._relax_cell,
-                                          verbose=self._verbose,
-                                          steps=self._steps,
-                                          model=self._model)
+            self._relaxer = M3GNetRelaxer()
         return self._relaxer
 
     def _relax_structure(self, structure: Structure) -> Structure:

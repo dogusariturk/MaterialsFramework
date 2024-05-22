@@ -31,30 +31,18 @@ class PhonopyDisplacementTransformation:
 
     def __init__(
             self,
-            fmax: float = 1e-5,
-            relax_cell: bool = True,
-            verbose: bool = False,
-            steps: int = 1000,
-            model: str = "M3GNet-MP-2021.2.8-PES"
+            relaxer: Optional[Relaxer] = None,
+            calculator: Optional[Calculator] = None,
     ) -> None:
         """
         Initializes the PhonopyDisplacementTransformation.
 
         Args:
-            fmax (float): The maximum force tolerance for relaxation. Defaults to 1e-5.
-            relax_cell (bool): Whether to relax the lattice cell. Defaults to True.
-            verbose (bool): Whether to print verbose output. Defaults to False.
-            steps (int): The maximum number of relaxation steps. Defaults to 1000.
-            model (str): The potential model to use for relaxation. Defaults to "M3GNet-MP-2021.2.8-PES".
+            relaxer (Relaxer): The Relaxer instance to use for relaxation. Defaults to M3GNetRelaxer.
+            calculator (Calculator): The Calculator instance to use for calculations. Defaults to M3GNetCalculator.
         """
-        self._fmax = fmax
-        self._relax_cell = relax_cell
-        self._verbose = verbose
-        self._steps = steps
-        self._model = model
-
-        self._relaxer = None
-        self._calculator = None
+        self._relaxer = relaxer
+        self._calculator = calculator
 
         self.phonon = None
         self.displacements = None
@@ -109,11 +97,7 @@ class PhonopyDisplacementTransformation:
             Relaxer: The Relaxer instance.
         """
         if self._relaxer is None:
-            self._relaxer = M3GNetRelaxer(fmax=self._fmax,
-                                          relax_cell=self._relax_cell,
-                                          verbose=self._verbose,
-                                          steps=self._steps,
-                                          model=self._model)
+            self._relaxer = M3GNetRelaxer()
         return self._relaxer
 
     @property
@@ -129,7 +113,7 @@ class PhonopyDisplacementTransformation:
             Calculator: The Calculator instance.
         """
         if self._calculator is None:
-            self._calculator = M3GNetCalculator(model=self._model)
+            self._calculator = M3GNetCalculator()
         return self._calculator
 
     def _relax_structure(self, structure: Structure) -> Structure:
