@@ -1,8 +1,8 @@
 """ This module contains the calculators for MaterialsFramework. """
-from materialsframework.calculators.chgnet import CHGNetCalculator, CHGNetRelaxer
-from materialsframework.calculators.m3gnet import M3GNetCalculator, M3GNetRelaxer
-from materialsframework.calculators.mace import MACECalculator
-from materialsframework.calculators.megnet import MEGNetCalculator
+from .chgnet import CHGNetCalculator, CHGNetRelaxer
+from .m3gnet import M3GNetCalculator, M3GNetRelaxer
+from .mace import MACECalculator
+from .megnet import MEGNetCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

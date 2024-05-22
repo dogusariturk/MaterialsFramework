@@ -73,13 +73,15 @@ class SqsgenTransformation:
             shell_weights (Optional[dict[int, float]]): The weights for the coordination shells. Default is None.
 
         Returns:
-            sqs_structure (Structure): The generated SQS structure.
+            dict (Structure, float): A dictionary containing the resulting sqs and the objective value.
         """
         self._supercell_size = supercell_size
-        self._lattice = self._get_lattice(composition=composition)
-        self._coords = self._get_coords(crystal_structure=crystal_structure)
-        self._multiplier = self._get_multiplier(crystal_structure=crystal_structure)
-        self._composition = self._determine_composition(supercell_size=self._supercell_size, composition=composition)
+        self._lattice = self._get_lattice(composition=composition,
+                                          crystal_structure=crystal_structure.lower())
+        self._coords = self._get_coords(crystal_structure=crystal_structure.lower())
+        self._multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
+        self._composition = self._determine_composition(supercell_size=self._supercell_size,
+                                                        composition=composition)
 
         if shell_weights is None:
             shell_weights: dict[int, float] = {
@@ -109,18 +111,39 @@ class SqsgenTransformation:
         self._sqs = self._parse_results_for_structure()
         self._objective = self._parse_results_for_objective()
 
-        return self._sqs
+        return {
+                'structure': self._sqs,
+                'objective': self._objective
+        }
 
     @staticmethod
-    def _get_lattice(composition) -> ArrayLike:
+    def _get_lattice(composition, crystal_structure) -> ArrayLike:
         """
-        Calculates and returns the lattice for the given composition.
+        Calculates and returns the lattice for the given composition and crystal structure.
+
+        BE CAREFUL: This function returns conventional unit cells except for the HCP and DHCP structures.
+
+        Args:
+            composition (Composition): The composition of the supercell.
+            crystal_structure (str): The crystal structure of the supercell.
 
         Returns:
             ArrayLike: The calculated lattice.
         """
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
-        lattice = Lattice.cubic(avg_radius)
+
+        if crystal_structure in ['hcp', 'dhcp']:
+            a_param = avg_radius * 2
+            c_param = a_param * np.sqrt(8.0 / 3.0)
+            if crystal_structure == 'dhcp':
+                c_param *= 2
+            lattice = Lattice.hexagonal(a_param, c_param).get_niggli_reduced_lattice()
+        elif crystal_structure in ['fcc', 'bcc', 'b2', 'sc']:
+            if crystal_structure == 'fcc':
+                avg_radius *= 2 * np.sqrt(2)
+            if crystal_structure in ['bcc', 'b2']:
+                avg_radius *= 4 / np.sqrt(3)
+            lattice = Lattice.cubic(avg_radius)
 
         return lattice.matrix
 
@@ -129,14 +152,30 @@ class SqsgenTransformation:
         """
         Returns the coordinates of atoms based on the crystal structure.
 
+        Args:
+            crystal_structure (str): The crystal structure of the supercell.
+
         Returns:
             dict[str, list[float]: The coordinates of atoms based on the crystal structure.
         Raises:
             ValueError: If the crystal structure is invalid.
         """
-        return {"fcc": [[0.0, 0.0, 0.0], [0.5, 0.5, 0], [0.5, 0, 0.5], [0.0, 0.5, 0.5]],
-                "bcc": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]],
-                "sc": [[0.0, 0.0, 0.0]]}.get(crystal_structure.lower(), ValueError("Invalid crystal structure."))
+        return {"fcc": [[0.0, 0.0, 0.0],
+                        [0.5, 0.5, 0],
+                        [0.5, 0, 0.5],
+                        [0.0, 0.5, 0.5]],
+                "bcc": [[0.0, 0.0, 0.0],
+                        [0.5, 0.5, 0.5]],
+                "sc": [[0.0, 0.0, 0.0]],
+                "hcp": [[1.0 / 3.0, 2.0 / 3.0, 1.0 / 4.0],
+                        [2.0 / 3.0, 1.0 / 3.0, 3.0 / 4.0]],
+                "dhcp": [[0, 0, 0],
+                         [0, 0, 1.0 / 2.0],
+                         [1.0 / 3.0, 2.0 / 3.0, 1.0 / 4.0],
+                         [2.0 / 3.0, 1.0 / 3.0, 3.0 / 4.0], ],
+                "b2": [[0.0, 0.0, 0.0],
+                       [0.5, 0.5, 0.5]],
+                }.get(crystal_structure, ValueError("Invalid crystal structure."))
 
     @staticmethod
     def _get_multiplier(crystal_structure) -> int:
@@ -144,7 +183,7 @@ class SqsgenTransformation:
         Returns the multiplier for the given crystal structure.
 
         Args:
-            crystal_structure (str): The crystal structure.
+            crystal_structure (str): The crystal structure of the supercell.
 
         Returns:
             int: The multiplier for the given crystal structure.
@@ -152,11 +191,19 @@ class SqsgenTransformation:
         Raises:
             ValueError: If the crystal structure is invalid.
         """
-        return {"fcc": 4, "bcc": 2, "sc": 1}.get(crystal_structure.lower(), ValueError("Invalid crystal structure."))
+        return {"fcc": 4,
+                "bcc": 2,
+                "sc": 1,
+                "hcp": 2,
+                "dhcp": 4}.get(crystal_structure, ValueError("Invalid crystal structure."))
 
     def _determine_composition(self, supercell_size, composition) -> dict[str, int]:
         """
         Determines the composition of the supercell.
+
+        Args:
+            supercell_size (tuple[int, int, int]): The size of the supercell.
+            composition (Composition): The composition of the supercell.
 
         Returns:
             dict[str, int]: A dictionary containing the element symbols as keys and the corresponding
