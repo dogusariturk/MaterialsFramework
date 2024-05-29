@@ -13,7 +13,6 @@ from pymatgen.core import Lattice
 from sqsgenerator import sqs_optimize
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
     from pymatgen.core import Composition, Structure
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -60,7 +59,7 @@ class SqsgenTransformation:
             self,
             composition: Composition,
             crystal_structure: str = "FCC",
-            supercell_size: int = (5, 5, 5),
+            supercell_size: tuple[int, int, int] = (5, 5, 5),
             shell_weights: Optional[dict[int, float]] = None,
     ) -> dict[Structure, float]:
         """
@@ -69,31 +68,27 @@ class SqsgenTransformation:
         Args:
             composition (Composition): The composition of the supercell.
             crystal_structure (str): The crystal structure of the supercell. Default is "FCC".
-            supercell_size (int): The size of the supercell. Default is (5, 5, 5).
+            supercell_size (tuple[int, int, int]): The size of the supercell. Default is (5, 5, 5).
             shell_weights (Optional[dict[int, float]]): The weights for the coordination shells. Default is None.
 
         Returns:
             dict (Structure, float): A dictionary containing the resulting sqs and the objective value.
         """
         self._supercell_size = supercell_size
-        self._lattice = self._get_lattice(composition=composition,
-                                          crystal_structure=crystal_structure.lower())
+        self._lattice: Lattice = self._get_lattice(composition=composition,
+                                                   crystal_structure=crystal_structure.lower())
         self._coords = self._get_coords(crystal_structure=crystal_structure.lower())
         self._multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
         self._composition = self._determine_composition(supercell_size=self._supercell_size,
                                                         composition=composition)
 
-        if shell_weights is None:
-            shell_weights: dict[int, float] = {
-                    1: 1.0,
-                    2: 0.5,
-            }  # Will use first and second coordination shells by default
+        shell_weights = {1: 1.0, 2: 0.5} if shell_weights is None else {1: 1.0} if shell_weights == (1, 1, 1) else shell_weights
 
         configuration = {
                 "structure": {
-                        "lattice": self._lattice,
+                        "lattice": self._lattice.matrix,
                         "coords": self._coords,
-                        "species": ["W"] * self._multiplier,
+                        "species": ["W"] * self._multiplier,  # Tungsten used here as a placeholder element
                         "supercell": self._supercell_size,
                 },
                 "iterations": self._iterations,
@@ -117,37 +112,40 @@ class SqsgenTransformation:
         }
 
     @staticmethod
-    def _get_lattice(composition, crystal_structure) -> ArrayLike:
+    def _get_lattice(composition: Composition, crystal_structure: str) -> Lattice:
         """
         Calculates and returns the lattice for the given composition and crystal structure.
 
-        BE CAREFUL: This function returns conventional unit cells except for the HCP and DHCP structures.
+        BE CAREFUL: This function returns primitive unit cells for the HCP and DHCP structures by default.
 
         Args:
             composition (Composition): The composition of the supercell.
             crystal_structure (str): The crystal structure of the supercell.
 
         Returns:
-            ArrayLike: The calculated lattice.
+            Lattice: The calculated lattice.
         """
+
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
 
-        if crystal_structure in ['hcp', 'dhcp']:
-            a_param = avg_radius * 2
-            c_param = a_param * np.sqrt(8.0 / 3.0)
-            if crystal_structure == 'dhcp':
-                c_param *= 2
-            lattice = Lattice.hexagonal(a_param, c_param).get_niggli_reduced_lattice()
-        elif crystal_structure in ['fcc', 'bcc', 'b2', 'sc']:
-            if crystal_structure == 'fcc':
-                avg_radius *= 2 * np.sqrt(2)
-            if crystal_structure in ['bcc', 'b2']:
-                avg_radius *= 4 / np.sqrt(3)
-            lattice = Lattice.cubic(avg_radius)
-        else:
-            raise ValueError("Invalid crystal structure.")
+        lattice_creators = {
+                'hcp': lambda: Lattice.hexagonal(
+                        a=avg_radius * 2,
+                        c=avg_radius * 2 * np.sqrt(8.0 / 3.0)).get_niggli_reduced_lattice(),
+                'dhcp': lambda: Lattice.hexagonal(
+                        a=avg_radius * 2,
+                        c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2).get_niggli_reduced_lattice(),
+                'fcc_prim': lambda: Lattice(
+                        matrix=[[0, avg_radius * np.sqrt(2), avg_radius * np.sqrt(2)],
+                                [avg_radius * np.sqrt(2), 0, avg_radius * np.sqrt(2)],
+                                [avg_radius * np.sqrt(2), avg_radius * np.sqrt(2), 0]]),
+                'fcc': lambda: Lattice.cubic(a=avg_radius * 2 * np.sqrt(2)),
+                'bcc': lambda: Lattice.cubic(a=avg_radius * 4 / np.sqrt(3)),
+                'b2': lambda: Lattice.cubic(a=avg_radius * 4 / np.sqrt(3)),
+                'sc': lambda: Lattice.cubic(a=avg_radius)
+        }
 
-        return lattice.matrix
+        return lattice_creators.get(crystal_structure, lambda: ValueError("Invalid crystal structure."))()
 
     @staticmethod
     def _get_coords(crystal_structure) -> dict[str, list[float]]:
@@ -162,22 +160,26 @@ class SqsgenTransformation:
         Raises:
             ValueError: If the crystal structure is invalid.
         """
-        return {"fcc": [[0.0, 0.0, 0.0],
-                        [0.5, 0.5, 0],
-                        [0.5, 0, 0.5],
-                        [0.0, 0.5, 0.5]],
-                "bcc": [[0.0, 0.0, 0.0],
-                        [0.5, 0.5, 0.5]],
-                "sc": [[0.0, 0.0, 0.0]],
+        coords_creators = {
                 "hcp": [[1.0 / 3.0, 2.0 / 3.0, 1.0 / 4.0],
                         [2.0 / 3.0, 1.0 / 3.0, 3.0 / 4.0]],
                 "dhcp": [[0, 0, 0],
                          [0, 0, 1.0 / 2.0],
                          [1.0 / 3.0, 2.0 / 3.0, 1.0 / 4.0],
                          [2.0 / 3.0, 1.0 / 3.0, 3.0 / 4.0], ],
+                "fcc_prim": [[0.0, 0.0, 0.0]],
+                "fcc": [[0.0, 0.0, 0.0],
+                        [0.5, 0.5, 0],
+                        [0.5, 0, 0.5],
+                        [0.0, 0.5, 0.5]],
+                "bcc": [[0.0, 0.0, 0.0],
+                        [0.5, 0.5, 0.5]],
                 "b2": [[0.0, 0.0, 0.0],
                        [0.5, 0.5, 0.5]],
-                }.get(crystal_structure, ValueError("Invalid crystal structure."))
+                "sc": [[0.0, 0.0, 0.0]],
+        }
+
+        return coords_creators.get(crystal_structure, ValueError("Invalid crystal structure."))
 
     @staticmethod
     def _get_multiplier(crystal_structure) -> int:
@@ -193,11 +195,17 @@ class SqsgenTransformation:
         Raises:
             ValueError: If the crystal structure is invalid.
         """
-        return {"fcc": 4,
-                "bcc": 2,
-                "sc": 1,
+        multiplier_creators = {
                 "hcp": 2,
-                "dhcp": 4}.get(crystal_structure, ValueError("Invalid crystal structure."))
+                "dhcp": 4,
+                "fcc_prim": 1,
+                "fcc": 4,
+                "bcc": 2,
+                "b2": 2,
+                "sc": 1,
+        }
+
+        return multiplier_creators.get(crystal_structure, ValueError("Invalid crystal structure."))
 
     def _determine_composition(self, supercell_size, composition) -> dict[str, int]:
         """
@@ -245,7 +253,7 @@ class SqsgenTransformation:
     @property
     def sqs(self) -> Structure:
         """
-        Returns the SQS (Special Quasirandom Structure) generated by the calculator.
+        Returns the SQS generated by the calculator.
 
         Raises:
             ValueError: If the SQS has not been generated yet.
@@ -258,10 +266,18 @@ class SqsgenTransformation:
 
         return self._sqs
 
+    @property
+    def objective(self) -> float:
+        """
+        Returns the objective value of the SQS generated by the calculator.
 
-class AtatCalculator:
-    pass
+        Raises:
+            ValueError: If the SQS has not been generated yet.
 
+        Returns:
+            float: The objective value of the SQS structure.
+        """
+        if self._objective is None:
+            raise ValueError("SQS has not been generated yet.")
 
-class IcetCalculator:
-    pass
+        return self._objective
