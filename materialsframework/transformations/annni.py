@@ -2,12 +2,14 @@
 This module provides a class to generate structures
 for stacking fault energy calculations using the ANNNI method.
 """
+from __future__ import annotations
+
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Union
 
 from pymatgen.core import Composition
 
-from materialsframework.transformations import SqsgenTransformation
+from materialsframework.transformations.special_quasirandom_structures import SqsgenTransformation
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -42,7 +44,7 @@ class ANNNIStackingFaultTransformation:
 
     def apply_transformation(
             self,
-            composition: Composition,
+            composition: Union[Composition, str],
             fcc_supercell_size: int = (5, 5, 5),
             hcp_supercell_size: int = (5, 5, 5),
             dhcp_supercell_size: int = (5, 5, 5),
@@ -54,7 +56,7 @@ class ANNNIStackingFaultTransformation:
         Applies the transformation to generate ANNNI stacking fault structures.
 
         Args:
-            composition (Composition): The composition of the supercell.
+            composition (Union[Composition,str]): The composition of the supercell.
             fcc_supercell_size (int): The size of the FCC supercell. Default is (5, 5, 5).
             hcp_supercell_size (int): The size of the HCP supercell. Default is (5, 5, 5).
             dhcp_supercell_size (int): The size of the DHCP supercell. Default is (5, 5, 5).
@@ -65,7 +67,7 @@ class ANNNIStackingFaultTransformation:
         composition = Composition(composition) if isinstance(composition, str) else composition
 
         fcc = self.sqs_transformation.generate(composition=composition,
-                                               crystal_structure='fcc',
+                                               crystal_structure='fcc_prim',
                                                supercell_size=fcc_supercell_size,
                                                shell_weights=fcc_shell_weights)
         self.structures['fcc'] = fcc['structure']
