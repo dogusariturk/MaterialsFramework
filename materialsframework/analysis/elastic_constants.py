@@ -10,8 +10,8 @@ import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.analysis.eos import EOS
 
-from materialsframework.calculators import M3GNetCalculator
-from materialsframework.transformations import CubicElasticConstantsDeformationTransformation
+from materialsframework.calculators.m3gnet import M3GNetCalculator
+from materialsframework.transformations.elastic_constants import CubicElasticConstantsDeformationTransformation
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure

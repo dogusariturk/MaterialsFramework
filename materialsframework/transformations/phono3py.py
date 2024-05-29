@@ -10,7 +10,7 @@ import numpy as np
 from phono3py import Phono3py
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
 
-from materialsframework.calculators import M3GNetCalculator, M3GNetRelaxer
+from materialsframework.calculators.m3gnet import M3GNetCalculator, M3GNetRelaxer
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure

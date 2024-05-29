@@ -1,13 +1,15 @@
 """
 This module provides a class to perform an Equation of State (EOS) analysis on a given structure.
 """
+from __future__ import annotations
+
 import os
 from typing import Optional, TYPE_CHECKING
 
 from pymatgen.analysis.eos import EOS
 
-from materialsframework.calculators import M3GNetCalculator, M3GNetRelaxer
-from materialsframework.transformations import EOSTransformation
+from materialsframework.calculators.m3gnet import M3GNetCalculator, M3GNetRelaxer
+from materialsframework.transformations.eos import EOSTransformation
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -118,4 +120,4 @@ class EOSAnalyzer:
         """
         if self._eos_transformation is None:
             self._eos_transformation = EOSTransformation()
-        return EOSTransformation()
+        return self._eos_transformation

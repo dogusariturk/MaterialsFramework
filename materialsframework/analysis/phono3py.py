@@ -8,8 +8,8 @@ from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 
-from materialsframework.calculators import M3GNetCalculator
-from materialsframework.transformations import Phono3pyDisplacementTransformation
+from materialsframework.calculators.m3gnet import M3GNetCalculator
+from materialsframework.transformations.phono3py import Phono3pyDisplacementTransformation
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

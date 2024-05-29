@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.3
+===========
+- Added ``ANNNI-SFE`` and ``EOS`` implementations
+
 Version 0.2
 ===========
 

@@ -9,7 +9,7 @@ from typing import Optional, TYPE_CHECKING
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
 
-from materialsframework.calculators import M3GNetRelaxer
+from materialsframework.calculators.m3gnet import M3GNetRelaxer
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure

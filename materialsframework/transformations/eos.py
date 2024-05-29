@@ -1,6 +1,8 @@
 """
 This module contains the EOSTransformation class that generates deformed structures for EOS calculations.
 """
+from __future__ import annotations
+
 import os
 from typing import Optional, TYPE_CHECKING
 
