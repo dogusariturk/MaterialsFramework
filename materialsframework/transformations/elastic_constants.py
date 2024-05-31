@@ -98,7 +98,7 @@ class CubicElasticConstantsDeformationTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        return self.relaxer.relax(structure)['final_structure']
+        return self.relaxer.relax(structure)["final_structure"]
 
     def _apply_monoclinic_distortion(self, delta: float, structure: Structure) -> None:
         """

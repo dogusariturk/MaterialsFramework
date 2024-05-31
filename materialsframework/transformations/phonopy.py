@@ -127,7 +127,7 @@ class PhonopyDisplacementTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        return self.relaxer.relax(structure)['final_structure']
+        return self.relaxer.relax(structure)["final_structure"]
 
     def _get_displaced_structures(self, distance: float = 0.01, **kwargs) -> list[Structure, ...]:
         """

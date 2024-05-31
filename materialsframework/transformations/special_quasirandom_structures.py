@@ -69,7 +69,7 @@ class SqsgenTransformation:
             composition (Composition): The composition of the supercell.
             crystal_structure (str): The crystal structure of the supercell. Default is "FCC".
             supercell_size (tuple[int, int, int]): The size of the supercell. Default is (5, 5, 5).
-            shell_weights (Optional[dict[int, float]]): The weights for the coordination shells. Default is None.
+            shell_weights (Optional[dict[int, float]]): The weights for the coordination shells. Default is {1: 1.0, 2: 0.5}.
 
         Returns:
             dict (Structure, float): A dictionary containing the resulting sqs and the objective value.
@@ -107,8 +107,8 @@ class SqsgenTransformation:
         self._objective = self._parse_results_for_objective()
 
         return {
-                'structure': self._sqs,
-                'objective': self._objective
+                "structure": self._sqs,
+                "objective": self._objective
         }
 
     @staticmethod
@@ -129,20 +129,20 @@ class SqsgenTransformation:
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
 
         lattice_creators = {
-                'hcp': lambda: Lattice.hexagonal(
+                "hcp": lambda: Lattice.hexagonal(
                         a=avg_radius * 2,
                         c=avg_radius * 2 * np.sqrt(8.0 / 3.0)).get_niggli_reduced_lattice(),
-                'dhcp': lambda: Lattice.hexagonal(
+                "dhcp": lambda: Lattice.hexagonal(
                         a=avg_radius * 2,
                         c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2).get_niggli_reduced_lattice(),
-                'fcc_prim': lambda: Lattice(
+                "fcc_prim": lambda: Lattice(
                         matrix=[[0, avg_radius * np.sqrt(2), avg_radius * np.sqrt(2)],
                                 [avg_radius * np.sqrt(2), 0, avg_radius * np.sqrt(2)],
                                 [avg_radius * np.sqrt(2), avg_radius * np.sqrt(2), 0]]),
-                'fcc': lambda: Lattice.cubic(a=avg_radius * 2 * np.sqrt(2)),
-                'bcc': lambda: Lattice.cubic(a=avg_radius * 4 / np.sqrt(3)),
-                'b2': lambda: Lattice.cubic(a=avg_radius * 4 / np.sqrt(3)),
-                'sc': lambda: Lattice.cubic(a=avg_radius)
+                "fcc": lambda: Lattice.cubic(a=avg_radius * 2 * np.sqrt(2)),
+                "bcc": lambda: Lattice.cubic(a=avg_radius * 4 / np.sqrt(3)),
+                "b2": lambda: Lattice.cubic(a=avg_radius * 4 / np.sqrt(3)),
+                "sc": lambda: Lattice.cubic(a=avg_radius)
         }
 
         return lattice_creators.get(crystal_structure, lambda: ValueError("Invalid crystal structure."))()

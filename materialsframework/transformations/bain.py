@@ -90,7 +90,7 @@ class BainDisplacementTransformation:
         Returns:
             Structure: The relaxed pymatgen Structure object.
         """
-        return self.relaxer.relax(structure)['final_structure']
+        return self.relaxer.relax(structure)["final_structure"]
 
     @staticmethod
     def _get_displaced_structures(

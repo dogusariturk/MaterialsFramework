@@ -36,9 +36,9 @@ class FileParser:
             ValueError: If the file type is not supported.
         """
         file_type = os.path.splitext(filename)[1][1:]
-        if file_type == 'xlsx':
+        if file_type == "xlsx":
             dataframe = pd.read_excel(filename)
-        elif file_type == 'csv':
+        elif file_type == "csv":
             dataframe = pd.read_csv(filename)
         else:
             raise ValueError(f"Unsupported file type: {file_type}")

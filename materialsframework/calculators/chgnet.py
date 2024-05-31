@@ -125,9 +125,9 @@ class CHGNetRelaxer(Relaxer):
                                            verbose=self._verbose,
                                            assign_magmoms=self._assign_magmoms)
         return {
-                'final_structure': relax_results["final_structure"],
-                'energy': float(relax_results["trajectory"].energies[-1]),
-                'magmom': relax_results["final_structure"].site_properties["magmom"]
+                "final_structure": relax_results["final_structure"],
+                "energy": float(relax_results["trajectory"].energies[-1]),
+                "magmom": relax_results["final_structure"].site_properties["magmom"]
         }
 
 
@@ -225,6 +225,6 @@ class CHGNetCalculator(Calculator):
         return {
                 "potential_energy": self.calculator.results["energy"],
                 "forces": self.calculator.results["forces"],
-                "stress": self.calculator.results['stress'],
-                "magmoms": self.calculator.results['magmoms']
+                "stress": self.calculator.results["stress"],
+                "magmoms": self.calculator.results["magmoms"]
         }

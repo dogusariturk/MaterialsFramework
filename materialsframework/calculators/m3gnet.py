@@ -115,8 +115,8 @@ class M3GNetRelaxer(Relaxer):
         """
         relax_results = self.relaxer.relax(structure, fmax=self._fmax, steps=self._steps, verbose=self._verbose)
         return {
-                'final_structure': relax_results["final_structure"],
-                'energy': float(relax_results["trajectory"].energies[-1])
+                "final_structure": relax_results["final_structure"],
+                "energy": float(relax_results["trajectory"].energies[-1])
         }
 
 

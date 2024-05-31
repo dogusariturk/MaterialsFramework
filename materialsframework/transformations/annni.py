@@ -67,22 +67,22 @@ class ANNNIStackingFaultTransformation:
         composition = Composition(composition) if isinstance(composition, str) else composition
 
         fcc = self.sqs_transformation.generate(composition=composition,
-                                               crystal_structure='fcc_prim',
+                                               crystal_structure="fcc_prim",
                                                supercell_size=fcc_supercell_size,
                                                shell_weights=fcc_shell_weights)
-        self.structures['fcc'] = fcc['structure']
+        self.structures["fcc"] = fcc["structure"]
 
         hcp = self.sqs_transformation.generate(composition=composition,
-                                               crystal_structure='hcp',
+                                               crystal_structure="hcp",
                                                supercell_size=hcp_supercell_size,
                                                shell_weights=hcp_shell_weights)
-        self.structures['hcp'] = hcp['structure']
+        self.structures["hcp"] = hcp["structure"]
 
         dhcp = self._sqs_transformation.generate(composition=composition,
-                                                 crystal_structure='dhcp',
+                                                 crystal_structure="dhcp",
                                                  supercell_size=dhcp_supercell_size,
                                                  shell_weights=dhcp_shell_weights)
-        self.structures['dhcp'] = dhcp['structure']
+        self.structures["dhcp"] = dhcp["structure"]
 
     @property
     def sqs_transformation(self) -> SqsgenTransformation:
