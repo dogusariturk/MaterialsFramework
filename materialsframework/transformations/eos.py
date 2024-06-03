@@ -57,6 +57,9 @@ class EOSTransformation:
         Args:
             undeformed_structure (Structure): The undeformed structure.
         """
+        initial_volume = undeformed_structure.volume
+
         for strain in self._strains:
-            deformed_structure = undeformed_structure.scale_lattice(undeformed_structure.volume * strain)
+            structure = undeformed_structure.copy()
+            deformed_structure = structure.scale_lattice(initial_volume * (1 + strain))
             self.structures[strain] = deformed_structure

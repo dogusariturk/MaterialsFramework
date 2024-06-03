@@ -61,7 +61,7 @@ class EOSAnalyzer:
         Returns:
             dict: A dictionary containing the strains, volumes, energies, and EOS fitting results.
         """
-        undeformed_structure = self.relaxer.relax(structure=undeformed_structure) if not is_relaxed else undeformed_structure
+        undeformed_structure = self.relaxer.relax(structure=undeformed_structure)["final_structure"] if not is_relaxed else undeformed_structure
 
         self.eos_transformation.apply_transformation(undeformed_structure)
 
