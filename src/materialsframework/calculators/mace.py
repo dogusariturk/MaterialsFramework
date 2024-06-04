@@ -70,7 +70,7 @@ class MACECalculator(Calculator):
                     "large": "MACE_MPtrj_2022.9.model",
             }
             model_file = models.get(self._model, self._model)
-            self._potential = os.path.abspath(os.path.join("../../data/", model_file))
+            self._potential = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/", model_file))
         return self._potential
 
     @property

@@ -3,11 +3,11 @@ name = "materialsframework"
 version = "0.3.0"
 requires-python = ">=3.11"
 authors = [
-  {name = "Doguhan Sariturk", email = "dogu.sariturk@gmail.com" }
+    { name = "Doguhan Sariturk", email = "doguhan.sariturk@gmail.com" },
 ]
 description = "MaterialsFramework"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { text = "GPL-3.0-only" }
 classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -18,13 +18,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dogusariturk/MaterialsFramework/"
+Home-page = "https://github.com/dogusariturk/MaterialsFramework/"
 Issues = "https://github.com/dogusariturk/MaterialsFramework/issues"
 Repository = "https://github.com/dogusariturk/MaterialsFramework.git"
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["materialsframework", "data"]
