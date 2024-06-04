@@ -1,0 +1,17 @@
+name: materialsframework
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.11
+  - numpy
+  - openpyxl
+  - pandas
+  - phono3py
+  - phonopy
+  - sqsgenerator
+  - pip:
+      - chgnet
+      - mace-torch
+      - matgl
+      - pymatgen

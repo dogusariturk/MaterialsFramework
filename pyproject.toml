@@ -1,6 +1,27 @@
-[build-system]
-requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=5"]
-build-backend = "setuptools.build_meta"
+[project]
+name = "materialsframework"
+version = "0.3.0"
+requires-python = ">=3.11"
+authors = [
+  {name = "Doguhan Sariturk", email = "dogu.sariturk@gmail.com" }
+]
+description = "MaterialsFramework"
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Utilities",
+    "Programming Language :: Python"
+]
 
-[tool.setuptools_scm]
-version_scheme = "no-guess-dev"
+[project.urls]
+Homepage = "https://github.com/dogusariturk/MaterialsFramework/"
+Issues = "https://github.com/dogusariturk/MaterialsFramework/issues"
+Repository = "https://github.com/dogusariturk/MaterialsFramework.git"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
