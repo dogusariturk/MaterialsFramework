@@ -44,7 +44,7 @@ class M3GNetMDCalculator(Calculator):
             avg_start: float,
             avg_end: float,
             model: str = "M3GNet-MP-2021.2.8-PES",
-            ensemble: Literal["nve", "nvt_nose_hoover"] = "nvt_nose_hoover",
+            ensemble: Literal["nve", "nvt_nose_hoover", "npt_nose_hoover"] = "nvt_nose_hoover",
             timestep: float = 1.0,
             temperature: int = 300,
             pressure: float = 1.01325 * units.bar,
@@ -79,6 +79,9 @@ class M3GNetMDCalculator(Calculator):
         """
         if avg_end <= avg_start:
             raise ValueError("avg_end must be greater than avg_start")
+
+        if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover"]:
+            raise ValueError("Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover'")
 
         self._steps: int = steps
         self._avg_start: int = avg_start
@@ -139,6 +142,27 @@ class M3GNetMDCalculator(Calculator):
                 "average_temperature": np.mean(temperature),
         }
 
+    def _initialize_npt_nose_hoover(self, ase_atoms) -> None:
+        """
+        Initializes the NPT Nose-Hoover ensemble for the MD simulation.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object.
+        """
+        self.dyn = NPT(
+                atoms=ase_atoms,
+                timestep=self._timestep * units.fs,
+                temperature_K=self._temperature,
+                externalstress=self._external_stress,
+                ttime=self._ttime * units.fs,
+                pfactor=self._pfactor * units.fs,
+                mask=np.array(self._mask),
+                trajectory=self.trajectory,
+                logfile=self._logfile,
+                loginterval=self._loginterval,
+                append_trajectory=self._append_trajectory,
+        )
+
     def _initialize_nvt_nose_hoover(self, ase_atoms) -> None:
         """
         Initializes the NVT Nose-Hoover ensemble for the MD simulation.
@@ -147,17 +171,17 @@ class M3GNetMDCalculator(Calculator):
             ase_atoms (Atoms): The ASE atoms object.
         """
         self.dyn = NPT(
-                ase_atoms,
-                self._timestep * units.fs,
+                atoms=ase_atoms,
+                timestep=self._timestep * units.fs,
                 temperature_K=self._temperature,
                 externalstress=self._external_stress,
                 ttime=self._ttime * units.fs,
                 pfactor=None,
+                mask=np.array(self._mask),
                 trajectory=self.trajectory,
                 logfile=self._logfile,
                 loginterval=self._loginterval,
                 append_trajectory=self._append_trajectory,
-                mask=np.array(self._mask),
         )
 
     def _initialize_nve(self, ase_atoms) -> None:
@@ -168,7 +192,7 @@ class M3GNetMDCalculator(Calculator):
             ase_atoms (Atoms): The ASE atoms object.
         """
         self.dyn = VelocityVerlet(
-                ase_atoms,
+                atoms=ase_atoms,
                 timestep=self._timestep * units.fs,
                 trajectory=self.trajectory,
                 logfile=self._logfile,
@@ -192,6 +216,9 @@ class M3GNetMDCalculator(Calculator):
         MaxwellBoltzmannDistribution(ase_atoms, temperature_K=self._temperature)
 
         ase_atoms.calc = PESCalculator(potential=self.potential)
+
+        if self._ensemble.lower() == "npt_nose_hoover":
+            self._initialize_npt_nose_hoover(ase_atoms)
 
         if self._ensemble.lower() == "nvt_nose_hoover":
             self._initialize_nvt_nose_hoover(ase_atoms)
