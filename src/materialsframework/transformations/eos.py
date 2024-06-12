@@ -4,13 +4,12 @@ This module contains the EOSTransformation class that generates deformed structu
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.calculators.typing import Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -30,7 +29,6 @@ class EOSTransformation:
             start: float = -0.01,
             stop: float = 0.01,
             num: int = 5,
-            relaxer: Optional[Relaxer] = None
     ) -> None:
         """
         Initializes the EOSTransformation.
@@ -39,10 +37,7 @@ class EOSTransformation:
             start (float): The starting strain value. Defaults to -0.01.
             stop (float): The stopping strain value. Defaults to 0.01.
             num (int): The number of strain values. Defaults to 5.
-            relaxer (Optional[Relaxer]): The Relaxer object to use for relaxation. Default is M3GNetRelaxer.
         """
-        self._relaxer = relaxer
-
         self._strains = np.linspace(start, stop, num)
 
         self.structures = {}
