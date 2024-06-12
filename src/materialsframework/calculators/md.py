@@ -12,6 +12,7 @@ import matgl
 import numpy as np
 import pandas as pd
 from ase import units
+from ase.md import VelocityVerlet
 from ase.md.npt import NPT
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
 from matgl.ext.ase import PESCalculator
@@ -43,7 +44,7 @@ class M3GNetMDCalculator(Calculator):
             avg_start: float,
             avg_end: float,
             model: str = "M3GNet-MP-2021.2.8-PES",
-            ensemble: Literal["nvt_nose_hoover"] = "nvt_nose_hoover",
+            ensemble: Literal["nve", "nvt_nose_hoover"] = "nvt_nose_hoover",
             timestep: float = 1.0,
             temperature: int = 300,
             pressure: float = 1.01325 * units.bar,
@@ -159,6 +160,22 @@ class M3GNetMDCalculator(Calculator):
                 mask=np.array(self._mask),
         )
 
+    def _initialize_nve(self, ase_atoms) -> None:
+        """
+        Initializes the NVE ensemble for the MD simulation.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object.
+        """
+        self.dyn = VelocityVerlet(
+                ase_atoms,
+                timestep=self._timestep * units.fs,
+                trajectory=self.trajectory,
+                logfile=self._logfile,
+                loginterval=self._loginterval,
+                append_trajectory=self._append_trajectory,
+        )
+
     def calculate(self, structure: Structure) -> dict:
         """
         Performs the Molecular Dynamics (MD) simulation using the M3GNet potential.
@@ -178,6 +195,9 @@ class M3GNetMDCalculator(Calculator):
 
         if self._ensemble.lower() == "nvt_nose_hoover":
             self._initialize_nvt_nose_hoover(ase_atoms)
+
+        if self._ensemble.lower() == "nve":
+            self._initialize_nve(ase_atoms)
 
         self.dyn.run(self._steps)
 
