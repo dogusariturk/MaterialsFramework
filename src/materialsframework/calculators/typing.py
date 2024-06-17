@@ -27,6 +27,29 @@ class Calculator(ABC):
 class Relaxer(ABC):
     """Base class for all relaxers"""
 
+    @property
+    @abstractmethod
+    def potential(self):
+        """Returns the potential associated with this relaxer object."""
+
+    @property
+    @abstractmethod
+    def relaxer(self):
+        """Returns the relaxer associated with this instance."""
+
     @abstractmethod
     def relax(self, structure: Structure):
         """Relaxes the input structure and returns the relaxed structure and other information."""
+
+
+class MDCalculator(ABC):
+    """Base class for all molecular dynamics (MD) calculators"""
+
+    @property
+    @abstractmethod
+    def potential(self):
+        """Returns the potential associated with this calculator object."""
+
+    @abstractmethod
+    def run(self, structure: Structure, steps: int):
+        """Runs a simulation on the input structure with the given number of steps and returns the results."""
