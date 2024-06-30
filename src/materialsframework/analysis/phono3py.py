@@ -4,15 +4,15 @@ This module provides a class to calculate phonon properties of a structure using
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
-
-import numpy as np
+from typing import Optional, TYPE_CHECKING, Union
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.phono3py import Phono3pyDisplacementTransformation
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
+    from phono3py.conductivity.direct_solution import ConductivityLBTE
+    from phono3py.conductivity.rta import ConductivityRTA
     from pymatgen.core import Structure
     from materialsframework.calculators.typing import Calculator
 
@@ -101,7 +101,7 @@ class Phono3pyAnalyzer:
         # Thermal Conductivity
         self.phonon.run_thermal_conductivity(is_LBTE=is_lbte,
                                              temperatures=range(t_min, t_max + 1, t_step))
-        self.thermal_conductivity = self.phonon.thermal_conductivity
+        self.thermal_conductivity: Union[ConductivityRTA, ConductivityLBTE] = self.phonon.thermal_conductivity
 
         return {
                 "thermal_conductivity": self.thermal_conductivity
@@ -139,14 +139,15 @@ class Phono3pyAnalyzer:
         if self.phonon is None:
             raise RuntimeError("phono3py_transformation has to be called before trying to produce force constants.")
 
-        forces = np.array([self.calculator.calculate(displaced_structure)["forces"]
-                           for displaced_structure in
-                           self.phono3py_transformation.phonon_supercells_with_displacements])
+        forces = [self.calculator.calculate(displaced_structure)["forces"]
+                  for displaced_structure in
+                  self.phono3py_transformation.supercells_with_displacements]
         self.phonon.forces = forces
-        self.phonon.produce_fc3()
 
-        phonon_forces = np.array([self.calculator.calculate(displaced_structure)["forces"]
-                                  for displaced_structure in
-                                  self.phono3py_transformation.supercell_displacements])
+        phonon_forces = [self.calculator.calculate(displaced_structure)["forces"]
+                         for displaced_structure in
+                         self.phono3py_transformation.phonon_supercells_with_displacements]
         self.phonon.phonon_forces = phonon_forces
+
+        self.phonon.produce_fc3()
         self.phonon.produce_fc2()
