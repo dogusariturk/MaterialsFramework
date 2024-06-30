@@ -47,6 +47,8 @@ class M3GNetMDCalculator(MDCalculator):
             pressure: float = 1,  # atm
             ttime: float = 10.0,  # fs
             pfactor: float = 75.0 ** 2.0,  # fs ** 2
+            stationary: bool = True,
+            zero_rotation: bool = True,
             logfile: Optional[str] = None,
             loginterval: int = 1,
     ) -> None:
@@ -61,6 +63,8 @@ class M3GNetMDCalculator(MDCalculator):
             pressure (float): The pressure in atm for the MD simulation. Defaults to 1 atm.
             ttime (float): The time constant for the thermostat. Defaults to 25.0 fs.
             pfactor (float): The pressure factor for the MD simulation. Defaults to 75.0 fs ** 2.0.
+            stationary (bool): Whether to et the center-of-mass momentum to zero. Defaults to True.
+            zero_rotation (bool): Whether to set the total angular momentum to zero. Defaults to True.
             logfile (Optional[str]): The logfile to save the results. Defaults to None.
             loginterval (int): The interval to log the results. Defaults to 1 (each step).
         """
@@ -74,6 +78,8 @@ class M3GNetMDCalculator(MDCalculator):
         self._pressure: float = pressure
         self._pfactor: float = pfactor
         self._ttime: float = ttime
+        self._stationary: bool = stationary
+        self._zero_rotation: bool = zero_rotation
         self._logfile: Union[str, None] = logfile
         self._loginterval: int = loginterval
 
@@ -158,8 +164,11 @@ class M3GNetMDCalculator(MDCalculator):
         ase_atoms = structure.to_ase_atoms()
 
         MaxwellBoltzmannDistribution(ase_atoms, temperature_K=self._temperature)
-        Stationary(ase_atoms)
-        ZeroRotation(ase_atoms)
+
+        if self._stationary:
+            Stationary(ase_atoms)
+        if self._zero_rotation:
+            ZeroRotation(ase_atoms)
 
         ase_atoms.calc = PESCalculator(potential=self.potential)
 
