@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.5.0
+===========
+- Added custom matgl relaxer implementation.
+
 Version 0.4.0
 ===========
 - Added ``M3GNet-MD`` implementation
