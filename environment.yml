@@ -9,7 +9,6 @@ dependencies:
   - phono3py
   - pip:
       - matgl
-      - pymatgen
       - chgnet
       - mace-torch
       - openpyxl

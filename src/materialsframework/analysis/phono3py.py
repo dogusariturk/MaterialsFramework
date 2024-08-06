@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from phono3py.conductivity.direct_solution import ConductivityLBTE
     from phono3py.conductivity.rta import ConductivityRTA
     from pymatgen.core import Structure
-    from materialsframework.calculators.typing import Calculator
+    from materialsframework.tools.typing import Calculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -139,12 +139,12 @@ class Phono3pyAnalyzer:
         if self.phonon is None:
             raise RuntimeError("phono3py_transformation has to be called before trying to produce force constants.")
 
-        forces = [self.calculator.calculate(displaced_structure)["forces"]
+        forces = [self.calculator.calculate(displaced_structure)["forces"].tolist()
                   for displaced_structure in
                   self.phono3py_transformation.supercells_with_displacements]
         self.phonon.forces = forces
 
-        phonon_forces = [self.calculator.calculate(displaced_structure)["forces"]
+        phonon_forces = [self.calculator.calculate(displaced_structure)["forces"].tolist()
                          for displaced_structure in
                          self.phono3py_transformation.phonon_supercells_with_displacements]
         self.phonon.phonon_forces = phonon_forces

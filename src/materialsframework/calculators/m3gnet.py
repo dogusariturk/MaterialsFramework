@@ -8,9 +8,10 @@ from typing import TYPE_CHECKING, Union
 
 import matgl
 import numpy as np
-from matgl.ext.ase import PESCalculator, Relaxer as AseM3GNetRelaxer
+from matgl.ext.ase import PESCalculator
 
-from materialsframework.calculators.typing import Calculator, Relaxer
+from materialsframework.tools.relaxer import Relaxer
+from materialsframework.tools.typing import Calculator, Relaxer
 
 if TYPE_CHECKING:
     from matgl.apps.pes import Potential
@@ -34,9 +35,11 @@ class M3GNetRelaxer(Relaxer):
             self,
             fmax: float = 0.001,
             relax_cell: bool = True,
+            fix_symmetry: bool = False,
             verbose: bool = False,
             steps: int = 1000,
             model: str = "M3GNet-MP-2021.2.8-PES",
+            optimizer: str = "FIRE",
     ) -> None:
         """
         Initializes the M3GNet calculator.
@@ -47,20 +50,23 @@ class M3GNetRelaxer(Relaxer):
             verbose (bool): Whether to print verbose output during calculations. Defaults to False.
             steps (int): The maximum number of optimization steps. Defaults to 1000.
             model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
+            optimizer (str): The optimizer to use for relaxation. Defaults to "FIRE".
 
         Examples:
             >>> relaxer = M3GNetRelaxer()
             >>> relaxer = M3GNetRelaxer(fmax=0.001, relax_cell=True, verbose=False, steps=1000,
-            ...                         model="M3GNet-MP-2021.2.8-PES")
+            ...                         model="M3GNet-MP-2021.2.8-PES", optimizer='FIRE')
 
         Note:
             The remaining values for the arguments are set to the default values for the M3GNet potential.
         """
         self._fmax = fmax
         self._relax_cell = relax_cell
+        self._fix_symmetry = fix_symmetry
         self._verbose = verbose
         self._model = model
         self._steps = steps
+        self._optimizer = optimizer
 
         self._relaxer = None
         self._potential = None
@@ -81,7 +87,7 @@ class M3GNetRelaxer(Relaxer):
         return self._potential
 
     @property
-    def relaxer(self) -> AseM3GNetRelaxer:
+    def relaxer(self) -> Relaxer:
         """
         Returns the Relaxer object associated with this instance.
 
@@ -92,7 +98,10 @@ class M3GNetRelaxer(Relaxer):
             AseRelaxer: The AseM3GNetRelaxer object associated with this instance.
         """
         if self._relaxer is None:
-            self._relaxer = AseM3GNetRelaxer(potential=self.potential, relax_cell=self._relax_cell)
+            self._relaxer = Relaxer(potential=self.potential,
+                                    optimizer=self._optimizer,
+                                    relax_cell=self._relax_cell,
+                                    fix_symmetry=self._fix_symmetry)
         return self._relaxer
 
     def relax(

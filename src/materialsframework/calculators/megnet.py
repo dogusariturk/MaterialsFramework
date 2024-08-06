@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import matgl
 
-from materialsframework.calculators.typing import Calculator
+from materialsframework.tools.typing import Calculator
 
 if TYPE_CHECKING:
     from matgl.models import MEGNet

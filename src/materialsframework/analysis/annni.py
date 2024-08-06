@@ -14,7 +14,7 @@ from materialsframework.transformations.annni import ANNNIStackingFaultTransform
 
 if TYPE_CHECKING:
     from pymatgen.core import Composition
-    from materialsframework.calculators.typing import Calculator, Relaxer
+    from materialsframework.tools.typing import Calculator, Relaxer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 

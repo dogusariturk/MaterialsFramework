@@ -4,25 +4,24 @@ Molecular Dynamics (MD) simulations using the M3GNet potential.
 """
 from __future__ import annotations
 
-import collections
 import os
 from typing import Literal, Optional, TYPE_CHECKING, Union
 
 import matgl
 import numpy as np
-import pandas as pd
 from ase import units
+from ase.constraints import FixSymmetry
 from ase.md import MDLogger, VelocityVerlet
 from ase.md.npt import NPT
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary, ZeroRotation
 from matgl.ext.ase import PESCalculator
 
-from materialsframework.calculators.typing import MDCalculator
+from materialsframework.tools.trajectory import TrajectoryObserver
+from materialsframework.tools.typing import MDCalculator
 
 if TYPE_CHECKING:
     from ase import Atoms
     from matgl.apps.pes import Potential
-    from numpy.typing import ArrayLike
     from pymatgen.core import Structure
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -41,6 +40,7 @@ class M3GNetMDCalculator(MDCalculator):
     def __init__(
             self,
             model: str = "M3GNet-MP-2021.2.8-PES",
+            fix_symmetry: bool = False,
             ensemble: Literal["nve", "nvt_nose_hoover", "npt_nose_hoover"] = "nve",
             timestep: float = 1.0,  # fs
             temperature: int = 300,  # K
@@ -72,6 +72,7 @@ class M3GNetMDCalculator(MDCalculator):
             raise ValueError("Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover'")
 
         self._model: str = model
+        self._fix_symmetry: bool = fix_symmetry
         self._ensemble: str = ensemble
         self._timestep: float = timestep
         self._temperature: float = temperature
@@ -172,6 +173,9 @@ class M3GNetMDCalculator(MDCalculator):
 
         ase_atoms.calc = PESCalculator(potential=self.potential)
 
+        if self._fix_symmetry:
+            ase_atoms.set_constraint(FixSymmetry(ase_atoms))
+
         if self._ensemble.lower() == "npt_nose_hoover":
             self._initialize_npt_nose_hoover(ase_atoms)
 
@@ -235,77 +239,3 @@ class M3GNetMDCalculator(MDCalculator):
 
             atoms.set_cell(new_basis, scale_atoms=True)
 
-
-class TrajectoryObserver(collections.abc.Sequence):
-    """Trajectory observer is a hook in the relaxation process that saves the
-    intermediate structures.
-
-    NOTE: Adapted from the matgl code and added the capability to save the temperature values.
-    """
-
-    def __init__(self, atoms: Atoms) -> None:
-        """
-        Initializes the TrajectoryObserver from the ase Atoms object.
-
-        Args:
-            atoms (Atoms): Structure to observe.
-        """
-        self.atoms = atoms
-        self.total_energies: list[float] = []
-        self.kinetic_energies: list[float] = []
-        self.potential_energies: list[float] = []
-        self.forces: list[ArrayLike] = []
-        self.stresses: list[ArrayLike] = []
-        self.temperature: list[ArrayLike] = []
-        self.cells: list[ArrayLike] = []
-        self.atom_positions: list[ArrayLike] = []
-
-    def __call__(self) -> None:
-        """Saves the current state of the atoms."""
-        self.total_energies.append(float(self.atoms.get_total_energy()))
-        self.kinetic_energies.append(float(self.atoms.get_kinetic_energy()))
-        self.potential_energies.append(float(self.atoms.get_potential_energy()))
-        self.forces.append(self.atoms.get_forces())
-        self.stresses.append(self.atoms.get_stress())
-        self.temperature.append(self.atoms.get_temperature())
-        self.cells.append(self.atoms.get_cell()[:])
-        self.atom_positions.append(self.atoms.get_positions())
-
-    def __getitem__(self, item):
-        """Returns a tuple of properties at the given index."""
-        item_properties = (
-                self.total_energies[item],
-                self.kinetic_energies[item],
-                self.potential_energies[item],
-                self.forces[item],
-                self.stresses[item],
-                self.temperature[item],
-                self.cells[item],
-                self.atom_positions[item]
-        )
-        return item_properties
-
-    def __len__(self):
-        """Returns the number of saved properties."""
-        return len(self.total_energies)
-
-    def as_pandas(self) -> pd.DataFrame:
-        """
-        Returns the trajectory as a pandas DataFrame
-        of energies, forces, stresses, temperatures, cells and atom_positions.
-
-        Returns:
-            pd.DataFrame: The trajectory as a pandas DataFrame.
-        """
-        return pd.DataFrame(
-                {
-                        "total_energies": self.total_energies,
-                        "kinetic_energies": self.kinetic_energies,
-                        "potential_energies": self.potential_energies,
-                        "forces": self.forces,
-                        "stresses": self.stresses,
-                        "temperature": self.temperature,
-                        "cells": self.cells,
-                        "atom_positions": self.atom_positions,
-                }
-        )

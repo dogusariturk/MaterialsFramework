@@ -8,7 +8,7 @@ from typing import Optional, TYPE_CHECKING, Union
 
 from mace.calculators import MACECalculator as ASEMACECalculator
 
-from materialsframework.calculators.typing import Calculator
+from materialsframework.tools.typing import Calculator
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

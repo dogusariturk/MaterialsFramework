@@ -7,7 +7,7 @@ from typing import Optional, TYPE_CHECKING, Union
 
 from chgnet.model import CHGNet, CHGNetCalculator as CHGNetCalc, StructOptimizer
 
-from materialsframework.calculators.typing import Calculator, Relaxer
+from materialsframework.tools.typing import Calculator, Relaxer
 
 if TYPE_CHECKING:
     from numpy import ndarray
