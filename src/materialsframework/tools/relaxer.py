@@ -7,7 +7,7 @@ import contextlib
 import io
 import sys
 from enum import Enum
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ase.constraints import FixAtoms, FixSymmetry
 from ase.filters import FrechetCellFilter
@@ -57,9 +57,24 @@ class Relaxer:
             relax_cell: bool = True,
             fix_symmetry: bool = False,
             fix_atoms: bool = False,
+            hydrostatic_strain: bool = False,
             symprec: float = 1e-2,
             stress_weight: float = 1 / 160.21766208,
     ):
+        """
+        Initialize a Relaxer object.
+
+        Args:
+            potential (Potential): The M3GNet potential to use for relaxation.
+            state_attr (torch.Tensor): The state attribute tensor. Defaults to None.
+            optimizer (Optimizer | str): The optimizer to use for relaxation. Defaults to "FIRE".
+            relax_cell (bool): Whether to relax the cell. Defaults to True.
+            fix_symmetry (bool): Whether to fix the symmetry during relaxation. Defaults to False.
+            fix_atoms (bool): Whether to fix the atoms during relaxation. Defaults to False.
+            hydrostatic_strain (bool): Whether to apply hydrostatic strain during relaxation. Defaults to False.
+            symprec (float): The symmetry precision to use. Defaults to 1e-2.
+            stress_weight (float): The stress weight to use. Defaults to 1 / 160.21766208
+        """
         self.optimizer: Optimizer = OPTIMIZERS[optimizer.lower()].value if isinstance(optimizer, str) else optimizer
         self.calculator = PESCalculator(
                 potential=potential,
@@ -69,6 +84,7 @@ class Relaxer:
         self.relax_cell = relax_cell
         self.fix_symmetry = fix_symmetry
         self.fix_atoms = fix_atoms
+        self.hydrostatic_strain = hydrostatic_strain
         self.sym_prec = symprec
         self.potential = potential
         self.ase_adaptor = AseAtomsAdaptor()
@@ -97,25 +113,32 @@ class Relaxer:
             params_asecellfilter (dict): The parameters to pass to the FrechetCellFilter. Defaults to None.
             **kwargs: Additional keyword arguments to pass to the optimizer.
         """
+        hydrostatic_strain = True if self.hydrostatic_strain else False
+        stream = sys.stdout if verbose else io.StringIO()
+        params_asecellfilter = params_asecellfilter or {}
+
         if isinstance(atoms, (Structure, Molecule)):
             atoms = self.ase_adaptor.get_atoms(atoms)
+
         atoms.calc = self.calculator
+
         if self.fix_symmetry:
             atoms.set_constraint([FixSymmetry(atoms=atoms, symprec=self.sym_prec)])
         if self.fix_atoms:
             atoms.set_constraint([FixAtoms(mask=[True for _ in atoms])])
-        stream = sys.stdout if verbose else io.StringIO()
-        params_asecellfilter = params_asecellfilter or {}
+
         with contextlib.redirect_stdout(stream):
             obs = TrajectoryObserver(atoms)
             if self.relax_cell:
-                atoms = FrechetCellFilter(atoms, **params_asecellfilter)
+                atoms = FrechetCellFilter(atoms=atoms, hydrostatic_strain=hydrostatic_strain, **params_asecellfilter)
             optimizer = self.optimizer(atoms, **kwargs)
             optimizer.attach(obs, interval=interval)
             optimizer.run(fmax=fmax, steps=steps)
             obs()
+
         if traj_file:
             obs.save(traj_file)
+
         if isinstance(atoms, FrechetCellFilter):
             atoms = atoms.atoms
 
