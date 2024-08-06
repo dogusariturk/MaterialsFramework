@@ -36,6 +36,7 @@ class M3GNetRelaxer(Relaxer):
             fmax: float = 0.001,
             relax_cell: bool = True,
             fix_symmetry: bool = False,
+            fix_atoms: bool = False,
             verbose: bool = False,
             steps: int = 1000,
             model: str = "M3GNet-MP-2021.2.8-PES",
@@ -47,6 +48,8 @@ class M3GNetRelaxer(Relaxer):
         Args:
             fmax (float): The maximum force tolerance for convergence. Defaults to 0.001.
             relax_cell (bool): Whether to relax the lattice cell. Defaults to True.
+            fix_symmetry (bool): Whether to fix the symmetry of the structure. Defaults to False.
+            fix_atoms (bool): Whether to fix the atoms during relaxation. Defaults to False.
             verbose (bool): Whether to print verbose output during calculations. Defaults to False.
             steps (int): The maximum number of optimization steps. Defaults to 1000.
             model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
@@ -63,6 +66,7 @@ class M3GNetRelaxer(Relaxer):
         self._fmax = fmax
         self._relax_cell = relax_cell
         self._fix_symmetry = fix_symmetry
+        self._fix_atoms = fix_atoms
         self._verbose = verbose
         self._model = model
         self._steps = steps
@@ -101,7 +105,8 @@ class M3GNetRelaxer(Relaxer):
             self._relaxer = Relaxer(potential=self.potential,
                                     optimizer=self._optimizer,
                                     relax_cell=self._relax_cell,
-                                    fix_symmetry=self._fix_symmetry)
+                                    fix_symmetry=self._fix_symmetry,
+                                    fix_atoms=self._fix_atoms)
         return self._relaxer
 
     def relax(
@@ -125,7 +130,8 @@ class M3GNetRelaxer(Relaxer):
         relax_results = self.relaxer.relax(structure, fmax=self._fmax, steps=self._steps, verbose=self._verbose)
         return {
                 "final_structure": relax_results["final_structure"],
-                "energy": float(relax_results["trajectory"].energies[-1])
+                "energy": float(relax_results["trajectory"].energies[-1]),
+                "trajectory": relax_results["trajectory"]
         }
 
 

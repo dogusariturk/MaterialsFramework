@@ -1,3 +1,6 @@
+"""
+This module provides a Relaxer class for relaxing structures using ASE and M3GNet.
+"""
 from __future__ import annotations
 
 import contextlib
@@ -6,7 +9,7 @@ import sys
 from enum import Enum
 from typing import Literal, TYPE_CHECKING
 
-from ase.constraints import FixSymmetry
+from ase.constraints import FixAtoms, FixSymmetry
 from ase.filters import FrechetCellFilter
 from ase.optimize import BFGS, BFGSLineSearch, FIRE, LBFGS, LBFGSLineSearch, MDMin
 from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
@@ -27,7 +30,9 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class OPTIMIZERS(Enum):
-    """An enumeration of optimizers for used in."""
+    """
+    Enum class for available optimizers.
+    """
     bfgs = BFGS
     bfgslinesearch = BFGSLineSearch
     fire = FIRE
@@ -39,6 +44,11 @@ class OPTIMIZERS(Enum):
 
 
 class Relaxer:
+    """
+    A class used to represent a Relaxer.
+
+    This class provides a method to perform relaxation of a structure using a M3GNet potential.
+    """
     def __init__(
             self,
             potential: Potential,
@@ -46,6 +56,7 @@ class Relaxer:
             optimizer: Optimizer | str = "FIRE",
             relax_cell: bool = True,
             fix_symmetry: bool = False,
+            fix_atoms: bool = False,
             symprec: float = 1e-2,
             stress_weight: float = 1 / 160.21766208,
     ):
@@ -57,6 +68,7 @@ class Relaxer:
         )
         self.relax_cell = relax_cell
         self.fix_symmetry = fix_symmetry
+        self.fix_atoms = fix_atoms
         self.sym_prec = symprec
         self.potential = potential
         self.ase_adaptor = AseAtomsAdaptor()
@@ -65,36 +77,33 @@ class Relaxer:
             self,
             atoms: Atoms | Structure | Molecule,
             fmax: float = 0.1,
-            steps: int = 500,
+            steps: int = 1000,
             traj_file: str | None = None,
             interval: int = 1,
             verbose: bool = False,
-            ase_cellfilter: Literal["Frechet", "Exp"] = "Frechet",
             params_asecellfilter: dict | None = None,
             **kwargs,
     ):
         """
-        Relax an input Atoms.
+        Perform relaxation of the given atoms using the M3GNet potential.
 
         Args:
-            atoms (Atoms | Structure | Molecule): the atoms for relaxation
-            fmax (float): total force tolerance for relaxation convergence.
-            Here fmax is a sum of force and stress forces
-            steps (int): max number of steps for relaxation
-            traj_file (str): the trajectory file for saving
-            interval (int): the step interval for saving the trajectories
-            verbose (bool): Whether to have verbose output.
-            ase_cellfilter (literal): which filter is used for variable cell relaxation. Default is Frechet.
-            params_asecellfilter (dict): Parameters to be passed to FrechetCellFilter. Allows
-                setting of constant pressure or constant volume relaxations, for example. Refer to
-                https://wiki.fysik.dtu.dk/ase/ase/filters.html#FrechetCellFilter for more information.
-            **kwargs: Kwargs pass-through to optimizer.
+            atoms (Atoms | Structure | Molecule): The structure to relax.
+            fmax (float): The maximum force tolerance for convergence. Defaults to 0.1.
+            steps (int): The maximum number of optimization steps. Defaults to 1000.
+            traj_file (str): The file to save the trajectory to. Defaults to None.
+            interval (int): The interval to save the trajectory. Defaults to 1.
+            verbose (bool): Whether to print verbose output during calculations. Defaults to False.
+            params_asecellfilter (dict): The parameters to pass to the FrechetCellFilter. Defaults to None.
+            **kwargs: Additional keyword arguments to pass to the optimizer.
         """
         if isinstance(atoms, (Structure, Molecule)):
             atoms = self.ase_adaptor.get_atoms(atoms)
         atoms.calc = self.calculator
         if self.fix_symmetry:
             atoms.set_constraint([FixSymmetry(atoms=atoms, symprec=self.sym_prec)])
+        if self.fix_atoms:
+            atoms.set_constraint([FixAtoms(mask=[True for _ in atoms])])
         stream = sys.stdout if verbose else io.StringIO()
         params_asecellfilter = params_asecellfilter or {}
         with contextlib.redirect_stdout(stream):
