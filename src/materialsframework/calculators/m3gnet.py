@@ -10,7 +10,7 @@ import matgl
 import numpy as np
 from matgl.ext.ase import PESCalculator
 
-from materialsframework.tools.relaxer import Relaxer
+from materialsframework.tools.relaxer import Relaxer as ASERelaxer
 from materialsframework.tools.typing import Calculator, Relaxer
 
 if TYPE_CHECKING:
@@ -37,6 +37,7 @@ class M3GNetRelaxer(Relaxer):
             relax_cell: bool = True,
             fix_symmetry: bool = False,
             fix_atoms: bool = False,
+            hydrostatic_strain: bool = False,
             verbose: bool = False,
             steps: int = 1000,
             model: str = "M3GNet-MP-2021.2.8-PES",
@@ -67,6 +68,7 @@ class M3GNetRelaxer(Relaxer):
         self._relax_cell = relax_cell
         self._fix_symmetry = fix_symmetry
         self._fix_atoms = fix_atoms
+        self._hydrostatic_strain = hydrostatic_strain
         self._verbose = verbose
         self._model = model
         self._steps = steps
@@ -91,7 +93,7 @@ class M3GNetRelaxer(Relaxer):
         return self._potential
 
     @property
-    def relaxer(self) -> Relaxer:
+    def relaxer(self) -> ASERelaxer:
         """
         Returns the Relaxer object associated with this instance.
 
@@ -102,11 +104,12 @@ class M3GNetRelaxer(Relaxer):
             AseRelaxer: The AseM3GNetRelaxer object associated with this instance.
         """
         if self._relaxer is None:
-            self._relaxer = Relaxer(potential=self.potential,
-                                    optimizer=self._optimizer,
-                                    relax_cell=self._relax_cell,
-                                    fix_symmetry=self._fix_symmetry,
-                                    fix_atoms=self._fix_atoms)
+            self._relaxer = ASERelaxer(potential=self.potential,
+                                       optimizer=self._optimizer,
+                                       relax_cell=self._relax_cell,
+                                       fix_symmetry=self._fix_symmetry,
+                                       fix_atoms=self._fix_atoms,
+                                       hydrostatic_strain=self._hydrostatic_strain)
         return self._relaxer
 
     def relax(
