@@ -40,6 +40,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         self.temperature: list[ArrayLike] = []
         self.cells: list[ArrayLike] = []
         self.atom_positions: list[ArrayLike] = []
+        self.chemical_symbols: list[str] = []
 
     def __call__(self) -> None:
         """Saves the current state of the atoms."""
@@ -51,6 +52,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         self.temperature.append(self.atoms.get_temperature())
         self.cells.append(self.atoms.get_cell()[:])
         self.atom_positions.append(self.atoms.get_positions())
+        self.chemical_symbols.append(self.atoms.get_chemical_symbols())
 
     def __getitem__(self, item):
         """Returns a tuple of properties at the given index."""
@@ -62,7 +64,8 @@ class TrajectoryObserver(collections.abc.Sequence):
                 self.stresses[item],
                 self.temperature[item],
                 self.cells[item],
-                self.atom_positions[item]
+                self.atom_positions[item],
+                self.chemical_symbols[item],
         )
         return item_properties
 
@@ -88,6 +91,7 @@ class TrajectoryObserver(collections.abc.Sequence):
                         "temperature": self.temperature,
                         "cells": self.cells,
                         "atom_positions": self.atom_positions,
+                        "chemical_symbols": self.chemical_symbols,
                 }
         )
 
@@ -107,6 +111,7 @@ class TrajectoryObserver(collections.abc.Sequence):
                 "atom_positions": self.atom_positions,
                 "cell": self.cells,
                 "atomic_number": self.atoms.get_atomic_numbers(),
+                "chemical_symbols": self.chemical_symbols,
         }
         with open(filename, "wb") as file:
             pickle.dump(out, file)
