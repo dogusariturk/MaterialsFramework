@@ -49,7 +49,7 @@ class BainPathAnalyzer:
                                                                                       apply Bain displacements. If not provided,
                                                                                       a new instance is initialized.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has potential_energy implemented
+        self._calculator = calculator
         self._bain_transformation = bain_transformation
 
     def calculate(
@@ -72,6 +72,9 @@ class BainPathAnalyzer:
             dict[str, list]: A dictionary containing the c/a ratios (`c_a_list`) and the corresponding calculated potential
                             energies (`energy_list`) along the Bain Path.
         """
+        if "potential_energy" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'potential_energy' property implemented.")
+
         self.bain_transformation.apply_transformation(structure=undeformed_structure,
                                                       is_relaxed=is_relaxed)
 

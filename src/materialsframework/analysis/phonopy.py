@@ -48,7 +48,7 @@ class PhonopyAnalyzer:
             phonopy_transformation (PhonopyDisplacementTransformation, optional): The transformation object used
                                                                                   to generate displaced supercells.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has forces implemented
+        self._calculator = calculator
         self._phonopy_transformation = phonopy_transformation
 
         self.phonon = None
@@ -100,6 +100,9 @@ class PhonopyAnalyzer:
         Returns:
             dict[str, dict]: A dictionary containing the calculated total DOS, thermal properties, and projected DOS.
         """
+        if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'forces' property implemented.")
+
         mesh = mesh or [20, 20, 20]
         pdos_mesh = pdos_mesh or [10, 10, 10]
 

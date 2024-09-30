@@ -49,7 +49,7 @@ class CubicElasticConstantsDeformationTransformation:
             calculator (Optional[BaseCalculator], optional): A calculator object for structure relaxation.
                                                              If None, defaults to `M3GNetCalculator`.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has final_structure implemented
+        self._calculator = calculator
 
         # TODO: The step size of 0.01 can be an input parameter
         self.deltas: np.ndarray = np.linspace(start=-1 * delta_max,

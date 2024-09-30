@@ -47,7 +47,7 @@ class Phono3pyDisplacementTransformation:
             calculator (Optional[BaseCalculator], optional): The calculator instance to use for relaxation.
                                                              Defaults to `M3GNetCalculator`.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has final_structure implemented
+        self._calculator = calculator
 
         self.phonon: Phono3py | None = None
 

@@ -52,7 +52,7 @@ class ANNNIStackingFaultAnalyzer:
                                                                                         fault structures. If not provided, a default instance
                                                                                         is initialized.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has potential_energy and final_structure implemented
+        self._calculator = calculator
         self._annni_transformation = annni_transformation
 
     def calculate(
@@ -74,6 +74,9 @@ class ANNNIStackingFaultAnalyzer:
             dict: A dictionary containing the intrinsic stacking fault energy (`isfe`) and extrinsic stacking fault
                   energy (`esfe`), both normalized by the FCC unit cell area.
         """
+        if "potential_energy" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'potential_energy' property implemented.")
+
         self.annni_transformation.apply_transformation(composition=composition)
 
         fcc_struct = self.annni_transformation.structures["fcc"]

@@ -50,7 +50,7 @@ class Phono3pyAnalyzer:
             phono3py_transformation (Phono3pyDisplacementTransformation, optional): The transformation object used
                                                                                    to generate displaced structures.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has forces implemented
+        self._calculator = calculator
         self._phono3py_transformation = phono3py_transformation
 
         self.phonon = None
@@ -94,6 +94,9 @@ class Phono3pyAnalyzer:
         Returns:
             dict[str, ConductivityRTA | ConductivityLBTE]: A dictionary containing the calculated thermal conductivity.
         """
+        if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'forces' property implemented.")
+
         mesh = mesh or [20, 20, 20]
 
         self.phono3py_transformation.apply_transformation(structure=structure,

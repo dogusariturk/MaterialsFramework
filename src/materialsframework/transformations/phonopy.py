@@ -47,7 +47,7 @@ class PhonopyDisplacementTransformation:
             calculator (BaseCalculator | None, optional): The calculator instance to use for relaxation.
                                                              Defaults to `M3GNetCalculator`.
         """
-        self._calculator = calculator  # TODO: Check if Calculator has final_structure implemented
+        self._calculator = calculator
 
         self.phonon: Phonopy | None = None
         self.displacements: np.ndarray | list | None = None
