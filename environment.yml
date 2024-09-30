@@ -12,3 +12,6 @@ dependencies:
       - chgnet
       - mace-torch
       - openpyxl
+      - sevenn
+      - orb-models
+      - git+https://github.com/dwastberg/pynanoflann

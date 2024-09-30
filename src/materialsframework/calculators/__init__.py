@@ -1,13 +1,26 @@
-""" This module contains the calculators for MaterialsFramework. """
-from .chgnet import CHGNetCalculator, CHGNetRelaxer
-from .m3gnet import M3GNetCalculator, M3GNetRelaxer
+"""
+This module provides the calculator classes for the MaterialsFramework.
+
+The module includes several calculators, each designed to interface with specific machine learning
+potentials and perform material property calculations such as potential energy, forces, and stresses.
+These calculators support advanced material simulations and structure relaxations.
+
+This module serves as a centralized collection of calculator classes to streamline
+the workflow of materials modeling and property prediction within the MaterialsFramework.
+"""
+from .chgnet import CHGNetCalculator
+from .m3gnet import M3GNetCalculator
 from .mace import MACECalculator
 from .megnet import MEGNetCalculator
+from .orb import ORBCalculator
+from .sevennet import SevenNetCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
-__all__ = ["CHGNetCalculator", "CHGNetRelaxer",
-           "M3GNetRelaxer", "M3GNetCalculator",
+__all__ = ["CHGNetCalculator",
+           "M3GNetCalculator",
            "MACECalculator",
-           "MEGNetCalculator"]
+           "MEGNetCalculator",
+           "ORBCalculator",
+           "SevenNetCalculator"]
