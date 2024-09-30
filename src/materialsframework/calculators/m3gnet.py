@@ -1,166 +1,76 @@
 """
-This module provides classes to perform calculations using the M3GNet potential.
+This module provides a class for performing calculations using the M3GNet potential.
+
+The `M3GNetCalculator` class is designed to calculate properties such as potential energy,
+forces, and stresses, and to perform structure relaxation using a specified M3GNet model.
 """
 from __future__ import annotations
 
-import os
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import matgl
-import numpy as np
 from matgl.ext.ase import PESCalculator
 
-from materialsframework.tools.relaxer import Relaxer as ASERelaxer
-from materialsframework.tools.typing import Calculator, Relaxer
+from materialsframework.tools.calculator import BaseCalculator
 
 if TYPE_CHECKING:
+    from ase.calculators.calculator import Calculator
+    from torch import Tensor
     from matgl.apps.pes import Potential
-    from numpy.typing import ArrayLike
-    from pymatgen.core import Structure
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class M3GNetRelaxer(Relaxer):
+class M3GNetCalculator(BaseCalculator):
     """
-    A class used to represent a M3GNet Relaxer.
+    A calculator class for performing material property calculations and structure relaxation using the M3GNet potential.
 
-    This class provides methods to perform relaxation of a structure using the M3GNet potential.
+    The `M3GNetCalculator` class supports the calculation of properties such as potential energy,
+    forces, and stresses. It also allows for the relaxation of structures using a specified M3GNet model.
+
+    Attributes:
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
+                                          including "potential_energy", "forces", and "stresses".
     """
+
+    AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]
 
     def __init__(
             self,
-            fmax: float = 0.001,
-            relax_cell: bool = True,
-            fix_symmetry: bool = False,
-            fix_atoms: bool = False,
-            hydrostatic_strain: bool = False,
-            verbose: bool = False,
-            steps: int = 1000,
             model: str = "M3GNet-MP-2021.2.8-PES",
-            optimizer: str = "FIRE",
+            state_attr: Tensor | None = None,
+            stress_weight: float = 1.0,
+            **basecalculator_kwargs
     ) -> None:
         """
-        Initializes the M3GNet calculator.
+        Initializes the M3GNetCalculator with the specified model and calculation settings.
+
+        This method sets up the calculator with a predefined M3GNet model, which will be used
+        to calculate properties and perform structure relaxation. Additional parameters
+        for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            fmax (float): The maximum force tolerance for convergence. Defaults to 0.001.
-            relax_cell (bool): Whether to relax the lattice cell. Defaults to True.
-            fix_symmetry (bool): Whether to fix the symmetry of the structure. Defaults to False.
-            fix_atoms (bool): Whether to fix the atoms during relaxation. Defaults to False.
-            verbose (bool): Whether to print verbose output during calculations. Defaults to False.
-            steps (int): The maximum number of optimization steps. Defaults to 1000.
-            model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
-            optimizer (str): The optimizer to use for relaxation. Defaults to "FIRE".
+            model (str, optional): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
+            state_attr (Tensor | None, optional): State attributes to include in the potential energy calculation.
+                                                  This allows for additional model customization. Defaults to None.
+            stress_weight (float, optional): Conversion factor from GPa to eV/ang^3. If set to 1.0, stress is calculated in GPa.
+                                             Defaults to 1.0.
+            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
 
         Examples:
-            >>> relaxer = M3GNetRelaxer()
-            >>> relaxer = M3GNetRelaxer(fmax=0.001, relax_cell=True, verbose=False, steps=1000,
-            ...                         model="M3GNet-MP-2021.2.8-PES", optimizer='FIRE')
+            >>> m3gnet_calculator = M3GNetCalculator(model="M3GNet-MP-2021.2.8-PES")
 
         Note:
-            The remaining values for the arguments are set to the default values for the M3GNet potential.
+            The remaining parameters for the M3GNet potential are set to their default values.
         """
-        self._fmax = fmax
-        self._relax_cell = relax_cell
-        self._fix_symmetry = fix_symmetry
-        self._fix_atoms = fix_atoms
-        self._hydrostatic_strain = hydrostatic_strain
-        self._verbose = verbose
-        self._model = model
-        self._steps = steps
-        self._optimizer = optimizer
+        # BaseCalculator specific attributes
+        super().__init__(**basecalculator_kwargs)
 
-        self._relaxer = None
-        self._potential = None
-
-    @property
-    def potential(self) -> Potential:
-        """
-        Returns the M3GNet potential associated with this instance.
-
-        If the potential has not been initialized yet, it will be loaded
-        using the model attribute of this instance.
-
-        Returns:
-            Potential: The M3GNet potential associated with this instance.
-        """
-        if self._potential is None:
-            self._potential = matgl.load_model(self._model)
-        return self._potential
-
-    @property
-    def relaxer(self) -> ASERelaxer:
-        """
-        Returns the Relaxer object associated with this instance.
-
-        If the Relaxer object has not been initialized yet, it will be created using the
-        potential and relax_cell attributes of this instance.
-
-        Returns:
-            AseRelaxer: The AseM3GNetRelaxer object associated with this instance.
-        """
-        if self._relaxer is None:
-            self._relaxer = ASERelaxer(potential=self.potential,
-                                       optimizer=self._optimizer,
-                                       relax_cell=self._relax_cell,
-                                       fix_symmetry=self._fix_symmetry,
-                                       fix_atoms=self._fix_atoms,
-                                       hydrostatic_strain=self._hydrostatic_strain)
-        return self._relaxer
-
-    def relax(
-            self,
-            structure: Structure,
-    ) -> tuple[Structure, float]:
-        """
-        Performs the relaxation of the structure using the M3GNet calculator.
-
-        Args:
-            structure (Structure): The input structure.
-
-        Returns:
-            tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
-
-        Examples:
-            >>> relaxer = M3GNetRelaxer()
-            >>> struct = Structure.from_file("POSCAR")
-            >>> relaxation_results = relaxer.relax(structure=struct)
-        """
-        relax_results = self.relaxer.relax(structure, fmax=self._fmax, steps=self._steps, verbose=self._verbose)
-        return {
-                "final_structure": relax_results["final_structure"],
-                "energy": float(relax_results["trajectory"].energies[-1]),
-                "trajectory": relax_results["trajectory"]
-        }
-
-
-class M3GNetCalculator(Calculator):
-    """
-    A class representing the M3GNet calculator.
-
-    This class is used to calculate the potential energy, forces, and stresses
-    of a given structure using the M3GNet potential.
-    """
-
-    def __init__(self, model: str = "M3GNet-MP-2021.2.8-PES") -> None:
-        """
-        Initializes the M3GNet calculator.
-
-        Args:
-            model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
-
-        Examples:
-            >>> calculator = M3GNetCalculator()
-            >>> calculator = M3GNetCalculator(model="M3GNet-MP-2021.2.8-PES")
-
-        Note:
-            The remaining values for the arguments are set to the default values for the M3GNet potential.
-        """
-        self._model: str = model
+        # M3GNet specific attributes
+        self.model = model
+        self.state_attr = state_attr
+        self.stress_weight = stress_weight
 
         self._calculator = None
         self._potential = None
@@ -168,56 +78,35 @@ class M3GNetCalculator(Calculator):
     @property
     def potential(self) -> Potential:
         """
-        Returns the M3GNet potential associated with this instance.
+        Loads and returns the M3GNet potential associated with this calculator instance.
 
-        If the potential has not been initialized yet, it will be loaded
-        using the model attribute of this instance.
+        This property lazily loads the M3GNet model specified during initialization if it
+        has not already been loaded. The loaded potential is then used for all subsequent
+        calculations.
 
         Returns:
-            Potential: The M3GNet potential associated with this instance.
+            Potential: The loaded M3GNet model instance used for calculations.
         """
         if self._potential is None:
-            self._potential = matgl.load_model(self._model)
+            self._potential = matgl.load_model(self.model)
         return self._potential
 
     @property
-    def calculator(self) -> PESCalculator:
+    def calculator(self) -> Calculator:
         """
-        Returns the M3GNet PESCalculator instance.
+        Creates and returns the ASE Calculator object associated with this calculator instance.
 
-        If the calculator instance is not already created, it creates a new PESCalculator instance
-        with the specified potential and returns it. Otherwise, it returns the existing
-        calculator instance.
+        This property initializes the Calculator object using the M3GNet potential and other
+        relevant attributes such as `state_attr` and `stress_weight`. If the Calculator object
+        has already been created, it will return the existing instance.
 
         Returns:
-            PESCalculator: The M3GNet calculator instance.
+            Calculator: The ASE Calculator object configured with the M3GNet potential.
         """
         if self._calculator is None:
-            self._calculator = PESCalculator(potential=self.potential)
+            self._calculator = PESCalculator(
+                    potential=self.potential,
+                    state_attr=self.state_attr,
+                    stress_weight=self.stress_weight,
+            )
         return self._calculator
-
-    def calculate(
-            self,
-            structure: Structure,
-    ) -> dict[str, Union[float, ArrayLike]]:
-        """
-        Calculates the potential energy, forces, and stresses of the given structure.
-
-        Args:
-            structure (Structure): The structure for which the properties will be calculated.
-
-        Returns:
-            dict[str, ArrayLike]: A dictionary containing the calculated properties.
-
-        Examples:
-            >>> calculator = M3GNetCalculator()
-            >>> struct = Structure.from_file("POSCAR")
-            >>> calculation_results = calculator.calculate(structure=struct)
-        """
-        atoms = structure.to_ase_atoms()
-        atoms.calc = self.calculator
-        return {
-                "potential_energy": np.array(atoms.get_potential_energy()),
-                "forces": np.array(atoms.get_forces()),
-                "stresses": np.array(atoms.get_stress())
-        }

@@ -1,11 +1,16 @@
 """
-This module contains the M3GNetMDCalculator class, which is used to perform
+This module provides the `M3GNetMDCalculator` class, which is used to perform
 Molecular Dynamics (MD) simulations using the M3GNet potential.
+
+The `M3GNetMDCalculator` class allows users to set up and run MD simulations with different ensembles,
+including NVE, NVT (Nose-Hoover), and NPT (Nose-Hoover). The calculator is designed to handle advanced
+MD settings such as velocity initialization, pressure control, and symmetry constraints, all based on the
+M3GNet potential model.
 """
 from __future__ import annotations
 
 import os
-from typing import Literal, Optional, TYPE_CHECKING, Union
+from typing import Literal, TYPE_CHECKING
 
 import matgl
 import numpy as np
@@ -17,7 +22,6 @@ from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary
 from matgl.ext.ase import PESCalculator
 
 from materialsframework.tools.trajectory import TrajectoryObserver
-from materialsframework.tools.typing import MDCalculator
 
 if TYPE_CHECKING:
     from ase import Atoms
@@ -30,11 +34,14 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class M3GNetMDCalculator(MDCalculator):
+class M3GNetMDCalculator:
     """
-    A class used to represent a M3GNet Molecular Dynamics (MD) Calculator.
+    A calculator class for performing Molecular Dynamics (MD) simulations using the M3GNet potential.
 
-    This class provides methods to perform Molecular Dynamics (MD) simulations using the M3GNet potential.
+    The `M3GNetMDCalculator` class supports different ensembles such as NVE, NVT (Nose-Hoover), and NPT (Nose-Hoover),
+    and provides a range of customizable parameters to control the simulation environment, including temperature,
+    pressure, and timestep. This class also integrates constraints like fixing symmetry and initializing velocities
+    to prepare the system for MD simulations.
     """
 
     def __init__(
@@ -49,24 +56,28 @@ class M3GNetMDCalculator(MDCalculator):
             pfactor: float = 75.0 ** 2.0,  # fs ** 2
             stationary: bool = True,
             zero_rotation: bool = True,
-            logfile: Optional[str] = None,
+            logfile: str | None = None,
             loginterval: int = 1,
     ) -> None:
         """
-        Initializes the M3GNet Molecular Dynamics (MD) Calculator.
+        Initializes the `M3GNetMDCalculator` with the specified parameters for running MD simulations.
 
         Args:
-            model (str): The M3GNet model to use. Defaults to "M3GNet-MP-2021.2.8-PES".
-            ensemble (Literal["nve", "nvt_nose_hoover", "npt_nose_hoover"]): The ensemble to use. Defaults to "nve".
-            timestep (float): The timestep in fs for the MD simulation. Defaults to 1.0 fs.
-            temperature (int): The temperature in K for the MD simulation. Defaults to 300 K.
-            pressure (float): The pressure in atm for the MD simulation. Defaults to 1 atm.
-            ttime (float): The time constant for the thermostat. Defaults to 25.0 fs.
-            pfactor (float): The pressure factor for the MD simulation. Defaults to 75.0 fs ** 2.0.
-            stationary (bool): Whether to et the center-of-mass momentum to zero. Defaults to True.
-            zero_rotation (bool): Whether to set the total angular momentum to zero. Defaults to True.
-            logfile (Optional[str]): The logfile to save the results. Defaults to None.
-            loginterval (int): The interval to log the results. Defaults to 1 (each step).
+            model (str, optional): The M3GNet model to use for the MD simulation. Defaults to "M3GNet-MP-2021.2.8-PES".
+            fix_symmetry (bool, optional): Whether to apply symmetry constraints during the simulation. Defaults to False.
+            ensemble (Literal["nve", "nvt_nose_hoover", "npt_nose_hoover"], optional): The ensemble to use in the simulation. Defaults to "nve".
+            timestep (float, optional): The timestep for the MD simulation in femtoseconds (fs). Defaults to 1.0 fs.
+            temperature (int, optional): The temperature in Kelvin (K) for the MD simulation. Defaults to 300 K.
+            pressure (float, optional): The pressure in atmospheres (atm) for the NPT ensemble. Defaults to 1 atm.
+            ttime (float, optional): The time constant for temperature control in femtoseconds (fs). Defaults to 10.0 fs.
+            pfactor (float, optional): Pressure factor for the NPT ensemble in fs^2. Defaults to 75.0^2 fs^2.
+            stationary (bool, optional): Whether to set the center-of-mass motion to zero. Defaults to True.
+            zero_rotation (bool, optional): Whether to set the total angular momentum to zero. Defaults to True.
+            logfile (Optional[str], optional): The file to log simulation output. If None, no logging occurs. Defaults to None.
+            loginterval (int, optional): The interval at which to log the simulation results. Defaults to 1 (every step).
+
+        Raises:
+            ValueError: If an unsupported ensemble type is provided.
         """
         if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover"]:
             raise ValueError("Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover'")
@@ -81,7 +92,7 @@ class M3GNetMDCalculator(MDCalculator):
         self._ttime: float = ttime
         self._stationary: bool = stationary
         self._zero_rotation: bool = zero_rotation
-        self._logfile: Union[str, None] = logfile
+        self._logfile: str | None = logfile
         self._loginterval: int = loginterval
 
         self._potential = None
@@ -94,13 +105,14 @@ class M3GNetMDCalculator(MDCalculator):
     @property
     def potential(self) -> Potential:
         """
-        Returns the M3GNet potential associated with this instance.
+        Loads and returns the M3GNet potential associated with this instance.
 
-        If the potential has not been initialized yet, it will be loaded
-        using the model attribute of this instance.
+        If the potential has not already been initialized, this property will load
+        it using the specified model. The loaded potential is then used for all
+        subsequent MD simulations.
 
         Returns:
-            Potential: The M3GNet potential associated with this instance.
+            Potential: The loaded M3GNet potential for the MD simulations.
         """
         if self._potential is None:
             self._potential = matgl.load_model(self._model)
@@ -108,10 +120,10 @@ class M3GNetMDCalculator(MDCalculator):
 
     def _initialize_npt_nose_hoover(self, ase_atoms: Atoms) -> None:
         """
-        Initializes the NPT Nose-Hoover ensemble for the MD simulation.
+        Initializes the NPT Nose-Hoover ensemble for MD simulations.
 
         Args:
-            ase_atoms (Atoms): The ASE atoms object.
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         self._upper_triangular_cell(ase_atoms)
         self.dyn = NPT(
@@ -125,10 +137,10 @@ class M3GNetMDCalculator(MDCalculator):
 
     def _initialize_nvt_nose_hoover(self, ase_atoms: Atoms) -> None:
         """
-        Initializes the NVT Nose-Hoover ensemble for the MD simulation.
+        Initializes the NVT Nose-Hoover ensemble for MD simulations.
 
         Args:
-            ase_atoms (Atoms): The ASE atoms object.
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         self._upper_triangular_cell(ase_atoms)
         self.dyn = NPT(
@@ -141,26 +153,30 @@ class M3GNetMDCalculator(MDCalculator):
 
     def _initialize_nve(self, ase_atoms: Atoms) -> None:
         """
-        Initializes the NVE ensemble for the MD simulation.
+        Initializes the NVE ensemble for MD simulations.
 
         Args:
-            ase_atoms (Atoms): The ASE atoms object.
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         self.dyn = VelocityVerlet(
                 atoms=ase_atoms,
                 timestep=self._timestep * units.fs,
         )
 
-    def run(self, structure: Structure, steps: int) -> dict:
+    def run(self, structure: Structure, steps: int) -> dict[str, list]:
         """
-        Performs the Molecular Dynamics (MD) simulation using the M3GNet potential.
+        Executes the Molecular Dynamics (MD) simulation using the M3GNet potential.
+
+        This method performs the simulation based on the provided structure and
+        simulation parameters such as the ensemble type and the number of MD steps.
 
         Args:
-            structure (Structure): The input structure.
-            steps (int): The number of MD steps.
+            structure (Structure): The input atomic structure for the MD simulation.
+            steps (int): The number of MD steps to perform.
 
         Returns:
-            dict: A dictionary containing the results of the MD simulation.
+            dict: A dictionary containing the results of the MD simulation, including
+                  total energy, potential energy, kinetic energy, forces, stresses, and temperature.
         """
         ase_atoms = structure.to_ase_atoms()
 
@@ -196,7 +212,7 @@ class M3GNetMDCalculator(MDCalculator):
             )
             self.dyn.attach(logger, interval=self._loginterval)
 
-        self.trajectory = TrajectoryObserver(ase_atoms)
+        self.trajectory = TrajectoryObserver(ase_atoms, include_temperature=True)
         self.dyn.attach(self.trajectory, interval=1)
 
         self.dyn.run(steps)
@@ -207,7 +223,7 @@ class M3GNetMDCalculator(MDCalculator):
                 "kinetic_energy": self.trajectory.kinetic_energies,
                 "forces": self.trajectory.forces,
                 "stresses": self.trajectory.stresses,
-                "temperature": self.trajectory.temperature,
+                "temperature": self.trajectory.temperatures,
         }
 
         return self.results
@@ -215,12 +231,16 @@ class M3GNetMDCalculator(MDCalculator):
     @staticmethod
     def _upper_triangular_cell(atoms) -> None:
         """
-        Converts the cell of the atoms to upper triangular form.
+        Converts the unit cell of the provided atoms object to upper triangular form.
+
+        This operation ensures that the cell parameters are in a suitable form for
+        MD simulations.
 
         Args:
-            atoms (Atoms): The ASE atoms object.
+            atoms (Atoms): The ASE atoms object whose cell will be converted.
 
-        NOTE: Adapted from the matgl code.
+        Note:
+            This method is adapted from the matgl code.
         """
         if not NPT._isuppertriangular(atoms.get_cell()):
             a, b, c, alpha, beta, gamma = atoms.cell.cellpar()

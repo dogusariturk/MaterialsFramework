@@ -1,19 +1,24 @@
 """
 This module provides a class to perform an Equation of State (EOS) analysis on a given structure.
+
+The `EOSAnalyzer` class allows users to perform an EOS analysis by applying a series of volume changes
+to a structure and calculating the corresponding energies. The resulting data is used to fit a chosen
+equation of state (EOS), providing insights into the mechanical properties of the material, such as the
+bulk modulus.
 """
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from pymatgen.analysis.eos import EOS
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator, M3GNetRelaxer
+from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.eos import EOSTransformation
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Calculator, Relaxer
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -23,45 +28,53 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class EOSAnalyzer:
     """
-    A class used to represent an EOSAnalyzer.
+    A class used to perform Equation of State (EOS) analysis for a given structure.
 
-    This class provides methods to perform an Equation of State (EOS) analysis on a given structure.
+    The `EOSAnalyzer` class provides methods to fit energy-volume data to an EOS (such as Birch-Murnaghan)
+    for determining material properties like the bulk modulus. The class uses deformation transformations
+    to create a series of structures with varying volumes and calculates their corresponding energies.
     """
 
     def __init__(
             self,
             eos_name: str = "birch_murnaghan",
-            relaxer: Optional[Relaxer] = None,
-            calculator: Optional[str] = None,
-            eos_transformation: Optional[EOSTransformation] = None
+            calculator: BaseCalculator | None = None,
+            eos_transformation: EOSTransformation | None = None
     ) -> None:
         """
-        Initializes the EOSAnalyzer.
+        Initializes the `EOSAnalyzer` object.
 
         Args:
-            eos_name (str): The name of the EOS to fit. Default is "birch_murnaghan".
-            relaxer (Optional[Relaxer]): The Relaxer object to use for relaxation. Default is M3GNetRelaxer.
-            calculator (Optional[str]): The Calculator object to use for calculations. Default is M3GNetCalculator
-            eos_transformation (Optional[EOSTransformation]): The EOS transformation object. Default is EOSTransformation.
+            eos_name (str, optional): The name of the equation of state (EOS) used for fitting. Defaults to "birch_murnaghan".
+            calculator (BaseCalculator | None, optional): The calculator used for energy calculations. Defaults to `M3GNetCalculator`.
+            eos_transformation (EOSTransformation | None, optional): The transformation used to generate deformed structures.
+                                                                         Defaults to `EOSTransformation`.
         """
         self._eos_name = eos_name
-        self._relaxer = relaxer
-        self._calculator = calculator
+        self._calculator = calculator  # TODO: Check if Calculator has potential_energy and final_structure implemented
 
         self._eos_transformation = eos_transformation
 
-    def calculate(self, undeformed_structure: Structure, is_relaxed: bool = False) -> dict:
+    def calculate(
+            self,
+            undeformed_structure: Structure,
+            is_relaxed: bool = False
+    ) -> dict[str, list]:
         """
-        Calculates the potential energies to construct the EOS for the given undeformed structure.
+        Calculates the potential energies and volumes to construct the EOS for the given undeformed structure.
+
+        This method applies a series of volume deformations to the input structure, generating a set of strained
+        structures. It then calculates the corresponding potential energies and fits the data to the specified
+        equation of state (EOS).
 
         Args:
-            undeformed_structure (Structure): The undeformed structure.
-            is_relaxed (bool): Whether the structure is already relaxed. Defaults to False.
+            undeformed_structure (Structure): The undeformed structure to be analyzed.
+            is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
-            dict: A dictionary containing the strains, volumes, energies, and EOS fitting results.
+            dict[str, list]: A dictionary containing the calculated strains, volumes, energies, and the EOS fitting results.
         """
-        undeformed_structure = self.relaxer.relax(structure=undeformed_structure)["final_structure"] if not is_relaxed else undeformed_structure
+        undeformed_structure = self.calculator.relax(structure=undeformed_structure)["final_structure"] if not is_relaxed else undeformed_structure
 
         self.eos_transformation.apply_transformation(undeformed_structure)
 
@@ -80,31 +93,14 @@ class EOSAnalyzer:
         }
 
     @property
-    def relaxer(self) -> Relaxer:
+    def calculator(self) -> BaseCalculator:
         """
-        Returns the Relaxer instance.
+        Returns the calculator instance used for energy calculations.
 
-        If the relaxer instance is not already created, it creates a new M3GNetRelaxer instance
-        and returns it. Otherwise, it returns the existing relaxer instance.
+        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            Relaxer: The Relaxer instance.
-        """
-        if self._relaxer is None:
-            self._relaxer = M3GNetRelaxer()
-        return self._relaxer
-
-    @property
-    def calculator(self) -> Calculator:
-        """
-        Returns the Calculator instance.
-
-        If the calculator instance is not already created, it creates a new M3GNetCalculator
-        instance with the specified potential and returns it. Otherwise, it returns the existing
-        calculator instance.
-
-        Returns:
-            Calculator: The Calculator instance.
+            BaseCalculator: The calculator object used for potential energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -113,10 +109,12 @@ class EOSAnalyzer:
     @property
     def eos_transformation(self) -> EOSTransformation:
         """
-        Gets the EOS transformation object.
+        Returns the EOS transformation object used to generate deformed structures.
+
+        If the transformation instance is not already initialized, this method creates a new `EOSTransformation` instance.
 
         Returns:
-            EOSTransformation: The EOS transformation object.
+            EOSTransformation: The transformation object used for EOS analysis.
         """
         if self._eos_transformation is None:
             self._eos_transformation = EOSTransformation()

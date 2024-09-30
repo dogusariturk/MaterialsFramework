@@ -1,122 +1,104 @@
 """
-This module provides classes to perform calculations using the MACE potential.
+This module provides a class for performing calculations and structure relaxation using the MACE potential.
+
+The `MACECalculator` class is designed to calculate properties such as potential energy, free energy,
+forces, and stresses, and to perform structure relaxation using a specified MACE model.
 """
 from __future__ import annotations
 
-import os
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Literal, TYPE_CHECKING
 
-from mace.calculators import MACECalculator as ASEMACECalculator
-
-from materialsframework.tools.typing import Calculator
+from mace.calculators import mace_mp
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
-    from pymatgen.core import Structure
+    from ase.calculators.calculator import Calculator
+    from pathlib import Path
+
+from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class MACECalculator(Calculator):
+class MACECalculator(BaseCalculator):
     """
-    A class used to represent a MACE Calculator.
+    A calculator class for performing material property calculations and structure relaxation using the MACE potential.
 
-    This class provides methods to perform calculations using the MACE potential.
+    The `MACECalculator` class supports the calculation of properties such as potential energy,
+    free energy, forces, and stresses. It also allows for the relaxation of structures using
+    a specified MACE model.
+
+    Attributes:
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
+                                          including "potential_energy", "free_energy", "forces", and "stresses".
     """
+
+    AVAILABLE_PROPERTIES = ["energy", "node_energy", "forces", "stress"]
 
     def __init__(
             self,
-            device: Optional[str] = None,
-            default_dtype: Optional[str] = None,
-            model: str = "2023-12-03-mace-128-L1_epoch-199.model") -> None:
+            model: str | Path = "large",
+            include_dipoles: bool = False,
+            device: Literal["cuda", "cpu", "mps"] = "cpu",
+            default_dtype: str = "",
+            model_type: Literal["MACE", "DipoleMACE", "EnergyDipoleMACE"] = "MACE",
+            **basecalculator_kwargs
+    ) -> None:
         """
-        Initialize a MACECalculator instance.
+        Initializes the MACECalculator with the specified model and calculation settings.
+
+        This method sets up the calculator with a predefined MACE model, which will be used
+        to calculate properties and perform structure relaxation. Additional parameters for
+        the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            device: The device to use for calculations (cuda or cpu).
-            default_dtype: The default data type to use for calculations (float64 or float32).
-            model: The model to use for calculations. Defaults to "2023-12-03-mace-128-L1_epoch-199.model".
+            model (Union[str, Path], optional): The MACE model to use. This can be the name of a predefined model
+                (e.g., "large"), a path to a custom model file, or a URL. Defaults to "large".
+            include_dipoles (bool, optional): Determines whether dipole properties are included in the model. Defaults to False.
+            device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
+            default_dtype (str, optional): The default data type to be used for the model. Defaults to an empty string,
+                meaning the default data type of the model will be used.
+            model_type (Literal["MACE", "DipoleMACE", "EnergyDipoleMACE"], optional): The type of MACE model to use. Defaults to "MACE".
+            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
 
         Examples:
-            >>> calculator = MACECalculator(device="cpu", default_dtype="float32")
-            >>> calculator = MACECalculator(device="cuda", default_dtype="float64", model="2023-12-03-mace-128-L1_epoch-199.model")
+            >>> mace_calculator = MACECalculator(model="medium", device="cuda")
 
         Note:
-            The remaining values for the arguments are set to the default values for the MACE potential.
+            The remaining parameters for the MACE potential are set to their default values, which are appropriate for general use cases.
+            If needed, they can be adjusted based on specific calculation requirements.
         """
-        self._device = device
-        self._default_dtype = default_dtype
-        self._model: str = model
+        # BaseCalculator specific attributes
+        super().__init__(include_dipoles=include_dipoles, **basecalculator_kwargs)
+
+        # MACE specific attributes
+        self.model = model
+        self.device = device
+        self.default_dtype = default_dtype
+        self.model_type = model_type
+
+        if include_dipoles:
+            self.__class__.AVAILABLE_PROPERTIES.append("dipoles")
 
         self._calculator = None
-        self._potential = None
 
     @property
-    def potential(self) -> str:
+    def calculator(self) -> Calculator:
         """
-        Returns the MACE potential path associated with this instance.
+        Creates and returns the ASE Calculator object associated with this calculator instance.
 
-        If the potential has not been initialized yet, it will be loaded
-        using the model attribute of this instance.
+        This property initializes the Calculator object using the specified MACE model and other
+        relevant attributes: `device`, `default_dtype`, and `model_type`. If the Calculator object
+        has already been created, it will return the existing instance.
 
         Returns:
-            str: The path to MACE potential associated with this instance.
-        """
-        if self._potential is None:
-            models = {
-                    "small": "2023-12-10-mace-128-L0_energy_epoch-249.model",
-                    "medium": "2023-12-03-mace-128-L1_epoch-199.model",
-                    "large": "MACE_MPtrj_2022.9.model",
-            }
-            model_file = models.get(self._model, self._model)
-            self._potential = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/", model_file))
-        return self._potential
-
-    @property
-    def calculator(self) -> ASEMACECalculator:
-        """
-        Returns the ASE MACECalculator associated with this instance.
-
-        If the calculator has not been initialized yet, it will be created
-        using the potential attribute of this instance.
-
-        Returns:
-            ASEMACECalculator: The ASE MACECalculator associated with this instance.
+            Calculator: The ASE Calculator object configured with the MACE potential.
         """
         if self._calculator is None:
-            self._calculator = ASEMACECalculator(
-                    model_paths=self.potential,
-                    device=self._device,
-                    default_dtype=self._default_dtype,
+            self._calculator = mace_mp(
+                    model=self.model,
+                    device=self.device,
+                    default_dtype=self.default_dtype,
+                    model_type=self.model_type,
             )
         return self._calculator
-
-    def calculate(
-            self,
-            structure: Structure
-    ) -> dict[str, Union[float, ArrayLike]]:
-        """
-        Calculate the potential energy, free energy, forces, and stresses
-        of a structure using the MACE potential.
-
-        Args:
-            structure: The input structure.
-
-        Returns:
-            dict[str, Union[float, ArrayLike]]: A dictionary containing the calculated properties.
-
-        Examples:
-            >>> calculator = MACECalculator(device="cuda", default_dtype="float64")
-            >>> struct = Structure.from_file("POSCAR")
-            >>> calculation_results = calculator.calculate(structure=struct)
-        """
-        atoms = structure.to_ase_atoms()
-        self.calculator.calculate(atoms=atoms)
-
-        return {
-                "potential_energy": self.calculator.results["energy"],
-                "free_energy": self.calculator.results["free_energy"],
-                "forces": self.calculator.results["forces"],
-                "stress": self.calculator.results["stress"],
-        }

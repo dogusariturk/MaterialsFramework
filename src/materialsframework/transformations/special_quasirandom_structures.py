@@ -1,12 +1,17 @@
 """
-This module contains classes for generating special quasirandom structures (SQS).
+This module contains classes for generating Special Quasirandom Structures (SQS).
+
+The `SqsgenTransformation` class allows users to generate SQS structures, which are designed
+to mimic the statistical properties of a random alloy, using the method implemented in the `sqsgenerator`.
+SQS structures are important in simulating disordered systems or alloys, as they approximate randomness
+while maintaining computational tractability.
 """
 from __future__ import annotations
 
 import operator
 import os
 from functools import reduce
-from typing import Optional, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 
 import numpy as np
 from pymatgen.core import Lattice
@@ -23,60 +28,69 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class SqsgenTransformation:
     """
-    A class used to represent a SQS (Special Quasirandom Structures) Calculator.
+    A class used to generate Special Quasirandom Structures (SQS).
 
-    This class provides methods to generate SQS structures using the SQS method implemented in "sqsgenerator".
+    The `SqsgenTransformation` class provides methods to generate SQS structures using the SQS method,
+    which produces structures that approximate a random arrangement of atoms while matching specific
+    pair and multi-site correlation functions. These structures are widely used in simulations of
+    disordered systems and alloys.
     """
 
     def __init__(
             self,
             iterations: int = 1000,
             make_structures: bool = True,
-            mode: str = "random",
+            mode: Literal["random", "systematic"] = "random",
             structure_format: str = "pymatgen",
     ) -> None:
         """
-        Initializes the SQSCalculator object.
+        Initializes the `SqsgenTransformation` object.
 
-        Parameters:
-            iterations (int): The number of iterations for the SQS generation. Default is 1000.
-            make_structures (bool): Whether to make structures. Default is True.
-            mode (str): The mode for the SQS generation. The "random" or "systematic" can be used. Default is "random".
-            structure_format (str): The structure format. Default is "pymatgen".
+        Args:
+            iterations (int, optional): The number of iterations for the SQS generation. Defaults to 1000.
+            make_structures (bool, optional): Whether to generate the structures during the optimization process. Defaults to True.
+            mode (Literal["random", "systematic"], optional): The mode for SQS generation. Defaults to "random".
+            structure_format (str, optional): The structure format for the generated SQS structure. Defaults to "pymatgen".
         """
         self._iterations = iterations
         self._make_structures = make_structures
         self._mode = mode
         self._structure_format = structure_format
 
-        self._lattice = self._coords = self._multiplier = self._supercell_size = self._composition = None
+        self._lattice: Lattice | None = None
+        self._coords: dict[str, list[float]] | None = None
+        self._multiplier: int | None = None
+        self._supercell_size: tuple[int, int, int] | None = None
+        self._composition: dict[str, int] | None = None
 
-        self._sqs = self._objective = None
-        self.results = None
-        self.timings = None
+        self._sqs: Structure | None = None
+        self._objective: float | None = None
+
+        self.results: dict[int, dict[str, Any]] | None = None
+        self.timings: dict[int, float | list[float]] | None = None
 
     def generate(
             self,
             composition: Composition,
             crystal_structure: str = "FCC",
             supercell_size: tuple[int, int, int] = (5, 5, 5),
-            shell_weights: Optional[dict[int, float]] = None,
-    ) -> dict[Structure, float]:
+            shell_weights: dict[int, float] | None = None,
+    ) -> dict[str, Any]:
         """
         Generates a supercell using the SQS (Special Quasirandom Structures) method.
 
         Args:
             composition (Composition): The composition of the supercell.
-            crystal_structure (str): The crystal structure of the supercell. Default is "FCC".
-            supercell_size (tuple[int, int, int]): The size of the supercell. Default is (5, 5, 5).
-            shell_weights (Optional[dict[int, float]]): The weights for the coordination shells. Default is {1: 1.0, 2: 0.5}.
+            crystal_structure (str, optional): The crystal structure of the supercell. Defaults to "FCC".
+            supercell_size (tuple[int, int, int], optional): The size of the supercell. Defaults to (5, 5, 5).
+            shell_weights (Optional[dict[int, float]], optional): The weights for the coordination shells. Defaults to {1: 1.0, 2: 0.5}.
 
         Returns:
-            dict (Structure, float): A dictionary containing the resulting sqs and the objective value.
+            dict[str, Any]: A dictionary containing the generated SQS structure and the objective value.
         """
         self._supercell_size = supercell_size
-        self._lattice: Lattice = self._get_lattice(composition=composition,
-                                                   crystal_structure=crystal_structure.lower())
+        self._lattice = self._get_lattice(composition=composition,
+                                          crystal_structure=crystal_structure.lower())
         self._coords = self._get_coords(crystal_structure=crystal_structure.lower())
         self._multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
         self._composition = self._determine_composition(supercell_size=self._supercell_size,
@@ -112,7 +126,10 @@ class SqsgenTransformation:
         }
 
     @staticmethod
-    def _get_lattice(composition: Composition, crystal_structure: str) -> Lattice:
+    def _get_lattice(
+            composition: Composition,
+            crystal_structure: str
+    ) -> Lattice:
         """
         Calculates and returns the lattice for the given composition and crystal structure.
 
@@ -157,6 +174,7 @@ class SqsgenTransformation:
 
         Returns:
             dict[str, list[float]: The coordinates of atoms based on the crystal structure.
+
         Raises:
             ValueError: If the crystal structure is invalid.
         """
@@ -207,7 +225,11 @@ class SqsgenTransformation:
 
         return multiplier_creators.get(crystal_structure, ValueError("Invalid crystal structure."))
 
-    def _determine_composition(self, supercell_size, composition) -> dict[str, int]:
+    def _determine_composition(
+            self,
+            supercell_size: tuple[int, int, int],
+            composition: Composition
+    ) -> dict[str, int]:
         """
         Determines the composition of the supercell.
 

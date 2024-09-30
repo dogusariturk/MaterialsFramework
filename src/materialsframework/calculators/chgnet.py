@@ -1,168 +1,82 @@
 """
-This module provides classes to perform calculations using the CHGNet potential.
+This module provides a class for performing calculations and structure relaxation using the CHGNet potential.
+
+The `CHGNetCalculator` class is designed to calculate properties such as potential energy, forces,
+stresses, and magnetic moments, and to perform structure relaxation using a specified CHGNet model.
 """
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Literal, TYPE_CHECKING
 
-from chgnet.model import CHGNet, CHGNetCalculator as CHGNetCalc, StructOptimizer
+from chgnet.model import CHGNet, CHGNetCalculator as CHGNetASECalculator
 
-from materialsframework.tools.typing import Calculator, Relaxer
+from materialsframework.tools.calculator import BaseCalculator
 
 if TYPE_CHECKING:
-    from numpy import ndarray
-    from pymatgen.core import Structure
+    from ase.calculators.calculator import Calculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class CHGNetRelaxer(Relaxer):
+class CHGNetCalculator(BaseCalculator):
     """
-    A class used to represent a CHGNet Relaxer.
+    A calculator class for performing material property calculations and structure relaxation using the CHGNet potential.
 
-    This class provides methods to perform relaxation of a structure using the CHGNet potential.
+    The `CHGNetCalculator` class supports the calculation of properties such as potential energy,
+    forces, stresses, and magnetic moments. It also allows for the relaxation of structures using
+    a specified CHGNet model.
+
+    Attributes:
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
+                                          including "potential_energy", "forces", "stresses", and "magmoms".
     """
+
+    AVAILABLE_PROPERTIES = ["energy", "forces", "stress", "magmoms"]
 
     def __init__(
             self,
             model: str = "0.3.0",
-            use_device: Optional[str] = None,
-            fmax: Optional[float] = 0.1,
-            steps: Optional[int] = 500,
-            relax_cell: Optional[bool] = True,
-            ase_filter: Optional[str] = "FrechetCellFilter",
-            assign_magmoms: bool = True,
-            verbose: bool = True
+            stress_weight: float = 1 / 160.21766208,
+            on_isolated_atoms: Literal["ignore", "warn", "error"] = "warn",
+            use_device: Literal["cpu", "cuda", "mps"] = "cpu",
+            check_cuda_mem: bool = True,
+            verbose: bool = False,
+            **basecalculator_kwargs
     ) -> None:
         """
-        Initializes the CHGNet calculator.
+        Initializes the CHGNetCalculator with the specified model and calculation settings.
+
+        This method sets up the calculator with a predefined CHGNet model, which will be used
+        to calculate properties and perform structure relaxation. Additional parameters for
+        the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model (str): The CHGNet model to use. Defaults to "0.3.0".
-            use_device (Optional[str]): The device to use for calculations. Defaults to None.
-            fmax (Optional[float]): The maximum force tolerance for convergence. Defaults to 0.1.
-            steps (Optional[int]): The maximum number of optimization steps. Defaults to 500.
-            relax_cell (Optional[bool]): Whether to relax the lattice cell. Defaults to True.
-            ase_filter (Optional[str]): The ASE filter to use for relaxation. Defaults to "FrechetCellFilter".
-            assign_magmoms (bool): Whether to assign magnetic moments to the atoms. Defaults to True.
-            verbose (bool): Whether to print verbose output during calculations. Defaults to True.
+            model (str, optional): The CHGNet model to use. Defaults to "0.3.0".
+            stress_weight (float, optional): Conversion factor for stress from GPa to eV/Å³. Defaults to 1 / 160.21766208.
+            on_isolated_atoms (Literal["ignore", "warn", "error"], optional): Behavior when isolated atoms are detected.
+                                                                              Defaults to "warn".
+            use_device (Literal["cpu", "cuda", "mps"], optional): The device to use for calculations. Defaults to "cpu".
+            check_cuda_mem (bool, optional): Whether to check CUDA memory before running calculations. Defaults to True.
+            verbose (bool, optional): Whether to print verbose output during calculations. Defaults to False.
+            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
 
         Examples:
-            >>> relaxer = CHGNetRelaxer()
-            >>> relaxer = CHGNetRelaxer(model="0.3.0", use_device="cuda", fmax=0.1, steps=500,
-            ...                         relax_cell=True, ase_filter="FrechetCellFilter", assign_magmoms=True,
-            ...                         verbose=True)
+            >>> chgnet_calculator = CHGNetCalculator(model="0.3.0", use_device="cuda", verbose=True)
 
         Note:
-            The remaining values for the arguments are set to the default values for the CHGNet potential.
+            The remaining parameters for the CHGNet potential are set to their default values.
         """
-        self._model = model
-        self._use_device = use_device
-        self._fmax = fmax
-        self._steps = steps
-        self._relax_cell = relax_cell
-        self._ase_filter = ase_filter
-        self._assign_magmoms = assign_magmoms
-        self._verbose = verbose
+        # BaseCalculator specific attributes
+        super().__init__(include_magmoms=True, **basecalculator_kwargs)
 
-        self._relaxer = None
-        self._potential = None
-
-    @property
-    def potential(self) -> CHGNet:
-        """
-        Returns the CHGNet potential associated with this instance.
-
-        If the potential has not been initialized yet, it will be loaded
-        using the model attribute of this instance.
-
-        Returns:
-            CHGNet: The CHGNet potential associated with this instance.
-        """
-        if self._potential is None:
-            self._potential = CHGNet.load(model_name=self._model,
-                                          use_device=self._use_device,
-                                          verbose=self._verbose)
-        return self._potential
-
-    @property
-    def relaxer(self) -> StructOptimizer:
-        """
-        Returns the Relaxer object associated with this instance.
-
-        If the Relaxer object has not been initialized yet, it will be created using the
-        potential and relax_cell attributes of this instance.
-
-        Returns:
-            StructOptimizer: The Relaxer object associated with this instance.
-        """
-        if self._relaxer is None:
-            self._relaxer = StructOptimizer(model=self.potential,
-                                            use_device=self._use_device)
-        return self._relaxer
-
-    def relax(self, structure: Structure) -> tuple[Structure, float]:
-        """
-        Performs the relaxation of the structure using the CHGNet calculator.
-
-        Args:
-            structure (Structure): The input structure.
-
-        Returns:
-            tuple[Structure, float]: A tuple containing the relaxed structure and its energy.
-
-        Examples:
-            >>> relaxer = CHGNetRelaxer()
-            >>> struct = Structure.from_file("POSCAR")
-            >>> relaxation_results = relaxer.relax(structure=struct)
-        """
-        relax_results = self.relaxer.relax(atoms=structure,
-                                           fmax=self._fmax,
-                                           steps=self._steps,
-                                           relax_cell=self._relax_cell,
-                                           ase_filter=self._ase_filter,
-                                           verbose=self._verbose,
-                                           assign_magmoms=self._assign_magmoms)
-        return {
-                "final_structure": relax_results["final_structure"],
-                "energy": float(relax_results["trajectory"].energies[-1]),
-                "magmom": relax_results["final_structure"].site_properties["magmom"]
-        }
-
-
-class CHGNetCalculator(Calculator):
-    """
-    A class used to represent a CHGNet Calculator.
-
-    This class is used to calculate the potential energy, forces, stresses,
-    and magmoms of a given structure using the CHGNet potential.
-    """
-
-    def __init__(
-            self,
-            model: str = "0.3.0",
-            use_device: Optional[str] = None,
-            verbose: bool = True
-    ) -> None:
-        """
-        Initializes the CHGNet calculator.
-
-        Args:
-            model (str): The CHGNet model to use.
-            use_device (Optional[str]): The device to use for calculations. Defaults to None.
-            verbose (bool): Whether to print verbose output during calculations. Defaults to True.
-
-        Examples:
-            >>> calculator = CHGNetCalculator()
-            >>> calculator = CHGNetCalculator(model="0.3.0", use_device="cuda", verbose=True)
-
-        Note:
-            The remaining values for the arguments are set to the default values for the CHGNet potential.
-        """
-        self._model: str = model
-        self._use_device = use_device
-        self._verbose = verbose
+        # CHGNet specific attributes
+        self.model = model
+        self.stress_weight = stress_weight
+        self.on_isolated_atoms = on_isolated_atoms
+        self.use_device = use_device
+        self.check_cuda_mem = check_cuda_mem
+        self.verbose = verbose
 
         self._calculator = None
         self._potential = None
@@ -170,61 +84,42 @@ class CHGNetCalculator(Calculator):
     @property
     def potential(self) -> CHGNet:
         """
-        Returns the CHGNet potential associated with this instance.
+        Loads and returns the CHGNet potential associated with this calculator instance.
 
-        If the potential has not been initialized yet, it will be loaded
-        using the model attribute of this instance.
+        This property lazily loads the CHGNet model specified during initialization if it
+        has not already been loaded. The loaded potential is then used for all subsequent
+        calculations.
 
         Returns:
-            CHGNet: The CHGNet potential associated with this instance.
+            CHGNet: The loaded CHGNet model instance used for calculations.
         """
         if self._potential is None:
-            self._potential = CHGNet.load(model_name=self._model,
-                                          use_device=self._use_device,
-                                          verbose=self._verbose)
+            self._potential = CHGNet.load(
+                    model_name=self.model,
+                    use_device=self.use_device,
+                    check_cuda_mem=self.check_cuda_mem,
+                    verbose=self.verbose
+            )
         return self._potential
 
     @property
-    def calculator(self) -> CHGNetCalc:
+    def calculator(self) -> Calculator:
         """
-        Returns the CHGNet CHGNetCalculator instance.
+        Creates and returns the ASE Calculator object associated with this calculator instance.
 
-        If the calculator instance is not already created, it creates a new CHGNetCalc instance
-        with the specified potential and returns it. Otherwise, it returns the existing
-        calculator instance.
+        This property initializes the Calculator object using the CHGNet potential and other
+        relevant attributes such as `use_device`, `check_cuda_mem`, and `stress_weight`.
+        If the Calculator object has already been created, it will return the existing instance.
 
         Returns:
-            CHGNetCalc: The CHGNet calculator instance.
+            Calculator: The ASE Calculator object configured with the CHGNet potential.
         """
         if self._calculator is None:
-            self._calculator = CHGNetCalc(model=self.potential,
-                                          use_device=self._use_device,
-                                          verbose=self._verbose)
+            self._calculator = CHGNetASECalculator(
+                    model=self.potential,
+                    use_device=self.use_device,
+                    check_cuda_mem=self.check_cuda_mem,
+                    stress_weight=self.stress_weight,
+                    on_isolated_atoms=self.on_isolated_atoms
+            )
         return self._calculator
-
-    def calculate(
-            self,
-            structure: Structure
-    ) -> dict[str, Union[float, ndarray]]:
-        """
-        Calculates the potential energy, forces, stresses, and magmoms of the given structure.
-
-        Args:
-            structure (Structure): The structure for which the properties will be calculated.
-
-        Returns:
-            dict[str, Any]: A dictionary containing the calculated properties.
-
-        Examples:
-            >>> calculator = CHGNetCalculator()
-            >>> struct = Structure.from_file("POSCAR")
-            >>> calculation_results = calculator.calculate(structure=struct)
-        """
-        atoms = structure.to_ase_atoms()
-        self.calculator.calculate(atoms=atoms)
-        return {
-                "potential_energy": self.calculator.results["energy"],
-                "forces": self.calculator.results["forces"],
-                "stress": self.calculator.results["stress"],
-                "magmoms": self.calculator.results["magmoms"]
-        }

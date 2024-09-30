@@ -1,4 +1,10 @@
-""" This module contains the transformation classes for generating structures."""
+"""
+This module provides various transformation classes for generating and manipulating crystal structures.
+
+The transformations in this module are designed to facilitate structure generation, manipulation,
+and analysis. These transformations are commonly used for  generating special types of structures,
+applying deformations, or preparing structures for phonon calculations or other simulations.
+"""
 from .annni import ANNNIStackingFaultTransformation
 from .bain import BainDisplacementTransformation
 from .elastic_constants import CubicElasticConstantsDeformationTransformation

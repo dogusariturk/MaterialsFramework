@@ -1,20 +1,24 @@
 """
 This module provides a class to generate distorted structures for Phono3py calculations.
+
+The `Phono3pyDisplacementTransformation` class facilitates the generation of supercells with atomic displacements,
+which are necessary for calculating second- and third-order force constants using Phono3py. These displaced structures
+are critical in studying anharmonic phonon properties and thermal conductivity in materials.
 """
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy as np
 from phono3py import Phono3py
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator, M3GNetRelaxer
+from materialsframework.calculators.m3gnet import M3GNetCalculator
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Calculator, Relaxer
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -24,27 +28,28 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class Phono3pyDisplacementTransformation:
     """
-    A class used to represent a Phono3py Displacement Transformation.
+    A class used to generate displaced structures for Phono3py calculations.
 
-    This class provides methods to generate displaced structures for Phono3py calculations.
+    The `Phono3pyDisplacementTransformation` class provides methods to create supercells with atomic
+    displacements needed for Phono3py calculations. It supports the generation of structures for both
+    second- and third-order force constants, which are crucial for phonon calculations, including the
+    study of lattice thermal conductivity and phonon interactions.
     """
 
     def __init__(
             self,
-            relaxer: Optional[Relaxer] = None,
-            calculator: Optional[Calculator] = None,
+            calculator: BaseCalculator| None = None,
     ) -> None:
         """
-        Initializes the Phono3pyDisplacementTransformation.
+        Initializes the `Phono3pyDisplacementTransformation` object.
 
         Args:
-            relaxer (Relaxer): The relaxer instance to use for relaxation. Defaults to M3GNetRelaxer.
-            calculator (Calculator): The calculator instance to use for calculations. Defaults to M3GNetCalculator.
+            calculator (Optional[BaseCalculator], optional): The calculator instance to use for relaxation.
+                                                             Defaults to `M3GNetCalculator`.
         """
-        self._relaxer = relaxer
-        self._calculator = calculator
+        self._calculator = calculator  # TODO: Check if Calculator has final_structure implemented
 
-        self.phonon = None
+        self.phonon: Phono3py | None = None
 
         # For second-order force-constant results
         self.phonon_displacements = None
@@ -58,25 +63,36 @@ class Phono3pyDisplacementTransformation:
             self,
             structure: Structure,
             distance: float = 0.03,
-            supercell_matrix: Optional[list] = None,
-            primitive_matrix: Optional[list] = None,
-            phonon_supercell_matrix: Optional[list] = None,
+            supercell_matrix: list | None = None,
+            primitive_matrix: list | None = None,
+            phonon_supercell_matrix: list | None = None,
             is_relaxed: bool = False,
             log_level: int = 0,
             **kwargs
     ) -> None:
         """
-        Applies the transformation to generate displaced supercells using Phono3py.
+        Applies the transformation to generate displaced supercells for Phono3py calculations.
+
+        This method generates supercells with atomic displacements for both second-order (phonon) and
+        third-order force constant calculations. These supercells are necessary for calculating phonon
+        properties and investigating lattice dynamics.
 
         Args:
-            structure (Structure): The input structure to be displaced.
-            distance (float): The maximum distance to displace the atoms. Defaults to 0.03.
-            supercell_matrix (list): Supercell matrix used for second-order force constant calculations.
-            primitive_matrix (list): Primitive matrix used for second-order force constant calculations.
-            phonon_supercell_matrix (list): Supercell matrix used for third-order force constant calculations.
-            is_relaxed (bool): Whether the input structure is already relaxed. Defaults to False.
-            log_level (int): The log level to use for Phono3py. Defaults to 0.
-            **kwargs: Additional keyword arguments to pass to the Phono3py.generate_displacement method.
+            structure (Structure): The input structure to be used for generating displacements.
+            distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
+            supercell_matrix (list, optional): The supercell matrix for third-order force constant calculations.
+                                               Defaults to a 2x2x2 supercell.
+            primitive_matrix (list, optional): The primitive matrix for second-order force constant calculations.
+                                               Defaults to None.
+            phonon_supercell_matrix (list, optional): The supercell matrix for second-order force constant calculations.
+                                                      Defaults to a 3x3x3 supercell.
+            is_relaxed (bool, optional): If True, the input structure is assumed to be relaxed. Defaults to False.
+            log_level (int, optional): The log level for Phono3py. Defaults to 0.
+            **kwargs: Additional keyword arguments for the `Phono3py.generate_displacement` method.
+
+        Note:
+            The generated displaced supercells are stored in `phonon_supercells_with_displacements` (for phonon calculations)
+            and `supercells_with_displacements` (for third-order force constants).
         """
         supercell_matrix = supercell_matrix or np.eye(3) * np.array((2, 2, 2))
         phonon_supercell_matrix = phonon_supercell_matrix or np.eye(3) * np.array((3, 3, 3))
@@ -99,31 +115,15 @@ class Phono3pyDisplacementTransformation:
         self.supercell_displacements = self.phonon.displacements
 
     @property
-    def relaxer(self) -> Relaxer:
+    def calculator(self) -> BaseCalculator:
         """
-        Returns the Relaxer instance.
+        Returns the Calculator instance for structure relaxation.
 
-        If the relaxer instance is not already created, it creates a new M3GNetRelaxer instance
-        and returns it. Otherwise, it returns the existing relaxer instance.
+        If the calculator instance is not already created, this method initializes a new
+        `M3GNetCalculator` instance. Otherwise, it returns the existing calculator.
 
         Returns:
-            Relaxer: The Relaxer instance.
-        """
-        if self._relaxer is None:
-            self._relaxer = M3GNetRelaxer()
-        return self._relaxer
-
-    @property
-    def calculator(self) -> Calculator:
-        """
-        Returns the Calculator instance.
-
-        If the calculator instance is not already created, it creates a new M3GNetCalculator
-        instance with the specified potential and returns it. Otherwise, it returns the existing
-        calculator instance.
-
-        Returns:
-            Calculator: The Calculator instance.
+            BaseCalculator: The calculator instance used for structure relaxation.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -131,16 +131,18 @@ class Phono3pyDisplacementTransformation:
 
     def _relax_structure(self, structure: Structure) -> Structure:
         """
-        This method takes a pymatgen Structure object as input and returns a relaxed structure.
-        The relaxation is performed using the M3GNetRelaxer instance associated with the class.
+        Relaxes the input structure using the calculator.
+
+        This method takes a pymatgen `Structure` object as input and relaxes it using the specified calculator.
+        The relaxed structure is returned.
 
         Args:
-            structure (Structure): The initial pymatgen Structure object that needs to be relaxed.
+            structure (Structure): The initial structure to be relaxed.
 
         Returns:
-            Structure: The relaxed pymatgen Structure object.
+            Structure: The relaxed structure.
         """
-        return self.relaxer.relax(structure)["final_structure"]
+        return self.calculator.relax(structure)["final_structure"]
 
     def _get_displaced_structures(
             self,
@@ -149,12 +151,20 @@ class Phono3pyDisplacementTransformation:
             is_diagonal: bool = True
     ) -> tuple[list[Structure, ...], list[Structure, ...]]:
         """
-        This method generates displaced structures using Phono3py.
+        Generates displaced structures using Phono3py.
+
+        This method generates the necessary supercells with atomic displacements for Phono3py calculations
+        by applying specified displacement distances.
 
         Args:
-            distance (float): The maximum distance to displace the atoms.
+            distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
+            is_plusminus (bool | str, optional): Whether to generate both positive and negative displacements.
+                                                 Defaults to "auto".
+            is_diagonal (bool, optional): Whether to only displace atoms along diagonal directions. Defaults to True.
+
         Returns:
-            tuple[list[Structure, ...], list[Structure, ...]]: Two lists of displaced structures.
+            tuple[list[Structure, ...], list[Structure, ...]]: Two lists of displaced structures for phonon (second-order)
+                                                               and third-order force constant calculations.
         """
         self.phonon.generate_displacements(distance=distance,
                                            is_plusminus=is_plusminus,

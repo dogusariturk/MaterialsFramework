@@ -1,10 +1,14 @@
 """
 This module provides a class to calculate phonon properties of a structure using Phono3py.
+
+The `Phono3pyAnalyzer` class facilitates phonon property calculations, including thermal
+conductivity, using Phono3py. It generates displaced structures, computes forces using
+the provided calculator, and calculates the thermal conductivity using the RTA or LBTE methods.
 """
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.phono3py import Phono3pyDisplacementTransformation
@@ -14,7 +18,7 @@ if TYPE_CHECKING:
     from phono3py.conductivity.direct_solution import ConductivityLBTE
     from phono3py.conductivity.rta import ConductivityRTA
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Calculator
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -24,24 +28,29 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class Phono3pyAnalyzer:
     """
-    A class used to represent a Phono3py Analyzer.
+    A class used to calculate phonon properties using Phono3py.
 
-    This class provides methods to calculate phonon properties of a structure.
+    The `Phono3pyAnalyzer` class provides methods to compute phonon properties of a given structure,
+    including thermal conductivity using the Relaxation Time Approximation (RTA) or the Linearized
+    Boltzmann Transport Equation (LBTE) methods. This is achieved by generating displaced supercells,
+    calculating forces using the provided calculator, and performing phonon property calculations.
     """
 
     def __init__(
             self,
-            calculator: Optional[Calculator] = None,
-            phono3py_transformation: Optional[Phono3pyDisplacementTransformation] = None
+            calculator: BaseCalculator | None = None,
+            phono3py_transformation: Phono3pyDisplacementTransformation | None = None
     ) -> None:
         """
-        Initializes the Phono3pyAnalyzer.
+        Initializes the `Phono3pyAnalyzer` object.
 
         Args:
-            calculator (Calculator): The calculator to use for calculating energies and forces.
-            phono3py_transformation (Phono3pyDisplacementTransformation): The Phono3pyDisplacementTransformation object.
+            calculator (BaseCalculator, optional): The calculator used to compute forces and energies.
+                                                   Defaults to `M3GNetCalculator` if not provided.
+            phono3py_transformation (Phono3pyDisplacementTransformation, optional): The transformation object used
+                                                                                   to generate displaced structures.
         """
-        self._calculator = calculator
+        self._calculator = calculator  # TODO: Check if Calculator has forces implemented
         self._phono3py_transformation = phono3py_transformation
 
         self.phonon = None
@@ -52,35 +61,38 @@ class Phono3pyAnalyzer:
             structure: Structure,
             is_relaxed: bool = False,
             distance: float = 0.01,
-            supercell_matrix: Optional[list] = None,
-            primitive_matrix: Optional[list] = None,
-            phonon_supercell_matrix: Optional[list] = None,
-            mesh: Optional[ArrayLike | float] = None,
+            supercell_matrix: list | None = None,
+            primitive_matrix: list | None = None,
+            phonon_supercell_matrix: list | None = None,
+            mesh: ArrayLike | float | None = None,
             is_lbte: bool = False,
-            t_min: Optional[float] = 0,
-            t_max: Optional[float] = 1000,
-            t_step: Optional[float] = 10,
+            t_min: float | None = 0,
+            t_max: float | None = 1000,
+            t_step: float | None = 10,
             log_level: int = 0
-    ) -> dict:
+    ) -> dict[str, ConductivityRTA | ConductivityLBTE]:
         """
-        Calculates the phonon properties of the given structure.
+        Calculates the phonon properties of the given structure, including thermal conductivity.
+
+        This method generates displaced supercells using Phono3py, calculates the forces using the provided calculator,
+        and computes thermal conductivity based on the chosen method (RTA or LBTE).
 
         Args:
-            structure (Structure): The structure to calculate phonon properties.
-            is_relaxed (bool): Whether the structure is relaxed. Defaults to False.
-            distance (float): The distance to displace atoms for forces. Defaults to 0.01.
-            supercell_matrix (list): The supercell matrix. Defaults to None.
-            primitive_matrix (list): The primitive matrix. Defaults to None.
-            phonon_supercell_matrix (list): The phonon supercell matrix. Defaults to None.
-            mesh (ArrayLike | float): The mesh numbers for phonon calculations. Defaults to None.
-            is_lbte (bool): Whether to use LBTE for thermal conductivity. Defaults to False.
-            t_min (float): The minimum temperature for thermal conductivity. Defaults to 0.
-            t_max (float): The maximum temperature for thermal conductivity. Defaults to 1000.
-            t_step (float): The temperature step for thermal conductivity. Defaults to 10.
-            log_level (int): The log level for the calculations. Defaults to 0.
+            structure (Structure): The structure to calculate phonon properties for.
+            is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
+            distance (float, optional): The distance to displace atoms for force calculations. Defaults to 0.01.
+            supercell_matrix (list, optional): The supercell matrix for generating supercells. Defaults to None.
+            primitive_matrix (list, optional): The primitive matrix for generating the primitive cell. Defaults to None.
+            phonon_supercell_matrix (list, optional): The supercell matrix for phonon calculations. Defaults to None.
+            mesh (ArrayLike | float, optional): The mesh numbers for phonon calculations. Defaults to [20, 20, 20].
+            is_lbte (bool, optional): Whether to use the Linearized Boltzmann Transport Equation (LBTE). Defaults to False.
+            t_min (float, optional): The minimum temperature for thermal conductivity calculations. Defaults to 0.
+            t_max (float, optional): The maximum temperature for thermal conductivity calculations. Defaults to 1000.
+            t_step (float, optional): The step size for temperature increments. Defaults to 10.
+            log_level (int, optional): The log level for the calculations. Defaults to 0.
 
         Returns:
-            dict: A dictionary containing the calculated thermal conductivity.
+            dict[str, ConductivityRTA | ConductivityLBTE]: A dictionary containing the calculated thermal conductivity.
         """
         mesh = mesh or [20, 20, 20]
 
@@ -101,20 +113,21 @@ class Phono3pyAnalyzer:
         # Thermal Conductivity
         self.phonon.run_thermal_conductivity(is_LBTE=is_lbte,
                                              temperatures=range(t_min, t_max + 1, t_step))
-        self.thermal_conductivity: Union[ConductivityRTA, ConductivityLBTE] = self.phonon.thermal_conductivity
+        self.thermal_conductivity: ConductivityRTA | ConductivityLBTE = self.phonon.thermal_conductivity
 
         return {
                 "thermal_conductivity": self.thermal_conductivity
         }
 
     @property
-    def calculator(self) -> Calculator:
+    def calculator(self) -> BaseCalculator:
         """
-        Gets the calculator used for calculating potential energies.
-        If not set, initializes a new M3GNetCalculator.
+        Returns the calculator used for energy and force calculations.
+
+        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            Calculator: The calculator object.
+            BaseCalculator: The calculator object used for force and energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -123,10 +136,12 @@ class Phono3pyAnalyzer:
     @property
     def phono3py_transformation(self) -> Phono3pyDisplacementTransformation:
         """
-        Gets the Phono3py transformation object.
+        Returns the Phono3py transformation object used to generate displaced structures.
+
+        If the transformation instance is not already initialized, this method creates a new `Phono3pyDisplacementTransformation` instance.
 
         Returns:
-            Phono3pyDisplacementTransformation: The Phono3py transformation object.
+            Phono3pyDisplacementTransformation: The transformation object used for phonon property calculations.
         """
         if self._phono3py_transformation is None:
             self._phono3py_transformation = Phono3pyDisplacementTransformation()
@@ -135,6 +150,9 @@ class Phono3pyAnalyzer:
     def _produce_force_constants(self) -> None:
         """
         Produces the force constants using the forces calculated from the calculator.
+
+        This method calculates the forces on the displaced atoms using the provided calculator and then
+        generates the second- and third-order force constants required for phonon calculations.
         """
         if self.phonon is None:
             raise RuntimeError("phono3py_transformation has to be called before trying to produce force constants.")

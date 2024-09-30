@@ -1,5 +1,10 @@
 """
 This module provides a class to generate distorted structures for elastic constant calculations.
+
+The `CubicElasticConstantsDeformationTransformation` class facilitates the generation of distorted
+structures required for the calculation of elastic constants in cubic systems. It supports the application
+of uniform, orthorhombic, and monoclinic distortions, which are used in the calculation of the corresponding
+elastic moduli.
 """
 from __future__ import annotations
 
@@ -9,11 +14,11 @@ from typing import Optional, TYPE_CHECKING
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
 
-from materialsframework.calculators.m3gnet import M3GNetRelaxer
+from materialsframework.calculators.m3gnet import M3GNetCalculator
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Relaxer
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -23,24 +28,28 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class CubicElasticConstantsDeformationTransformation:
     """
-    A class used to represent a Cubic Elastic Constants Transformation.
+    A class used to generate deformed structures for cubic elastic constant calculations.
 
-    This class provides methods to generate the deformed structures for the cubic elastic constant calculations.
+    The `CubicElasticConstantsDeformationTransformation` class provides methods to generate distorted
+    structures for the calculation of elastic constants in cubic crystals. The distortions applied include
+    uniform, orthorhombic, and monoclinic deformations. The deformation magnitudes are defined by a range
+    of delta values, which control the level of distortion.
     """
 
     def __init__(
             self,
             delta_max: float = 0.05,
-            relaxer: Optional[Relaxer] = None,
+            calculator: Optional[BaseCalculator] = None,
     ) -> None:
         """
-        Initializes the CubicElasticConstantsDeformationTransformation.
+        Initializes the `CubicElasticConstantsDeformationTransformation` object.
 
         Args:
-            delta_max (float): The maximum delta value for distortions. Defaults to 0.05.
-            relaxer (Optional[Relaxer]): The Relaxer object to use for relaxation. Default is M3GNetRelaxer.
+            delta_max (float, optional): The maximum delta value for the distortions. Defaults to 0.05.
+            calculator (Optional[BaseCalculator], optional): A calculator object for structure relaxation.
+                                                             If None, defaults to `M3GNetCalculator`.
         """
-        self._relaxer = relaxer
+        self._calculator = calculator  # TODO: Check if Calculator has final_structure implemented
 
         # TODO: The step size of 0.01 can be an input parameter
         self.deltas: np.ndarray = np.linspace(start=-1 * delta_max,
@@ -57,11 +66,18 @@ class CubicElasticConstantsDeformationTransformation:
             is_relaxed: bool = False
     ) -> None:
         """
-        Applies the transformation to generate distorted structures.
+        Applies the transformation to generate distorted structures for elastic constant calculations.
+
+        This method generates distorted structures for each delta value in the specified range. If the
+        input structure is not relaxed, the method relaxes it before applying distortions. The resulting
+        structures are stored in the class attributes for further elastic constant analysis.
 
         Args:
             structure (Structure): The input structure to be distorted.
-            is_relaxed (bool): Whether the input structure is already relaxed. Defaults to False.
+            is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
+
+        Note:
+            The distorted structures are stored in dictionaries under keys corresponding to the delta value.
         """
         if not is_relaxed:
             structure: Structure = self._relax_structure(structure)  # type: ignore
@@ -73,39 +89,51 @@ class CubicElasticConstantsDeformationTransformation:
                 self._apply_monoclinic_distortion(delta, structure)
 
     @property
-    def relaxer(self) -> Relaxer:
+    def calculator(self) -> BaseCalculator:
         """
-        Returns the Relaxer instance.
+        Returns the calculator instance used for structure relaxation.
 
-        If the relaxer instance is not already created, it creates a new M3GNetRelaxer instance
-        and returns it. Otherwise, it returns the existing relaxer instance.
+        If the calculator instance is not already created, this method initializes a new `M3GNetCalculator`
+        instance. Otherwise, it returns the existing calculator.
 
         Returns:
-            Relaxer: The Relaxer instance.
+            BaseCalculator: The calculator instance used for structure relaxation.
         """
-        if self._relaxer is None:
-            self._relaxer = M3GNetRelaxer()
-        return self._relaxer
+        if self._calculator is None:
+            self._calculator = M3GNetCalculator()
+        return self._calculator
 
-    def _relax_structure(self, structure: Structure) -> Structure:
+    def _relax_structure(
+            self,
+            structure: Structure
+    ) -> Structure:
         """
-        This method takes a pymatgen Structure object as input and returns a relaxed structure.
-        The relaxation is performed using the M3GNetRelaxer instance associated with the class.
+        Relaxes the input structure using the calculator.
+
+        This method takes a pymatgen `Structure` object as input and relaxes it using the specified calculator.
+        The relaxed structure is returned.
 
         Args:
-            structure (Structure): The initial pymatgen Structure object that needs to be relaxed.
+            structure (Structure): The initial structure to be relaxed.
 
         Returns:
-            Structure: The relaxed pymatgen Structure object.
+            Structure: The relaxed structure.
         """
-        return self.relaxer.relax(structure)["final_structure"]
+        return self.calculator.relax(structure)["final_structure"]
 
-    def _apply_monoclinic_distortion(self, delta: float, structure: Structure) -> None:
+    def _apply_monoclinic_distortion(
+            self,
+            delta: float,
+            structure: Structure
+    ) -> None:
         """
-        Applies the monoclinic distortion to the structure.
+        Applies a monoclinic distortion to the structure.
+
+        This method generates a monoclinic deformation by modifying the lattice vectors according to the
+        specified delta value. The distorted structure is stored in the `monoclinic_distorted_structures` attribute.
 
         Args:
-            delta (float): The delta value for the distortion.
+            delta (float): The magnitude of the monoclinic distortion.
             structure (Structure): The input structure to be distorted.
         """
         _monoclinic_distortion = ([1, delta, 0],
@@ -116,12 +144,19 @@ class CubicElasticConstantsDeformationTransformation:
                 deformation=_monoclinic_distortion
         )
 
-    def _apply_orthorhombic_distortion(self, delta: float, structure: Structure) -> None:
+    def _apply_orthorhombic_distortion(
+            self,
+            delta: float,
+            structure: Structure
+    ) -> None:
         """
-        Applies the orthorhombic distortion to the structure.
+        Applies an orthorhombic distortion to the structure.
+
+        This method generates an orthorhombic deformation by modifying the lattice vectors according to the
+        specified delta value. The distorted structure is stored in the `orthorhombic_distorted_structures` attribute.
 
         Args:
-            delta (float): The delta value for the distortion.
+            delta (float): The magnitude of the orthorhombic distortion.
             structure (Structure): The input structure to be distorted.
         """
         _orthorhombic_distortion = ([1 + delta, 0, 0],
@@ -132,12 +167,19 @@ class CubicElasticConstantsDeformationTransformation:
                 deformation=_orthorhombic_distortion
         )
 
-    def _apply_uniform_distortion(self, delta: float, structure: Structure) -> None:
+    def _apply_uniform_distortion(
+            self,
+            delta: float,
+            structure: Structure
+    ) -> None:
         """
-        Applies the uniform distortion to the structure.
+        Applies a uniform distortion to the structure.
+
+        This method generates a uniform deformation by scaling all lattice vectors equally according to the
+        specified delta value. The distorted structure is stored in the `uniform_distorted_structures` attribute.
 
         Args:
-            delta (float): The delta value for the distortion.
+            delta (float): The magnitude of the uniform distortion.
             structure (Structure): The input structure to be distorted.
         """
         _uniform_distortion = ([1 + delta, 0, 0],
@@ -149,9 +191,15 @@ class CubicElasticConstantsDeformationTransformation:
         )
 
     @staticmethod
-    def _apply_deformation(structure: Structure, deformation: tuple) -> Structure:
+    def _apply_deformation(
+            structure: Structure,
+            deformation: tuple
+    ) -> Structure:
         """
-        Applies the deformation to the structure.
+        Applies the given deformation matrix to the structure.
+
+        This method applies the specified deformation matrix to the input structure, returning the
+        deformed structure.
 
         Args:
             structure (Structure): The input structure to be deformed.

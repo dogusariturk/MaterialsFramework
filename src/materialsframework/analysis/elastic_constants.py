@@ -1,10 +1,15 @@
 """
 This module contains a class to calculate the cubic elastic constants of a given relaxed structure.
+
+The `CubicElasticConstantsAnalyzer` class computes the elastic constants (C11, C12, and C44)
+for a cubic crystal structure using energy-volume data and various deformation modes. The class
+also computes additional mechanical properties such as bulk modulus, shear modulus, Poisson's ratio,
+and Pugh's ratio based on the calculated elastic constants.
 """
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
@@ -15,7 +20,7 @@ from materialsframework.transformations.elastic_constants import CubicElasticCon
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Calculator
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -27,43 +32,58 @@ eV_A3_to_GPa: float = 160.21766208
 
 class CubicElasticConstantsAnalyzer:
     """
-    A class used to represent a Cubic Elastic Constants Analyzer.
+    A class used to calculate cubic elastic constants for a given relaxed structure.
 
-    This class provides methods to calculate the cubic elastic constants for a given relaxed structure.
+    The `CubicElasticConstantsAnalyzer` class provides methods to compute the elastic constants
+    (C11, C12, C44) for a cubic crystal structure using deformation and energy-volume data. In addition
+    to the elastic constants, this class computes mechanical properties such as bulk modulus, shear modulus,
+    Young's modulus, and Poisson's ratio.
     """
 
     def __init__(
             self,
             eos_name: str = "birch_murnaghan",
-            calculator: Optional[Calculator] = None,
-            cubic_transformation: Optional[CubicElasticConstantsDeformationTransformation] = None
+            calculator: BaseCalculator | None = None,
+            cubic_transformation: CubicElasticConstantsDeformationTransformation | None = None
     ) -> None:
         """
-        Initializes the CubicElasticConstantsAnalyzer.
+        Initializes the `CubicElasticConstantsAnalyzer` object.
 
-        Parameters:
-            eos_name (str): The name of the equation of state (EOS) to use for fitting energy-volume data.
-                            Default is "birch_murnaghan".
-            calculator (Optional[Calculator]): The calculator object to use for calculating potential energies.
-            cubic_transformation (Optional[CubicElasticConstantsDeformationTransformation]): The cubic transformation object.
+        Args:
+            eos_name (str, optional): The name of the equation of state (EOS) used for fitting energy-volume data.
+                                      Defaults to "birch_murnaghan".
+            calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
+                                                          Defaults to `M3GNetCalculator`.
+            cubic_transformation (CubicElasticConstantsDeformationTransformation | None, optional): The transformation
+                                                                                                    object used to apply
+                                                                                                    cubic distortions.
         """
         self._eos_name = eos_name
 
-        self._calculator = calculator
+        self._calculator = calculator  # TODO: Check if Calculator has potential_energy implemented
         self._cubic_transformation = cubic_transformation
 
-    def calculate(self, undeformed_structure: Structure, is_relaxed: bool = False) -> dict:
+    def calculate(
+            self,
+            undeformed_structure: Structure,
+            is_relaxed: bool = False
+    ) -> dict[str, float]:
         """
-        Calculates the cubic elastic constants for the given undeformed structure.
+        Calculates the cubic elastic constants for a given undeformed structure.
 
-        Parameters:
-            undeformed_structure (Structure): The undeformed relaxed structure.
-            is_relaxed (bool): Whether the undeformed structure is already relaxed. Default is False.
+        This method applies cubic distortions to the input structure and computes the potential energies
+        of the deformed structures. The elastic constants (C11, C12, C44) are calculated based on these
+        energy differences, and additional mechanical properties are computed.
+
+        Args:
+            undeformed_structure (Structure): The undeformed, relaxed structure.
+            is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
-            dict: A dictionary containing the calculated cubic elastic constants.
+            dict[str, float]: A dictionary containing the calculated cubic elastic constants (C11, C12, C44) and
+                              various derived mechanical properties.
         """
-        initial_volume: float = undeformed_structure.volume
+        initial_volume: float = undeformed_structure.volume  # FIXME: This volume is before relaxation!
 
         self.cubic_transformation.apply_transformation(structure=undeformed_structure,
                                                        is_relaxed=is_relaxed)
@@ -94,13 +114,14 @@ class CubicElasticConstantsAnalyzer:
         }
 
     @property
-    def calculator(self) -> Calculator:
+    def calculator(self) -> BaseCalculator:
         """
-        Gets the calculator used for calculating potential energies.
-        If not set, initializes a new M3GNetCalculator.
+        Returns the calculator instance used for energy calculations.
+
+        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            Calculator: The calculator object.
+            BaseCalculator: The calculator object used for potential energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -109,10 +130,12 @@ class CubicElasticConstantsAnalyzer:
     @property
     def cubic_transformation(self) -> CubicElasticConstantsDeformationTransformation:
         """
-        Gets the cubic transformation object.
+        Returns the cubic transformation object used to generate deformed structures.
+
+        If the transformation instance is not already initialized, this method creates a new `CubicElasticConstantsDeformationTransformation` instance.
 
         Returns:
-            CubicElasticConstantsDeformationTransformation: The cubic transformation object.
+            CubicElasticConstantsDeformationTransformation: The transformation object used for cubic distortions.
         """
         if self._cubic_transformation is None:
             self._cubic_transformation = CubicElasticConstantsDeformationTransformation()
@@ -124,10 +147,9 @@ class CubicElasticConstantsAnalyzer:
             energies: list[float, ...]
     ) -> float:
         """
-        Fits the equation of state (EOS) to the given volumes and energies
-        and returns the bulk modulus.
+        Fits the equation of state (EOS) to the given volumes and energies, returning the bulk modulus.
 
-        Parameters:
+        Args:
             volumes (list[float, ...]): A list of volumes.
             energies (list[float, ...]): A list of energies.
 
@@ -144,26 +166,25 @@ class CubicElasticConstantsAnalyzer:
             degree: int = 2
     ) -> float:
         """
-        Fits a polynomial curve to the given deltas and energies data points
-        and calculates the second order coefficient.
+        Fits a polynomial to the given deltas and energies data points and calculates the second-order coefficient.
 
-        Parameters:
+        Args:
             deltas (list[float, ...]): The array of delta values.
             energies (list[float, ...]): The array of energy values.
-            degree (int): The degree of the polynomial to fit. Default is 2.
+            degree (int, optional): The degree of the polynomial to fit. Defaults to 2.
 
         Returns:
-            float: The calculated second order coefficient.
+            float: The second-order coefficient of the polynomial fit.
         """
         fit_coefficients = np.polynomial.polynomial.polyfit(deltas, energies, degree)
         return fit_coefficients[2]
 
     def _get_bulk_modulus(self) -> float:
         """
-        Calculates the bulk modulus using the equation of state (EOS) fitting.
+        Calculates the bulk modulus using equation of state (EOS) fitting.
 
         Returns:
-            float: The calculated bulk modulus.
+            float: The bulk modulus in GPa.
         """
         volumes, energies = zip(
                 *[(deformed_structure.volume,
@@ -171,30 +192,36 @@ class CubicElasticConstantsAnalyzer:
                   _, deformed_structure in self.cubic_transformation.uniform_distorted_structures.items()])
         return self._fit_eos(volumes, energies)
 
-    def _get_tetragonal_shear_modulus(self, initial_volume: float) -> float:
+    def _get_tetragonal_shear_modulus(
+            self,
+            initial_volume: float
+    ) -> float:
         """
-        Calculates the tetragonal shear modulus.
+        Calculates the tetragonal shear modulus from orthorhombic distortions.
 
         Args:
             initial_volume (float): The initial volume of the undeformed structure.
 
         Returns:
-            float: The calculated tetragonal shear modulus.
+            float: The tetragonal shear modulus in GPa.
         """
         deltas, energies = zip(
                 *[(delta, self.calculator.calculate(structure=deformed_structure)["potential_energy"],) for
                   delta, deformed_structure in self.cubic_transformation.orthorhombic_distorted_structures.items()])
         return eV_A3_to_GPa * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
-    def _get_shear_modulus(self, initial_volume: float) -> float:
+    def _get_shear_modulus(
+            self,
+            initial_volume: float
+    ) -> float:
         """
-        Calculates the shear modulus using the given calculator and cubic transformation.
+        Calculates the shear modulus from monoclinic distortions.
 
         Args:
             initial_volume (float): The initial volume of the undeformed structure.
 
         Returns:
-            float: The shear modulus calculated from the potential energy and deformation values.
+            float: The shear modulus in GPa.
         """
         deltas, energies = zip(
                 *[(delta, self.calculator.calculate(structure=deformed_structure)["potential_energy"],) for
@@ -216,7 +243,7 @@ class CubicElasticConstantsAnalyzer:
             c44 (float): The C44 elastic constant.
 
         Returns:
-            ElasticTensor: pymatgen ElasticTensor object.
+            ElasticTensor: The pymatgen `ElasticTensor` object.
         """
         elastic_tensor = np.zeros([6, 6])
         elastic_tensor[:3, :3].fill(c12)

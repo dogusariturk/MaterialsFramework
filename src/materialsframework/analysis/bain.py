@@ -1,17 +1,22 @@
 """
 This module provides a class to perform a Bain transformation on a given structure.
+
+The `BainPathAnalyzer` class calculates the potential energies along the Bain transformation path,
+which describes the structural transition between body-centered cubic (BCC) and face-centered cubic (FCC)
+phases. This transformation is essential for understanding phase stability and transformations in various
+metallic systems.
 """
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.bain import BainDisplacementTransformation
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Calculator
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -21,37 +26,54 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class BainPathAnalyzer:
     """
-    A class used to represent a BainPathAnalyzer.
+    A class used to analyze the Bain transformation path for a given structure.
 
-    This class provides methods to perform a Bain transformation on a given structure.
+    The `BainPathAnalyzer` class provides methods to perform a Bain transformation on an undeformed
+    structure and calculate the potential energies at various c/a ratios along the transformation path.
+    The Bain transformation path describes the transition from a body-centered cubic (BCC) phase to
+    a face-centered cubic (FCC) phase, with intermediate structures explored along the way.
     """
 
     def __init__(
             self,
-            calculator: Optional[Calculator] = None,
-            bain_transformation: Optional[BainDisplacementTransformation] = None
+            calculator: BaseCalculator | None = None,
+            bain_transformation: BainDisplacementTransformation | None = None
     ) -> None:
         """
-        Initializes the BainPathAnalyzer.
+        Initializes the `BainPathAnalyzer` object.
 
-        Parameters:
-            calculator (Optional[Calculator]): The calculator object to use for calculating potential energies.
-            bain_transformation (Optional[BainDisplacementTransformation]): The bain displacement transformation object.
+        Args:
+            calculator (BaseCalculator | None, optional): The calculator object used to compute potential energies.
+                                                            Defaults to `M3GNetCalculator`.
+            bain_transformation (BainDisplacementTransformation | None, optional): The transformation object used to
+                                                                                      apply Bain displacements. If not provided,
+                                                                                      a new instance is initialized.
         """
-        self._calculator = calculator
+        self._calculator = calculator  # TODO: Check if Calculator has potential_energy implemented
         self._bain_transformation = bain_transformation
 
-    def calculate(self, undeformed_structure: Structure) -> dict:
+    def calculate(
+            self,
+            undeformed_structure: Structure,
+            is_relaxed: bool = False
+    ) -> dict[str, list]:
         """
         Calculates the potential energies along the Bain Path for the given undeformed structure.
 
-        Parameters:
-            undeformed_structure (Structure): The undeformed relaxed structure.
+        This method applies the Bain transformation to the input structure, generating a series of deformed
+        structures corresponding to different c/a ratios along the Bain path. It then calculates the potential
+        energies of each deformed structure using the provided calculator.
+
+        Args:
+            undeformed_structure (Structure): The undeformed structure to be transformed and analyzed.
+            is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
 
         Returns:
-            dict: A dictionary containing the c_a ratios and calculated potential energies along the Bain Path.
+            dict[str, list]: A dictionary containing the c/a ratios (`c_a_list`) and the corresponding calculated potential
+                            energies (`energy_list`) along the Bain Path.
         """
-        self.bain_transformation.apply_transformation(structure=undeformed_structure)
+        self.bain_transformation.apply_transformation(structure=undeformed_structure,
+                                                      is_relaxed=is_relaxed)
 
         c_a_list, energy_list = zip(
                 *[(c_a, self.calculator.calculate(structure=deformed_structure)["potential_energy"])
@@ -63,13 +85,14 @@ class BainPathAnalyzer:
         }
 
     @property
-    def calculator(self) -> Calculator:
+    def calculator(self) -> BaseCalculator:
         """
-        Gets the calculator used for calculating potential energies.
-        If not set, initializes a new M3GNetCalculator.
+        Returns the calculator instance used for energy calculations.
+
+        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            Calculator: The calculator object.
+            BaseCalculator: The calculator object used for calculating potential energies.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -78,10 +101,12 @@ class BainPathAnalyzer:
     @property
     def bain_transformation(self) -> BainDisplacementTransformation:
         """
-        Gets the bain displacement transformation object.
+        Returns the Bain displacement transformation object used to apply Bain displacements.
+
+        If the transformation instance is not already initialized, this method creates a new `BainDisplacementTransformation` instance.
 
         Returns:
-            BainDisplacementTransformation: The bain displcement transformation object.
+            BainDisplacementTransformation: The transformation object used for Bain displacements.
         """
         if self._bain_transformation is None:
             self._bain_transformation = BainDisplacementTransformation()

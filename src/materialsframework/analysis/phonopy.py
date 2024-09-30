@@ -1,12 +1,14 @@
 """
 This module provides a class to calculate phonon properties of a structure using Phonopy.
+
+The `PhonopyAnalyzer` class facilitates phonon property calculations, including the total density of states (DOS),
+projected DOS (PDOS), and thermal properties of a structure. It leverages Phonopy for calculating these properties
+and utilizes transformations to generate displaced structures and force constants.
 """
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
-
-import numpy as np
+from typing import TYPE_CHECKING
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.phonopy import PhonopyDisplacementTransformation
@@ -14,7 +16,7 @@ from materialsframework.transformations.phonopy import PhonopyDisplacementTransf
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
     from pymatgen.core import Structure
-    from materialsframework.tools.typing import Calculator
+    from materialsframework.tools.calculator import BaseCalculator
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
@@ -24,24 +26,29 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class PhonopyAnalyzer:
     """
-    A class used to represent a Phonopy Analyzer.
+    A class used to calculate phonon properties using Phonopy.
 
-    This class provides methods to calculate phonon properties of a structure.
+    The `PhonopyAnalyzer` class provides methods to compute phonon properties such as the total
+    density of states (DOS), projected DOS (PDOS), and thermal properties of a given structure.
+    It generates displaced supercells, calculates forces using a specified calculator, and computes
+    the required phonon properties.
     """
 
     def __init__(
             self,
-            calculator: Optional[Calculator] = None,
-            phonopy_transformation: Optional[PhonopyDisplacementTransformation] = None
+            calculator: BaseCalculator | None = None,
+            phonopy_transformation: PhonopyDisplacementTransformation | None = None
     ) -> None:
         """
-        Initializes the PhonopyAnalyzer.
+        Initializes the `PhonopyAnalyzer` object.
 
         Args:
-            calculator (Calculator): The calculator to use for calculating energies and forces.
-            phonopy_transformation (PhonopyDisplacementTransformation): The PhonopyDisplacementTransformation object.
+            calculator (BaseCalculator, optional): The calculator used to compute forces and energies.
+                                                   Defaults to `M3GNetCalculator`.
+            phonopy_transformation (PhonopyDisplacementTransformation, optional): The transformation object used
+                                                                                  to generate displaced supercells.
         """
-        self._calculator = calculator
+        self._calculator = calculator  # TODO: Check if Calculator has forces implemented
         self._phonopy_transformation = phonopy_transformation
 
         self.phonon = None
@@ -54,41 +61,44 @@ class PhonopyAnalyzer:
             structure: Structure,
             is_relaxed: bool = False,
             distance: float = 0.01,
-            supercell_matrix: Optional[list] = None,
-            primitive_matrix: Optional[list] = None,
-            mesh: Optional[ArrayLike | float] = None,
-            pdos_mesh: Optional[ArrayLike | float] = None,
-            sigma: Optional[float] = None,
-            freq_min: Optional[float] = None,
-            freq_max: Optional[float] = None,
-            freq_pitch: Optional[float] = None,
-            t_min: Optional[float] = 0,
-            t_max: Optional[float] = 1000,
-            t_step: Optional[float] = 10,
+            supercell_matrix: list | None = None,
+            primitive_matrix: list | None = None,
+            mesh: ArrayLike | float | None = None,
+            pdos_mesh: ArrayLike | float | None = None,
+            sigma: float | None = None,
+            freq_min: float | None = None,
+            freq_max: float | None = None,
+            freq_pitch: float | None = None,
+            t_min: float | None = 0,
+            t_max: float | None = 1000,
+            t_step: float | None = 10,
             log_level: int = 0
-    ) -> dict:
+    ) -> dict[str, dict]:
         """
         Calculates the phonon properties of the given structure.
 
+        This method generates displaced supercells using Phonopy, calculates the forces using the provided calculator,
+        and computes the total density of states (DOS), projected DOS (PDOS), and thermal properties.
+
         Args:
-            structure (Structure): The structure to calculate the phonon properties.
-            is_relaxed (bool): Whether the structure is relaxed. Defaults to False.
-            distance (float): The distance to displace the atoms for the force calculations. Defaults to 0.01.
-            supercell_matrix (list): The supercell matrix to use for the phonon calculations.
-            primitive_matrix (list): The primitive matrix to use for the phonon calculations.
-            mesh (ArrayLike | float): The mesh to use for the phonon calculations.
-            pdos_mesh (ArrayLike | float): The mesh to use for the phonon calculations for PDOS.
-            sigma (float): The smearing width for smearing method to use for the total DOS.
-            freq_min (float): The minimum frequency at which total DOS is computed.
-            freq_max (float): The maximum frequency at which total DOS is computed.
-            freq_pitch (float): The interval of frequencies to use for the total DOS.
-            t_min (float): The minimum temperature to use for the thermal properties.
-            t_max (float): The maximum temperature to use for the thermal properties.
-            t_step (float): The step to use for the thermal properties.
-            log_level (int): The log level to use for the phonon calculations. Defaults to 0.
+            structure (Structure): The structure to calculate phonon properties for.
+            is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
+            distance (float, optional): The distance to displace atoms for force calculations. Defaults to 0.01.
+            supercell_matrix (list, optional): The supercell matrix for generating supercells. Defaults to None.
+            primitive_matrix (list, optional): The primitive matrix for generating the primitive cell. Defaults to None.
+            mesh (ArrayLike | float, optional): The mesh numbers for phonon calculations. Defaults to [20, 20, 20].
+            pdos_mesh (ArrayLike | float, optional): The mesh numbers for projected DOS calculations. Defaults to [10, 10, 10].
+            sigma (float, optional): The smearing width for the total DOS calculation. Defaults to None.
+            freq_min (float, optional): The minimum frequency for the total DOS calculation. Defaults to None.
+            freq_max (float, optional): The maximum frequency for the total DOS calculation. Defaults to None.
+            freq_pitch (float, optional): The interval of frequencies for the total DOS calculation. Defaults to None.
+            t_min (float, optional): The minimum temperature for thermal property calculations. Defaults to 0.
+            t_max (float, optional): The maximum temperature for thermal property calculations. Defaults to 1000.
+            t_step (float, optional): The step size for temperature increments. Defaults to 10.
+            log_level (int, optional): The log level for the phonon calculations. Defaults to 0.
 
         Returns:
-            dict: A dictionary containing the calculated total DOS, thermal properties, and projected DOS.
+            dict[str, dict]: A dictionary containing the calculated total DOS, thermal properties, and projected DOS.
         """
         mesh = mesh or [20, 20, 20]
         pdos_mesh = pdos_mesh or [10, 10, 10]
@@ -131,13 +141,14 @@ class PhonopyAnalyzer:
         }
 
     @property
-    def calculator(self) -> Calculator:
+    def calculator(self) -> BaseCalculator:
         """
-        Gets the calculator used for calculating potential energies.
-        If not set, initializes a new M3GNetCalculator.
+        Returns the calculator used for energy and force calculations.
+
+        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            Calculator: The calculator object.
+            BaseCalculator: The calculator object used for force and energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -146,10 +157,12 @@ class PhonopyAnalyzer:
     @property
     def phonopy_transformation(self) -> PhonopyDisplacementTransformation:
         """
-        Gets the phonopy transformation object.
+        Returns the Phonopy transformation object used to generate displaced structures.
+
+        If the transformation instance is not already initialized, this method creates a new `PhonopyDisplacementTransformation` instance.
 
         Returns:
-            PhonopyDisplacementTransformation: The phonopy transformation object.
+            PhonopyDisplacementTransformation: The transformation object used for phonon property calculations.
         """
         if self._phonopy_transformation is None:
             self._phonopy_transformation = PhonopyDisplacementTransformation()
@@ -158,11 +171,14 @@ class PhonopyAnalyzer:
     def _produce_force_constants(self) -> None:
         """
         Produces the force constants using the forces calculated from the calculator.
+
+        This method calculates the forces on the displaced atoms using the provided calculator and generates
+        the force constants required for phonon calculations.
         """
         if self.phonon is None:
             raise RuntimeError("phonopy_transformation has to be called before trying to produce force constants.")
 
-        forces = np.array([self.calculator.calculate(displaced_structure)["forces"]
-                           for displaced_structure in self.phonopy_transformation.displaced_structures])
+        forces = [self.calculator.calculate(displaced_structure)["forces"]
+                  for displaced_structure in self.phonopy_transformation.displaced_structures]
         self.phonon.forces = forces
         self.phonon.produce_force_constants()
