@@ -10,6 +10,8 @@ from typing import Literal, TYPE_CHECKING
 
 from mace.calculators import mace_mp
 
+from materialsframework.tools.md import BaseMDCalculator
+
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
     from pathlib import Path
@@ -20,7 +22,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class MACECalculator(BaseCalculator):
+class MACECalculator(BaseCalculator, BaseMDCalculator):
     """
     A calculator class for performing material property calculations and structure relaxation using the MACE potential.
 

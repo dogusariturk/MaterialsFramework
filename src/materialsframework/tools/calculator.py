@@ -163,8 +163,6 @@ class BaseCalculator(ABC):
         self.include_magmoms = include_magmoms
         self.include_dipoles = include_dipoles
 
-        self._calculator = None
-
     @property
     def calculator(self) -> Calculator:
         """
@@ -266,7 +264,6 @@ class BaseCalculator(ABC):
     def calculate(
             self,
             structure: Atoms | Structure | Molecule,
-            **kwargs,
     ) -> dict[Structure, float | ArrayLike]:
         """
         Performs a single-point calculation on the given atomic structure using the specified calculator.
@@ -277,7 +274,6 @@ class BaseCalculator(ABC):
         Args:
             structure (Atoms | Structure | Molecule): The atomic structure to calculate. This can be an ASE `Atoms` object,
                 a Pymatgen `Structure` object, or a Pymatgen `Molecule` object.
-            **kwargs: Additional keyword arguments to pass to the calculator during calculation.
 
         Returns:
             dict: A dictionary containing the calculated structure and properties.

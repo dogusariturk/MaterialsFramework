@@ -2,9 +2,15 @@
 Changelog
 =========
 
+Version 0.6.0
+===========
+- Added ``ORB`` and ``SevenNet`` implementations
+- Refactored relaxation and calculator classes
+- Generalized the ``BaseMDCalculator`` class
+
 Version 0.5.0
 ===========
-- Added custom matgl relaxer implementation.
+- Added custom matgl relaxer implementation
 
 Version 0.4.0
 ===========

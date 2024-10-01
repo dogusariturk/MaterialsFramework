@@ -11,6 +11,7 @@ from typing import Literal, TYPE_CHECKING
 from chgnet.model import CHGNet, CHGNetCalculator as CHGNetASECalculator
 
 from materialsframework.tools.calculator import BaseCalculator
+from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -19,7 +20,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class CHGNetCalculator(BaseCalculator):
+class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
     """
     A calculator class for performing material property calculations and structure relaxation using the CHGNet potential.
 

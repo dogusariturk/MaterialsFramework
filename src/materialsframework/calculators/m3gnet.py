@@ -12,6 +12,7 @@ import matgl
 from matgl.ext.ase import PESCalculator
 
 from materialsframework.tools.calculator import BaseCalculator
+from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -22,7 +23,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class M3GNetCalculator(BaseCalculator):
+class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
     """
     A calculator class for performing material property calculations and structure relaxation using the M3GNet potential.
 

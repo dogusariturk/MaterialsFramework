@@ -13,6 +13,7 @@ from orb_models.forcefield.atomic_system import SystemConfig
 from orb_models.forcefield.calculator import ORBCalculator as ORBASECalculator
 
 from materialsframework.tools.calculator import BaseCalculator
+from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -22,7 +23,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class ORBCalculator(BaseCalculator):
+class ORBCalculator(BaseCalculator, BaseMDCalculator):
     """
     A calculator class for performing material property calculations and structure relaxation using the ORB potential.
 
