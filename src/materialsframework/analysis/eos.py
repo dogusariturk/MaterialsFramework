@@ -8,7 +8,6 @@ bulk modulus.
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from pymatgen.analysis.eos import EOS
@@ -19,8 +18,6 @@ from materialsframework.transformations.eos import EOSTransformation
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -74,15 +71,15 @@ class EOSAnalyzer:
         Returns:
             dict[str, list]: A dictionary containing the calculated strains, volumes, energies, and the EOS fitting results.
         """
-        if "potential_energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'potential_energy' property implemented.")
+        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'energy' property implemented.")
 
         undeformed_structure = self.calculator.relax(structure=undeformed_structure)["final_structure"] if not is_relaxed else undeformed_structure
 
         self.eos_transformation.apply_transformation(undeformed_structure)
 
         strain_list, volume_list, energy_list = zip(
-                *[(strain, deformed_structure.volume, self.calculator.calculate(structure=deformed_structure)["potential_energy"]) for
+                *[(strain, deformed_structure.volume, self.calculator.calculate(structure=deformed_structure)["energy"]) for
                   strain, deformed_structure in self.eos_transformation.structures.items()])
 
         eos = EOS(eos_name=self._eos_name)
@@ -103,7 +100,7 @@ class EOSAnalyzer:
         If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            BaseCalculator: The calculator object used for potential energy calculations.
+            BaseCalculator: The calculator object used for energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()

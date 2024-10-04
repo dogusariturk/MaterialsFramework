@@ -7,7 +7,6 @@ are essential for studying vibrational modes, thermal properties, and lattice dy
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -19,8 +18,6 @@ from materialsframework.calculators.m3gnet import M3GNetCalculator
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

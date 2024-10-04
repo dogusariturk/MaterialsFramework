@@ -9,8 +9,6 @@ import os
 import pandas as pd
 from pymatgen.core import Composition, Element
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
-
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 

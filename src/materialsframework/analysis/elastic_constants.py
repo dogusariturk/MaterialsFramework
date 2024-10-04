@@ -8,7 +8,6 @@ and Pugh's ratio based on the calculated elastic constants.
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -21,8 +20,6 @@ from materialsframework.transformations.elastic_constants import CubicElasticCon
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -83,8 +80,8 @@ class CubicElasticConstantsAnalyzer:
             dict[str, float]: A dictionary containing the calculated cubic elastic constants (C11, C12, C44) and
                               various derived mechanical properties.
         """
-        if "potential_energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'potential_energy' property implemented.")
+        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'energy' property implemented.")
 
         initial_volume: float = undeformed_structure.volume  # FIXME: This volume is before relaxation!
 
@@ -124,7 +121,7 @@ class CubicElasticConstantsAnalyzer:
         If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            BaseCalculator: The calculator object used for potential energy calculations.
+            BaseCalculator: The calculator object used for energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
@@ -191,7 +188,7 @@ class CubicElasticConstantsAnalyzer:
         """
         volumes, energies = zip(
                 *[(deformed_structure.volume,
-                   self.calculator.calculate(structure=deformed_structure)["potential_energy"],) for
+                   self.calculator.calculate(structure=deformed_structure)["energy"],) for
                   _, deformed_structure in self.cubic_transformation.uniform_distorted_structures.items()])
         return self._fit_eos(volumes, energies)
 
@@ -209,7 +206,7 @@ class CubicElasticConstantsAnalyzer:
             float: The tetragonal shear modulus in GPa.
         """
         deltas, energies = zip(
-                *[(delta, self.calculator.calculate(structure=deformed_structure)["potential_energy"],) for
+                *[(delta, self.calculator.calculate(structure=deformed_structure)["energy"],) for
                   delta, deformed_structure in self.cubic_transformation.orthorhombic_distorted_structures.items()])
         return eV_A3_to_GPa * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
@@ -227,7 +224,7 @@ class CubicElasticConstantsAnalyzer:
             float: The shear modulus in GPa.
         """
         deltas, energies = zip(
-                *[(delta, self.calculator.calculate(structure=deformed_structure)["potential_energy"],) for
+                *[(delta, self.calculator.calculate(structure=deformed_structure)["energy"],) for
                   delta, deformed_structure in self.cubic_transformation.monoclinic_distorted_structures.items()])
         return eV_A3_to_GPa * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 

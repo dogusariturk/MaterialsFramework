@@ -7,7 +7,6 @@ are critical in studying anharmonic phonon properties and thermal conductivity i
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -19,8 +18,6 @@ from materialsframework.calculators.m3gnet import M3GNetCalculator
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -44,7 +41,7 @@ class Phono3pyDisplacementTransformation:
         Initializes the `Phono3pyDisplacementTransformation` object.
 
         Args:
-            calculator (Optional[BaseCalculator], optional): The calculator instance to use for relaxation.
+            calculator (BaseCalculator | None, optional): The calculator instance to use for relaxation.
                                                              Defaults to `M3GNetCalculator`.
         """
         self._calculator = calculator

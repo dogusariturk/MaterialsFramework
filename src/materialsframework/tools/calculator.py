@@ -102,7 +102,6 @@ class BaseCalculator(ABC):
         Returns:
             list[str]: A list of property names available from the calculator.
         """
-        pass
 
     def __init__(
             self,
@@ -212,7 +211,7 @@ class BaseCalculator(ABC):
         """
 
         stream = sys.stdout if self.verbose else io.StringIO()
-        params_asecellfilter = self.params_asecellfilter or dict()
+        params_asecellfilter = self.params_asecellfilter or {}
 
         atoms = structure.copy()
 

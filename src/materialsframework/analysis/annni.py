@@ -9,8 +9,7 @@ based on the energy differences between FCC, HCP, and DHCP structures.
 """
 from __future__ import annotations
 
-import os
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -20,8 +19,6 @@ from materialsframework.transformations.annni import ANNNIStackingFaultTransform
 if TYPE_CHECKING:
     from pymatgen.core import Composition
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -74,8 +71,8 @@ class ANNNIStackingFaultAnalyzer:
             dict: A dictionary containing the intrinsic stacking fault energy (`isfe`) and extrinsic stacking fault
                   energy (`esfe`), both normalized by the FCC unit cell area.
         """
-        if "potential_energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'potential_energy' property implemented.")
+        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'energy' property implemented.")
 
         self.annni_transformation.apply_transformation(composition=composition)
 
@@ -87,11 +84,11 @@ class ANNNIStackingFaultAnalyzer:
 
         hcp_struct = self.annni_transformation.structures["hcp"].scale_lattice(fcc_volume)
         hcp_result = self.calculator.calculate(hcp_struct)
-        hcp_energy = hcp_result["potential_energy"] / hcp_struct.num_sites
+        hcp_energy = hcp_result["energy"] / hcp_struct.num_sites
 
         dhcp_struct = self.annni_transformation.structures["dhcp"].scale_lattice(fcc_volume)
         dhcp_result = self.calculator.calculate(dhcp_struct)
-        dhcp_energy = dhcp_result["potential_energy"] / dhcp_struct.num_sites
+        dhcp_energy = dhcp_result["energy"] / dhcp_struct.num_sites
 
         return {
                 "isfe": (hcp_energy + (2 * dhcp_energy) - (3 * fcc_energy)) / a_fcc,
@@ -106,7 +103,7 @@ class ANNNIStackingFaultAnalyzer:
         If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            BaseCalculator: The calculator object used for relaxation and potential energy calculations.
+            BaseCalculator: The calculator object used for relaxation and energy calculations.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()

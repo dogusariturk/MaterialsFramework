@@ -10,13 +10,12 @@ from typing import Literal, TYPE_CHECKING
 
 from mace.calculators import mace_mp
 
+from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
     from pathlib import Path
-
-from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -54,7 +53,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
         the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model (Union[str, Path], optional): The MACE model to use. This can be the name of a predefined model
+            model (str | Path, optional): The MACE model to use. This can be the name of a predefined model
                 (e.g., "large"), a path to a custom model file, or a URL. Defaults to "large".
             include_dipoles (bool, optional): Determines whether dipole properties are included in the model. Defaults to False.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".

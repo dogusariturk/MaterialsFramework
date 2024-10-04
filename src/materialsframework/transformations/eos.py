@@ -7,15 +7,12 @@ between volume, pressure, and energy of a material system.
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 import numpy as np
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

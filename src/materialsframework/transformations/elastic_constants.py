@@ -9,7 +9,7 @@ elastic moduli.
 from __future__ import annotations
 
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
@@ -39,14 +39,14 @@ class CubicElasticConstantsDeformationTransformation:
     def __init__(
             self,
             delta_max: float = 0.05,
-            calculator: Optional[BaseCalculator] = None,
+            calculator: BaseCalculator | None = None,
     ) -> None:
         """
         Initializes the `CubicElasticConstantsDeformationTransformation` object.
 
         Args:
             delta_max (float, optional): The maximum delta value for the distortions. Defaults to 0.05.
-            calculator (Optional[BaseCalculator], optional): A calculator object for structure relaxation.
+            calculator (BaseCalculator | None, optional): A calculator object for structure relaxation.
                                                              If None, defaults to `M3GNetCalculator`.
         """
         self._calculator = calculator

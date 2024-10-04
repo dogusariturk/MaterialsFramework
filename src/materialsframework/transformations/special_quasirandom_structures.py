@@ -9,7 +9,6 @@ while maintaining computational tractability.
 from __future__ import annotations
 
 import operator
-import os
 from functools import reduce
 from typing import Any, Literal, TYPE_CHECKING
 
@@ -19,8 +18,6 @@ from sqsgenerator import sqs_optimize
 
 if TYPE_CHECKING:
     from pymatgen.core import Composition, Structure
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -83,7 +80,7 @@ class SqsgenTransformation:
             composition (Composition): The composition of the supercell.
             crystal_structure (str, optional): The crystal structure of the supercell. Defaults to "FCC".
             supercell_size (tuple[int, int, int], optional): The size of the supercell. Defaults to (5, 5, 5).
-            shell_weights (Optional[dict[int, float]], optional): The weights for the coordination shells. Defaults to {1: 1.0, 2: 0.5}.
+            shell_weights (dict[int, float], optional): The weights for the coordination shells. Defaults to {1: 1.0, 2: 0.5}.
 
         Returns:
             dict[str, Any]: A dictionary containing the generated SQS structure and the objective value.

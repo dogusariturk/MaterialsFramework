@@ -7,7 +7,6 @@ and utilizes transformations to generate displaced structures and force constant
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
@@ -17,8 +16,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

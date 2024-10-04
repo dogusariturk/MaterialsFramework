@@ -8,8 +8,7 @@ This transformation is useful in studying martensitic transformations and phase 
 """
 from __future__ import annotations
 
-import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
@@ -19,8 +18,6 @@ from materialsframework.calculators.m3gnet import M3GNetCalculator
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -41,7 +38,7 @@ class BainDisplacementTransformation:
             start: float = 0.89,
             stop: float = 1.4,
             step: float = 0.01,
-            calculator: Optional[BaseCalculator] = None,
+            calculator: BaseCalculator | None = None,
     ) -> None:
         """
         Initializes the `BainDisplacementTransformation` object.
@@ -50,7 +47,7 @@ class BainDisplacementTransformation:
             start (float, optional): The starting displacement value for the c/a ratio. Defaults to 0.89.
             stop (float, optional): The stopping displacement value for the c/a ratio. Defaults to 1.4.
             step (float, optional): The step size for incrementing the c/a ratio. Defaults to 0.01.
-            calculator (Optional[BaseCalculator], optional): A calculator object for structure relaxation.
+            calculator (BaseCalculator | None, optional): A calculator object for structure relaxation.
                                                              If None, defaults to `M3GNetCalculator`.
         """
         self._calculator = calculator

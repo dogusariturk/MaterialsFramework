@@ -8,7 +8,6 @@ metallic systems.
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
@@ -17,8 +16,6 @@ from materialsframework.transformations.bain import BainDisplacementTransformati
 if TYPE_CHECKING:
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -72,14 +69,14 @@ class BainPathAnalyzer:
             dict[str, list]: A dictionary containing the c/a ratios (`c_a_list`) and the corresponding calculated potential
                             energies (`energy_list`) along the Bain Path.
         """
-        if "potential_energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'potential_energy' property implemented.")
+        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
+            raise ValueError("The calculator object must have the 'energy' property implemented.")
 
         self.bain_transformation.apply_transformation(structure=undeformed_structure,
                                                       is_relaxed=is_relaxed)
 
         c_a_list, energy_list = zip(
-                *[(c_a, self.calculator.calculate(structure=deformed_structure)["potential_energy"])
+                *[(c_a, self.calculator.calculate(structure=deformed_structure)["energy"])
                   for c_a, deformed_structure in self.bain_transformation.displaced_structures.items()])
 
         return {
@@ -95,7 +92,7 @@ class BainPathAnalyzer:
         If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
         Returns:
-            BaseCalculator: The calculator object used for calculating potential energies.
+            BaseCalculator: The calculator object used for calculating energies.
         """
         if self._calculator is None:
             self._calculator = M3GNetCalculator()
