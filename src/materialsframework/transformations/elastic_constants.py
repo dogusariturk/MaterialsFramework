@@ -39,6 +39,7 @@ class CubicElasticConstantsDeformationTransformation:
     def __init__(
             self,
             delta_max: float = 0.05,
+            step_size: float = 0.01,
             calculator: BaseCalculator | None = None,
     ) -> None:
         """
@@ -46,15 +47,18 @@ class CubicElasticConstantsDeformationTransformation:
 
         Args:
             delta_max (float, optional): The maximum delta value for the distortions. Defaults to 0.05.
+            step_size (float, optional): The step size for the delta values. Defaults to 0.01.
             calculator (BaseCalculator | None, optional): A calculator object for structure relaxation.
                                                              If None, defaults to `M3GNetCalculator`.
         """
+        self.delta_max = delta_max
+        self.step_size = step_size
+
         self._calculator = calculator
 
-        # TODO: The step size of 0.01 can be an input parameter
-        self.deltas: np.ndarray = np.linspace(start=-1 * delta_max,
-                                              stop=delta_max,
-                                              num=int(2 * delta_max / 0.01) + 1)
+        self.deltas: np.ndarray = np.linspace(start=-1 * self.delta_max,
+                                              stop=self.delta_max,
+                                              num=int(2 * self.delta_max / self.step_size) + 1)
 
         self.uniform_distorted_structures: dict[float, Structure] = {}
         self.orthorhombic_distorted_structures: dict[float, Structure] = {}
