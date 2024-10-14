@@ -8,19 +8,13 @@ elastic moduli.
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
-
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.calculator import BaseCalculator
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -40,7 +34,6 @@ class CubicElasticConstantsDeformationTransformation:
             self,
             delta_max: float = 0.05,
             step_size: float = 0.01,
-            calculator: BaseCalculator | None = None,
     ) -> None:
         """
         Initializes the `CubicElasticConstantsDeformationTransformation` object.
@@ -48,13 +41,9 @@ class CubicElasticConstantsDeformationTransformation:
         Args:
             delta_max (float, optional): The maximum delta value for the distortions. Defaults to 0.05.
             step_size (float, optional): The step size for the delta values. Defaults to 0.01.
-            calculator (BaseCalculator | None, optional): A calculator object for structure relaxation.
-                                                             If None, defaults to `M3GNetCalculator`.
         """
         self.delta_max = delta_max
         self.step_size = step_size
-
-        self._calculator = calculator
 
         self.deltas: np.ndarray = np.linspace(start=-1 * self.delta_max,
                                               stop=self.delta_max,
@@ -67,63 +56,24 @@ class CubicElasticConstantsDeformationTransformation:
     def apply_transformation(
             self,
             structure: Structure,
-            is_relaxed: bool = False
     ) -> None:
         """
         Applies the transformation to generate distorted structures for elastic constant calculations.
 
-        This method generates distorted structures for each delta value in the specified range. If the
-        input structure is not relaxed, the method relaxes it before applying distortions. The resulting
+        This method generates distorted structures for each delta value in the specified range. The resulting
         structures are stored in the class attributes for further elastic constant analysis.
 
         Args:
             structure (Structure): The input structure to be distorted.
-            is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
 
         Note:
             The distorted structures are stored in dictionaries under keys corresponding to the delta value.
         """
-        if not is_relaxed:
-            structure: Structure = self._relax_structure(structure)  # type: ignore
-
         for delta in self.deltas:
             self._apply_uniform_distortion(delta, structure)
             if delta >= 0:
                 self._apply_orthorhombic_distortion(delta, structure)
                 self._apply_monoclinic_distortion(delta, structure)
-
-    @property
-    def calculator(self) -> BaseCalculator:
-        """
-        Returns the calculator instance used for structure relaxation.
-
-        If the calculator instance is not already created, this method initializes a new `M3GNetCalculator`
-        instance. Otherwise, it returns the existing calculator.
-
-        Returns:
-            BaseCalculator: The calculator instance used for structure relaxation.
-        """
-        if self._calculator is None:
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    def _relax_structure(
-            self,
-            structure: Structure
-    ) -> Structure:
-        """
-        Relaxes the input structure using the calculator.
-
-        This method takes a pymatgen `Structure` object as input and relaxes it using the specified calculator.
-        The relaxed structure is returned.
-
-        Args:
-            structure (Structure): The initial structure to be relaxed.
-
-        Returns:
-            Structure: The relaxed structure.
-        """
-        return self.calculator.relax(structure)["final_structure"]
 
     def _apply_monoclinic_distortion(
             self,

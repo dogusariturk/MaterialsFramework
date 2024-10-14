@@ -1,5 +1,5 @@
 """
-This module contains a class to calculate the cubic elastic constants of a given relaxed structure.
+This module contains a class to calculate the cubic elastic constants of a given structure.
 
 The `CubicElasticConstantsAnalyzer` class computes the elastic constants (C11, C12, and C44)
 for a cubic crystal structure using energy-volume data and various deformation modes. The class
@@ -29,7 +29,7 @@ eV_A3_to_GPa: float = 160.21766208
 
 class CubicElasticConstantsAnalyzer:
     """
-    A class used to calculate cubic elastic constants for a given relaxed structure.
+    A class used to calculate cubic elastic constants for a given structure.
 
     The `CubicElasticConstantsAnalyzer` class provides methods to compute the elastic constants
     (C11, C12, C44) for a cubic crystal structure using deformation and energy-volume data. In addition
@@ -62,18 +62,18 @@ class CubicElasticConstantsAnalyzer:
 
     def calculate(
             self,
-            undeformed_structure: Structure,
+            structure: Structure,
             is_relaxed: bool = False
     ) -> dict[str, float]:
         """
-        Calculates the cubic elastic constants for a given undeformed structure.
+        Calculates the cubic elastic constants for a given structure.
 
         This method applies cubic distortions to the input structure and computes the potential energies
         of the deformed structures. The elastic constants (C11, C12, C44) are calculated based on these
         energy differences, and additional mechanical properties are computed.
 
         Args:
-            undeformed_structure (Structure): The undeformed, relaxed structure.
+            structure (Structure): The input structure.
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
@@ -83,10 +83,12 @@ class CubicElasticConstantsAnalyzer:
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
 
-        initial_volume: float = undeformed_structure.volume  # FIXME: This volume is before relaxation!
+        if not is_relaxed:
+            structure: Structure = self.calculator.relax(structure)["final_structure"]
 
-        self.cubic_transformation.apply_transformation(structure=undeformed_structure,
-                                                       is_relaxed=is_relaxed)
+        initial_volume: float = structure.volume
+
+        self.cubic_transformation.apply_transformation(structure=structure)
 
         bulk_modulus = self._get_bulk_modulus()
         tetragonal_shear_modulus = self._get_tetragonal_shear_modulus(initial_volume)
@@ -189,7 +191,8 @@ class CubicElasticConstantsAnalyzer:
         volumes, energies = zip(
                 *[(deformed_structure.volume,
                    self.calculator.calculate(structure=deformed_structure)["energy"],) for
-                  _, deformed_structure in self.cubic_transformation.uniform_distorted_structures.items()])
+                  _, deformed_structure in self.cubic_transformation.uniform_distorted_structures.items()]
+        )
         return self._fit_eos(volumes, energies)
 
     def _get_tetragonal_shear_modulus(
@@ -207,7 +210,8 @@ class CubicElasticConstantsAnalyzer:
         """
         deltas, energies = zip(
                 *[(delta, self.calculator.calculate(structure=deformed_structure)["energy"],) for
-                  delta, deformed_structure in self.cubic_transformation.orthorhombic_distorted_structures.items()])
+                  delta, deformed_structure in self.cubic_transformation.orthorhombic_distorted_structures.items()]
+        )
         return eV_A3_to_GPa * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
     def _get_shear_modulus(
@@ -225,7 +229,8 @@ class CubicElasticConstantsAnalyzer:
         """
         deltas, energies = zip(
                 *[(delta, self.calculator.calculate(structure=deformed_structure)["energy"],) for
-                  delta, deformed_structure in self.cubic_transformation.monoclinic_distorted_structures.items()])
+                  delta, deformed_structure in self.cubic_transformation.monoclinic_distorted_structures.items()]
+        )
         return eV_A3_to_GPa * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
     @staticmethod
