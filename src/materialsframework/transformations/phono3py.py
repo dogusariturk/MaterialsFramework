@@ -13,11 +13,8 @@ import numpy as np
 from phono3py import Phono3py
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
-
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -33,19 +30,10 @@ class Phono3pyDisplacementTransformation:
     study of lattice thermal conductivity and phonon interactions.
     """
 
-    def __init__(
-            self,
-            calculator: BaseCalculator| None = None,
-    ) -> None:
+    def __init__(self) -> None:
         """
         Initializes the `Phono3pyDisplacementTransformation` object.
-
-        Args:
-            calculator (BaseCalculator | None, optional): The calculator instance to use for relaxation.
-                                                             Defaults to `M3GNetCalculator`.
         """
-        self._calculator = calculator
-
         self.phonon: Phono3py | None = None
 
         # For second-order force-constant results
@@ -63,7 +51,6 @@ class Phono3pyDisplacementTransformation:
             supercell_matrix: list | None = None,
             primitive_matrix: list | None = None,
             phonon_supercell_matrix: list | None = None,
-            is_relaxed: bool = False,
             log_level: int = 0,
             **kwargs
     ) -> None:
@@ -83,7 +70,6 @@ class Phono3pyDisplacementTransformation:
                                                Defaults to None.
             phonon_supercell_matrix (list, optional): The supercell matrix for second-order force constant calculations.
                                                       Defaults to a 3x3x3 supercell.
-            is_relaxed (bool, optional): If True, the input structure is assumed to be relaxed. Defaults to False.
             log_level (int, optional): The log level for Phono3py. Defaults to 0.
             **kwargs: Additional keyword arguments for the `Phono3py.generate_displacement` method.
 
@@ -93,9 +79,6 @@ class Phono3pyDisplacementTransformation:
         """
         supercell_matrix = supercell_matrix or np.eye(3) * np.array((2, 2, 2))
         phonon_supercell_matrix = phonon_supercell_matrix or np.eye(3) * np.array((3, 3, 3))
-
-        if not is_relaxed:
-            structure: Structure = self._relax_structure(structure)  # type: ignore
 
         phonopy_structure = get_phonopy_structure(structure)
 
@@ -110,36 +93,6 @@ class Phono3pyDisplacementTransformation:
 
         self.phonon_displacements = self.phonon.phonon_displacements
         self.supercell_displacements = self.phonon.displacements
-
-    @property
-    def calculator(self) -> BaseCalculator:
-        """
-        Returns the Calculator instance for structure relaxation.
-
-        If the calculator instance is not already created, this method initializes a new
-        `M3GNetCalculator` instance. Otherwise, it returns the existing calculator.
-
-        Returns:
-            BaseCalculator: The calculator instance used for structure relaxation.
-        """
-        if self._calculator is None:
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    def _relax_structure(self, structure: Structure) -> Structure:
-        """
-        Relaxes the input structure using the calculator.
-
-        This method takes a pymatgen `Structure` object as input and relaxes it using the specified calculator.
-        The relaxed structure is returned.
-
-        Args:
-            structure (Structure): The initial structure to be relaxed.
-
-        Returns:
-            Structure: The relaxed structure.
-        """
-        return self.calculator.relax(structure)["final_structure"]
 
     def _get_displaced_structures(
             self,

@@ -94,13 +94,15 @@ class Phono3pyAnalyzer:
         if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'forces' property implemented.")
 
+        if not is_relaxed:
+            structure: Structure = self.calculator.relax(structure)["final_structure"]
+
         mesh = mesh or [20, 20, 20]
 
         self.phono3py_transformation.apply_transformation(structure=structure,
                                                           distance=distance,
                                                           supercell_matrix=supercell_matrix,
                                                           primitive_matrix=primitive_matrix,
-                                                          is_relaxed=is_relaxed,
                                                           phonon_supercell_matrix=phonon_supercell_matrix,
                                                           log_level=log_level)
 

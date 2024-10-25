@@ -51,7 +51,7 @@ class EOSTransformation:
 
     def apply_transformation(
             self,
-            undeformed_structure: Structure
+            structure: Structure
     ) -> None:
         """
         Applies the transformation to generate deformed structures for EOS calculations.
@@ -61,15 +61,15 @@ class EOSTransformation:
         strain value.
 
         Args:
-            undeformed_structure (Structure): The initial, undeformed structure to be used for EOS calculations.
+            structure (Structure): The initial, undeformed structure to be used for EOS calculations.
 
         Note:
             The volume of the structure is scaled by `(1 + strain)` for each strain value in the `_strains` array.
             This method does not modify the input structure; it creates copies that are scaled and stored.
         """
-        initial_volume = undeformed_structure.volume
+        initial_volume = structure.volume
 
         for strain in self._strains:
-            structure = undeformed_structure.copy()
+            structure = structure.copy()
             deformed_structure = structure.scale_lattice(initial_volume * (1 + strain))
             self.structures[strain] = deformed_structure

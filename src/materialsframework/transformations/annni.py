@@ -9,7 +9,6 @@ energy computations in various crystal systems.
 """
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from pymatgen.core import Composition
@@ -18,8 +17,6 @@ from materialsframework.transformations.special_quasirandom_structures import Sq
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"

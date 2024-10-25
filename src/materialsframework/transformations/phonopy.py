@@ -13,11 +13,8 @@ import numpy as np
 from phonopy import Phonopy
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
-
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -33,19 +30,10 @@ class PhonopyDisplacementTransformation:
     and other lattice dynamical properties.
     """
 
-    def __init__(
-            self,
-            calculator: BaseCalculator | None = None,
-    ) -> None:
+    def __init__(self) -> None:
         """
         Initializes the `PhonopyDisplacementTransformation` object.
-
-        Args:
-            calculator (BaseCalculator | None, optional): The calculator instance to use for relaxation.
-                                                             Defaults to `M3GNetCalculator`.
         """
-        self._calculator = calculator
-
         self.phonon: Phonopy | None = None
         self.displacements: np.ndarray | list | None = None
         self.displaced_structures: list[Structure, ...] | None = None
@@ -56,7 +44,6 @@ class PhonopyDisplacementTransformation:
             distance: float = 0.01,
             supercell_matrix: list | None = None,
             primitive_matrix: list | None = None,
-            is_relaxed: bool = False,
             log_level: int = 0,
             **kwargs
     ) -> None:
@@ -73,7 +60,6 @@ class PhonopyDisplacementTransformation:
             supercell_matrix (list, optional): The supercell matrix to generate supercells for phonon calculations.
                                                Defaults to a 2x2x2 supercell.
             primitive_matrix (list, optional): The primitive matrix to generate the primitive cell. Defaults to None.
-            is_relaxed (bool, optional): If True, the input structure is assumed to be relaxed. Defaults to False.
             log_level (int, optional): The log level for Phonopy. Defaults to 0.
             **kwargs: Additional keyword arguments for the `Phonopy.generate_displacement` method.
 
@@ -82,9 +68,6 @@ class PhonopyDisplacementTransformation:
             displacement vectors are stored in `displacements`.
         """
         supercell_matrix = supercell_matrix or np.eye(3) * np.array((2, 2, 2))
-
-        if not is_relaxed:
-            structure: Structure = self._relax_structure(structure)  # type: ignore
 
         phonopy_structure = get_phonopy_structure(structure)
 
@@ -95,39 +78,6 @@ class PhonopyDisplacementTransformation:
 
         self.displaced_structures = self._get_displaced_structures(distance=distance, **kwargs)
         self.displacements = self.phonon.displacements
-
-    @property
-    def calculator(self) -> BaseCalculator:
-        """
-        Returns the Calculator instance for structure relaxation.
-
-        If the calculator instance is not already created, this method initializes a new
-        `M3GNetCalculator` instance. Otherwise, it returns the existing calculator.
-
-        Returns:
-            BaseCalculator: The calculator instance used for structure relaxation.
-        """
-        if self._calculator is None:
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    def _relax_structure(
-            self,
-            structure: Structure
-    ) -> Structure:
-        """
-        Relaxes the input structure using the calculator.
-
-        This method takes a pymatgen `Structure` object as input and relaxes it using the specified calculator.
-        The relaxed structure is returned.
-
-        Args:
-            structure (Structure): The initial structure to be relaxed.
-
-        Returns:
-            Structure: The relaxed structure.
-        """
-        return self.calculator.relax(structure)["final_structure"]
 
     def _get_displaced_structures(
             self,

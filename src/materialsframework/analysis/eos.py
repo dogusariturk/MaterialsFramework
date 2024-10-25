@@ -54,7 +54,7 @@ class EOSAnalyzer:
 
     def calculate(
             self,
-            undeformed_structure: Structure,
+            structure: Structure,
             is_relaxed: bool = False
     ) -> dict[str, list]:
         """
@@ -65,7 +65,7 @@ class EOSAnalyzer:
         equation of state (EOS).
 
         Args:
-            undeformed_structure (Structure): The undeformed structure to be analyzed.
+            structure (Structure): The undeformed structure to be analyzed.
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
@@ -74,9 +74,10 @@ class EOSAnalyzer:
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
 
-        undeformed_structure = self.calculator.relax(structure=undeformed_structure)["final_structure"] if not is_relaxed else undeformed_structure
+        if not is_relaxed:
+            structure: Structure = self.calculator.relax(structure)["final_structure"]
 
-        self.eos_transformation.apply_transformation(undeformed_structure)
+        self.eos_transformation.apply_transformation(structure)
 
         strain_list, volume_list, energy_list = zip(
                 *[(strain, deformed_structure.volume, self.calculator.calculate(structure=deformed_structure)["energy"]) for

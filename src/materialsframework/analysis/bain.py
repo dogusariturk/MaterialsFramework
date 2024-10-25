@@ -51,7 +51,7 @@ class BainPathAnalyzer:
 
     def calculate(
             self,
-            undeformed_structure: Structure,
+            structure: Structure,
             is_relaxed: bool = False
     ) -> dict[str, list]:
         """
@@ -62,7 +62,7 @@ class BainPathAnalyzer:
         energies of each deformed structure using the provided calculator.
 
         Args:
-            undeformed_structure (Structure): The undeformed structure to be transformed and analyzed.
+            structure (Structure): The undeformed structure to be transformed and analyzed.
             is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
 
         Returns:
@@ -72,8 +72,10 @@ class BainPathAnalyzer:
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
 
-        self.bain_transformation.apply_transformation(structure=undeformed_structure,
-                                                      is_relaxed=is_relaxed)
+        if not is_relaxed:
+            structure: Structure = self.calculator.relax(structure)["final_structure"]
+
+        self.bain_transformation.apply_transformation(structure=structure)
 
         c_a_list, energy_list = zip(
                 *[(c_a, self.calculator.calculate(structure=deformed_structure)["energy"])

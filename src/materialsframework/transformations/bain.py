@@ -13,11 +13,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 from pymatgen.transformations.standard_transformations import DeformStructureTransformation
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
-
 if TYPE_CHECKING:
     from pymatgen.core import Structure
-    from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -38,7 +35,6 @@ class BainDisplacementTransformation:
             start: float = 0.89,
             stop: float = 1.4,
             step: float = 0.01,
-            calculator: BaseCalculator | None = None,
     ) -> None:
         """
         Initializes the `BainDisplacementTransformation` object.
@@ -47,18 +43,13 @@ class BainDisplacementTransformation:
             start (float, optional): The starting displacement value for the c/a ratio. Defaults to 0.89.
             stop (float, optional): The stopping displacement value for the c/a ratio. Defaults to 1.4.
             step (float, optional): The step size for incrementing the c/a ratio. Defaults to 0.01.
-            calculator (BaseCalculator | None, optional): A calculator object for structure relaxation.
-                                                             If None, defaults to `M3GNetCalculator`.
         """
-        self._calculator = calculator
-
         self.c_a_ratios: np.ndarray = np.arange(start=start, stop=stop, step=step)
         self.displaced_structures: dict[float, Structure] = {}
 
     def apply_transformation(
             self,
             structure: Structure,
-            is_relaxed: bool = False
     ) -> None:
         """
         Applies the Bain displacement transformation to generate structures along the Bain path.
@@ -69,51 +60,13 @@ class BainDisplacementTransformation:
 
         Args:
             structure (Structure): The input structure to be displaced along the Bain path.
-            is_relaxed (bool, optional): If False, the input structure is first relaxed before applying the transformation.
-                                         Defaults to False.
 
         Note:
             The generated structures are stored in the `displaced_structures` attribute, keyed by the corresponding c/a ratio.
         """
-        if not is_relaxed:
-            structure: Structure = self._relax_structure(structure)  # type: ignore
-
         for c_a in self.c_a_ratios:
             delta = np.cbrt(1 / c_a) - 1
             self.displaced_structures[c_a] = self._get_displaced_structures(delta, structure)
-
-    @property
-    def calculator(self) -> BaseCalculator:
-        """
-        Returns the Calculator instance for structure relaxation.
-
-        If the calculator instance is not already created, it creates a new `M3GNetCalculator` instance
-        and returns it. Otherwise, it returns the existing calculator instance.
-
-        Returns:
-            BaseCalculator: The calculator instance used for structure relaxation.
-        """
-        if self._calculator is None:
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    def _relax_structure(
-            self,
-            structure: Structure
-    ) -> Structure:
-        """
-        Relaxes the input structure using the calculator.
-
-        This method takes a pymatgen `Structure` object as input and relaxes it using the specified calculator.
-        The relaxed structure is returned.
-
-        Args:
-            structure (Structure): The initial structure to be relaxed.
-
-        Returns:
-            Structure: The relaxed structure.
-        """
-        return self.calculator.relax(structure)["final_structure"]
 
     @staticmethod
     def _get_displaced_structures(
