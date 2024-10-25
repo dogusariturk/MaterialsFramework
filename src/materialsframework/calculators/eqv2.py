@@ -1,0 +1,84 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from fairchem.core import OCPCalculator
+
+from materialsframework.tools.calculator import BaseCalculator
+from materialsframework.tools.md import BaseMDCalculator
+
+if TYPE_CHECKING:
+    from ase.calculators.calculator import Calculator
+
+__author__ = "Doguhan Sariturk"
+__email__ = "dogu.sariturk@gmail.com"
+
+
+class EqV2Calculator(BaseCalculator, BaseMDCalculator):
+    """
+    A calculator class for performing material property calculations and structure relaxation using the EqV2 potential.
+
+    The `EqV2Calculator` class supports the calculation of properties such as potential energy,
+    forces, and stresses. It also allows for the relaxation of structures using a specified EqV2 model.
+
+    Attributes:
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
+                                          including "potential_energy", "forces", and "stresses".
+    """
+
+    AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]
+
+    def __init__(
+            self,
+            checkpoint_path: str | None = None,
+            model_name: str | None = None,
+            local_cache: str | None = None,
+            cpu: bool = False,
+            **basecalculator_kwargs
+    ) -> None:
+        """
+        Initializes the EqV2Calculator with the specified model and calculation settings.
+
+        This method sets up the calculator with a predefined EqV2 model, which will be used
+        to calculate properties and perform structure relaxation. Additional parameters
+        for the relaxation process can be passed via `basecalculator_kwargs`.
+
+        Args:
+            checkpoint_path (str, optional): The path to the checkpoint file for the EqV2 model.
+            model_name (str, optional): The name of the EqV2 model to use.
+            local_cache (str, optional): The path to the local cache directory for the EqV2 model.
+            cpu (bool, optional): Whether to use the CPU for calculations. Defaults to False.
+            **basecalculator_kwargs: Additional keyword arguments for the base calculator.
+        """
+        # BaseCalculator specific attributes
+        super().__init__(**basecalculator_kwargs)
+
+        # EqV2 specific attributes
+        self.checkpoint_path = checkpoint_path
+        self.model_name = model_name
+        self.local_cache = local_cache
+        self.cpu = cpu
+
+        self._potential = None
+        self._calculator = None
+
+    @property
+    def calculator(self) -> Calculator:
+        """
+        Creates and returns the ASE Calculator object associated with this calculator instance.
+
+        This property initializes the Calculator object using the EqV2 potential and other settings
+        specified during the initialization of this calculator. The Calculator object is then returned
+        to the caller. If the Calculator object has already been created, it is returned directly.
+
+        Returns:
+            Calculator: The ASE Calculator object configured with the EqV2 potential.
+        """
+        if self._calculator is None:
+            self._calculator = OCPCalculator(
+                    checkpoint_path=self.checkpoint_path,
+                    model_name=self.model_name,
+                    local_cache=self.local_cache,
+                    cpu=self.cpu
+            )
+        return self._calculator
