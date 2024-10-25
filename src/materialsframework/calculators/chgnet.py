@@ -39,6 +39,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             self,
             model: str = "0.3.0",
             stress_weight: float = 1 / 160.21766208,
+            include_magmoms: bool = False,
             on_isolated_atoms: Literal["ignore", "warn", "error"] = "warn",
             use_device: Literal["cpu", "cuda", "mps"] = "cpu",
             check_cuda_mem: bool = True,
@@ -55,6 +56,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         Args:
             model (str, optional): The CHGNet model to use. Defaults to "0.3.0".
             stress_weight (float, optional): Conversion factor for stress from GPa to eV/Å³. Defaults to 1 / 160.21766208.
+            include_magmoms (bool, optional): Whether to include magnetic moments in the model. Defaults to False.
             on_isolated_atoms (Literal["ignore", "warn", "error"], optional): Behavior when isolated atoms are detected.
                                                                               Defaults to "warn".
             use_device (Literal["cpu", "cuda", "mps"], optional): The device to use for calculations. Defaults to "cpu".
@@ -69,7 +71,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             The remaining parameters for the CHGNet potential are set to their default values.
         """
         # BaseCalculator specific attributes
-        super().__init__(include_magmoms=True, **basecalculator_kwargs)
+        super().__init__(include_magmoms=include_magmoms, **basecalculator_kwargs)
 
         # CHGNet specific attributes
         self.model = model
