@@ -39,7 +39,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = 'orb-d3-v1',
+            model: str = 'orb-v2',
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             brute_force_knn: bool | None = None,
             system_config: SystemConfig = SystemConfig(radius=10.0, max_num_neighbors=20),
