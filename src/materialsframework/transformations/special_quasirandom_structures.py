@@ -39,6 +39,7 @@ class SqsgenTransformation:
             make_structures: bool = True,
             mode: Literal["random", "systematic"] = "random",
             structure_format: str = "pymatgen",
+            log_level: Literal["trace", "debug", "info", "warning", "error"] = "warning"
     ) -> None:
         """
         Initializes the `SqsgenTransformation` object.
@@ -48,11 +49,13 @@ class SqsgenTransformation:
             make_structures (bool, optional): Whether to generate the structures during the optimization process. Defaults to True.
             mode (Literal["random", "systematic"], optional): The mode for SQS generation. Defaults to "random".
             structure_format (str, optional): The structure format for the generated SQS structure. Defaults to "pymatgen".
+            log_level (Literal["trace", "debug", "info", "warning", "error"], optional): The log level for the SQS generation. Defaults to "warning".
         """
         self._iterations = iterations
         self._make_structures = make_structures
         self._mode = mode
         self._structure_format = structure_format
+        self._log_level = log_level
 
         self._lattice: Lattice | None = None
         self._coords: dict[str, list[float]] | None = None
@@ -93,7 +96,7 @@ class SqsgenTransformation:
         self._composition = self._determine_composition(supercell_size=self._supercell_size,
                                                         composition=composition)
 
-        shell_weights = {1: 1.0, 2: 0.5} if shell_weights is None else {1: 1.0} if shell_weights == (1, 1, 1) else shell_weights
+        shell_weights = {1: 1.0, 2: 0.5} if shell_weights is None else {1: 1.0} if supercell_size == (1, 1, 1) else shell_weights
 
         configuration = {
                 "structure": {
@@ -112,6 +115,7 @@ class SqsgenTransformation:
                 settings=configuration,
                 make_structures=self._make_structures,
                 structure_format=self._structure_format,
+                log_level=self._log_level
         )
 
         self._sqs = self._parse_results_for_structure()
