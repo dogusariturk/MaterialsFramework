@@ -44,7 +44,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             use_device: Literal["cpu", "cuda", "mps"] = "cpu",
             check_cuda_mem: bool = True,
             verbose: bool = False,
-            **basecalculator_kwargs
+            **kwargs
     ) -> None:
         """
         Initializes the CHGNetCalculator with the specified model and calculation settings.
@@ -62,7 +62,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             use_device (Literal["cpu", "cuda", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             check_cuda_mem (bool, optional): Whether to check CUDA memory before running calculations. Defaults to True.
             verbose (bool, optional): Whether to print verbose output during calculations. Defaults to False.
-            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
+            **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
             >>> chgnet_calculator = CHGNetCalculator(model="0.3.0", use_device="cuda", verbose=True)
@@ -70,8 +70,12 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the CHGNet potential are set to their default values.
         """
-        # BaseCalculator specific attributes
-        super().__init__(include_magmoms=include_magmoms, **basecalculator_kwargs)
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
+        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+
+        # BaseCalculator and BaseMDCalculator specific attributes
+        BaseCalculator.__init__(self, include_magmoms=include_magmoms, **basecalculator_kwargs)
+        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # CHGNet specific attributes
         self.model = model

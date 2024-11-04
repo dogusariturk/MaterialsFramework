@@ -43,7 +43,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             brute_force_knn: bool | None = None,
             system_config: SystemConfig = SystemConfig(radius=10.0, max_num_neighbors=20),
-            **basecalculator_kwargs
+            **kwargs
     ) -> None:
         """
         Initializes the ORBCalculator with the specified model and calculation settings.
@@ -59,13 +59,17 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
                 Defaults to None.
             system_config (SystemConfig, optional): The system configuration for the featurization.
                 Defaults to SystemConfig(radius=10.0, max_num_neighbors=20).
-            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
+            **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
             >>> orb_calculator = ORBCalculator(model="orb-d3-v1", device="cuda")
         """
-        # BaseCalculator specific attributes
-        super().__init__(**basecalculator_kwargs)
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
+        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+
+        # BaseCalculator and BaseMDCalculator specific attributes
+        BaseCalculator.__init__(self, **basecalculator_kwargs)
+        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # ORB specific attributes
         self.model = model

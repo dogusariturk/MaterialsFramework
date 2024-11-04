@@ -42,7 +42,7 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
             model: str = "M3GNet-MP-2021.2.8-PES",
             state_attr: Tensor | None = None,
             stress_weight: float = 1.0,
-            **basecalculator_kwargs
+            **kwargs
     ) -> None:
         """
         Initializes the M3GNetCalculator with the specified model and calculation settings.
@@ -57,7 +57,7 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
                                                   This allows for additional model customization. Defaults to None.
             stress_weight (float, optional): Conversion factor from GPa to eV/ang^3. If set to 1.0, stress is calculated in GPa.
                                              Defaults to 1.0.
-            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
+            **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
             >>> m3gnet_calculator = M3GNetCalculator(model="M3GNet-MP-2021.2.8-PES")
@@ -65,8 +65,12 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the M3GNet potential are set to their default values.
         """
-        # BaseCalculator specific attributes
-        super().__init__(**basecalculator_kwargs)
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
+        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+
+        # BaseCalculator and BaseMDCalculator specific attributes
+        BaseCalculator.__init__(self, **basecalculator_kwargs)
+        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # M3GNet specific attributes
         self.model = model

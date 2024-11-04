@@ -43,7 +43,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             default_dtype: str = "",
             model_type: Literal["MACE", "DipoleMACE", "EnergyDipoleMACE"] = "MACE",
-            **basecalculator_kwargs
+            **kwargs
     ) -> None:
         """
         Initializes the MACECalculator with the specified model and calculation settings.
@@ -60,7 +60,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             default_dtype (str, optional): The default data type to be used for the model. Defaults to an empty string,
                 meaning the default data type of the model will be used.
             model_type (Literal["MACE", "DipoleMACE", "EnergyDipoleMACE"], optional): The type of MACE model to use. Defaults to "MACE".
-            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
+            **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
             >>> mace_calculator = MACECalculator(model="medium", device="cuda")
@@ -69,8 +69,12 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             The remaining parameters for the MACE potential are set to their default values, which are appropriate for general use cases.
             If needed, they can be adjusted based on specific calculation requirements.
         """
-        # BaseCalculator specific attributes
-        super().__init__(include_dipoles=include_dipoles, **basecalculator_kwargs)
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
+        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+
+        # BaseCalculator and BaseMDCalculator specific attributes
+        BaseCalculator.__init__(self, **basecalculator_kwargs)
+        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # MACE specific attributes
         self.model = model

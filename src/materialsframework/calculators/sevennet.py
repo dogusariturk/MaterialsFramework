@@ -39,7 +39,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
             model: str = 'SevenNet-0',
             file_type: Literal["checkpoint", "torchscript"] = 'checkpoint',
             device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
-            **basecalculator_kwargs
+            **kwargs
     ) -> None:
         """
         Initialize a SevenNetCalculator instance with a specified model and calculation settings.
@@ -49,7 +49,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
             file_type (Literal["checkpoint", "torchscript"]): The format of the model file.
                 Defaults to 'checkpoint'.
             device (Literal["cuda", "cpu", "mps", "auto"], optional): The device to use for calculations. Defaults to "auto".
-            **basecalculator_kwargs: Additional keyword arguments passed to the `BaseCalculator` constructor.
+            **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Example:
             >>> sevennet_calculator = SevenNetCalculator(model="SevenNet-0", device="cuda")
@@ -57,8 +57,12 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining values for the arguments are set to the default values for the SevenNet potential.
         """
-        # BaseCalculator specific attributes
-        super().__init__(**basecalculator_kwargs)
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
+        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+
+        # BaseCalculator and BaseMDCalculator specific attributes
+        BaseCalculator.__init__(self, **basecalculator_kwargs)
+        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # SevenNet specific attributes
         self.model = model

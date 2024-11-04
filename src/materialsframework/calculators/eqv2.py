@@ -34,7 +34,8 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
             model_name: str | None = None,
             local_cache: str | None = None,
             cpu: bool = False,
-            **basecalculator_kwargs
+            seed: int | None = 42,
+            **kwargs
     ) -> None:
         """
         Initializes the EqV2Calculator with the specified model and calculation settings.
@@ -48,16 +49,22 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
             model_name (str, optional): The name of the EqV2 model to use.
             local_cache (str, optional): The path to the local cache directory for the EqV2 model.
             cpu (bool, optional): Whether to use the CPU for calculations. Defaults to False.
-            **basecalculator_kwargs: Additional keyword arguments for the base calculator.
+            seed (int, optional): The seed value for the model. Defaults to 42.
+            **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        # BaseCalculator specific attributes
-        super().__init__(**basecalculator_kwargs)
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
+        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+
+        # BaseCalculator and BaseMDCalculator specific attributes
+        BaseCalculator.__init__(self, **basecalculator_kwargs)
+        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # EqV2 specific attributes
         self.checkpoint_path = checkpoint_path
         self.model_name = model_name
         self.local_cache = local_cache
         self.cpu = cpu
+        self.seed = seed
 
         self._potential = None
         self._calculator = None
@@ -79,6 +86,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
                     checkpoint_path=self.checkpoint_path,
                     model_name=self.model_name,
                     local_cache=self.local_cache,
-                    cpu=self.cpu
+                    cpu=self.cpu,
+                    seed=self.seed,
             )
         return self._calculator
