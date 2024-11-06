@@ -221,6 +221,7 @@ class BaseMDCalculator(ABC):
                 "forces": self.trajectory.forces,
                 "stresses": self.trajectory.stresses,
                 "temperature": self.trajectory.temperatures,
+                "final_structure": self.ase_adaptor.get_structure(self.dyn.atoms),
         }
 
         return self.results
