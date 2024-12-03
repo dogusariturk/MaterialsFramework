@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.7.0
+===========
+- Added ``MatterSim`` implementation
+
 Version 0.6.0
 ===========
 - Added ``ORB`` and ``SevenNet`` implementations

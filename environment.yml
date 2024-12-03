@@ -15,6 +15,7 @@ dependencies:
       - matgl
       - chgnet
       - mace-torch
+      - mattersim
       - sevenn
       - orb-models
       - git+https://github.com/dwastberg/pynanoflann
