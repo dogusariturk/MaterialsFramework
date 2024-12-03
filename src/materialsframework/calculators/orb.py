@@ -53,7 +53,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model (str, optional): The name of the ORB model to use. Defaults to 'orb-d3-v1'.
+            model (str, optional): The name of the ORB model to use. Defaults to 'orb-v2'.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             brute_force_knn (bool, optional): Whether to use brute-force k-nearest neighbors search.
                 Defaults to None.
@@ -62,7 +62,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
-            >>> orb_calculator = ORBCalculator(model="orb-d3-v1", device="cuda")
+            >>> orb_calculator = ORBCalculator(model="orb-v2", device="cuda")
         """
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}

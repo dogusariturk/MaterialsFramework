@@ -12,6 +12,7 @@ from .chgnet import CHGNetCalculator
 from .eqv2 import EqV2Calculator
 from .m3gnet import M3GNetCalculator
 from .mace import MACECalculator
+from .mattersim import MatterSimCalculator
 from .megnet import MEGNetCalculator
 from .orb import ORBCalculator
 from .sevennet import SevenNetCalculator
@@ -23,6 +24,7 @@ __all__ = ["CHGNetCalculator",
            "EqV2Calculator",
            "M3GNetCalculator",
            "MACECalculator",
+           "MatterSimCalculator",
            "MEGNetCalculator",
            "ORBCalculator",
            "SevenNetCalculator"]
