@@ -41,7 +41,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             stress_weight: float = 1 / 160.21766208,
             include_magmoms: bool = False,
             on_isolated_atoms: Literal["ignore", "warn", "error"] = "warn",
-            use_device: Literal["cpu", "cuda", "mps"] = "cpu",
+            device: Literal["cpu", "cuda", "mps"] = "cpu",
             check_cuda_mem: bool = True,
             verbose: bool = False,
             **kwargs
@@ -59,13 +59,13 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             include_magmoms (bool, optional): Whether to include magnetic moments in the model. Defaults to False.
             on_isolated_atoms (Literal["ignore", "warn", "error"], optional): Behavior when isolated atoms are detected.
                                                                               Defaults to "warn".
-            use_device (Literal["cpu", "cuda", "mps"], optional): The device to use for calculations. Defaults to "cpu".
+            device (Literal["cpu", "cuda", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             check_cuda_mem (bool, optional): Whether to check CUDA memory before running calculations. Defaults to True.
             verbose (bool, optional): Whether to print verbose output during calculations. Defaults to False.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
-            >>> chgnet_calculator = CHGNetCalculator(model="0.3.0", use_device="cuda", verbose=True)
+            >>> chgnet_calculator = CHGNetCalculator(model="0.3.0", device="cuda", verbose=True)
 
         Note:
             The remaining parameters for the CHGNet potential are set to their default values.
@@ -81,7 +81,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         self.model = model
         self.stress_weight = stress_weight
         self.on_isolated_atoms = on_isolated_atoms
-        self.use_device = use_device
+        self.device = device
         self.check_cuda_mem = check_cuda_mem
         self.verbose = verbose
 
@@ -103,7 +103,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         if self._potential is None:
             self._potential = CHGNet.load(
                     model_name=self.model,
-                    use_device=self.use_device,
+                    use_device=self.device,
                     check_cuda_mem=self.check_cuda_mem,
                     verbose=self.verbose
             )
@@ -115,7 +115,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         Creates and returns the ASE Calculator object associated with this calculator instance.
 
         This property initializes the Calculator object using the CHGNet potential and other
-        relevant attributes such as `use_device`, `check_cuda_mem`, and `stress_weight`.
+        relevant attributes such as `device`, `check_cuda_mem`, and `stress_weight`.
         If the Calculator object has already been created, it will return the existing instance.
 
         Returns:
@@ -124,7 +124,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             self._calculator = CHGNetASECalculator(
                     model=self.potential,
-                    use_device=self.use_device,
+                    use_device=self.device,
                     check_cuda_mem=self.check_cuda_mem,
                     stress_weight=self.stress_weight,
                     on_isolated_atoms=self.on_isolated_atoms

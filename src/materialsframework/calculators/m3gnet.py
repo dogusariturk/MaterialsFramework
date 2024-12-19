@@ -6,9 +6,11 @@ forces, and stresses, and to perform structure relaxation using a specified M3GN
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
+import dgl
 import matgl
+import torch
 from matgl.ext.ase import PESCalculator
 
 from materialsframework.tools.calculator import BaseCalculator
@@ -16,7 +18,6 @@ from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
-    from torch import Tensor
     from matgl.apps.pes import Potential
 
 __author__ = "Doguhan Sariturk"
@@ -40,8 +41,10 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
     def __init__(
             self,
             model: str = "M3GNet-MP-2021.2.8-PES",
-            state_attr: Tensor | None = None,
+            state_attr: torch.Tensor | None = None,
             stress_weight: float = 1.0,
+            device: Literal["cpu", "cuda", "mps"] = "cpu",
+            n_cores: int | None = None,
             **kwargs
     ) -> None:
         """
@@ -57,6 +60,9 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
                                                   This allows for additional model customization. Defaults to None.
             stress_weight (float, optional): Conversion factor from GPa to eV/ang^3. If set to 1.0, stress is calculated in GPa.
                                              Defaults to 1.0.
+            device (Literal["cpu", "cuda", "mps"], optional): The device to use for calculations. Defaults to "cpu".
+            n_cores (int | None, optional): The number of OMP threads to use. If None, the number of threads is set automatically.
+                                            Defaults to None.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
@@ -76,6 +82,13 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         self.model = model
         self.state_attr = state_attr
         self.stress_weight = stress_weight
+        self.device = device
+        self.n_cores = n_cores
+
+        if self.n_cores is not None:
+            dgl.utils.set_num_threads(self.n_cores)
+
+        torch.set_default_device(torch.device(self.device))
 
         self._calculator = None
         self._potential = None
