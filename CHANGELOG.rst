@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.8.0
+===========
+- Added ``GRACE`` implementation
+
 Version 0.7.0
 ===========
 - Added ``MatterSim`` implementation

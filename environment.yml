@@ -20,3 +20,4 @@ dependencies:
       - orb-models
       - git+https://github.com/dwastberg/pynanoflann
       - git+https://github.com/FAIR-Chem/fairchem.git@omat24#egg=fairchem-core&subdirectory=packages/fairchem-core
+      - tensorpotential
