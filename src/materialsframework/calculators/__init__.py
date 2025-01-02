@@ -10,6 +10,7 @@ the workflow of materials modeling and property prediction within the MaterialsF
 """
 from .chgnet import CHGNetCalculator
 from .eqv2 import EqV2Calculator
+from .grace import GraceCalculator
 from .m3gnet import M3GNetCalculator
 from .mace import MACECalculator
 from .mattersim import MatterSimCalculator
@@ -23,6 +24,7 @@ __email__ = "dogu.sariturk@gmail.com"
 __all__ = ["CHGNetCalculator",
            "EqV2Calculator",
            "M3GNetCalculator",
+           "GraceCalculator",
            "MACECalculator",
            "MatterSimCalculator",
            "MEGNetCalculator",

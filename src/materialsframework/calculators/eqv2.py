@@ -23,7 +23,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
 
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "potential_energy", "forces", and "stresses".
+                                          including "energy", "forces", and "stresses".
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

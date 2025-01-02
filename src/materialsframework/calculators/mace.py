@@ -31,7 +31,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
 
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "potential_energy", "free_energy", "forces", and "stresses".
+                                          including "energy", "free_energy", "forces", and "stresses".
     """
 
     AVAILABLE_PROPERTIES = ["energy", "node_energy", "forces", "stress"]

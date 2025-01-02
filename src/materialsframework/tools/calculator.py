@@ -159,6 +159,8 @@ class BaseCalculator(ABC):
         self.verbose = verbose
         self.params_asecellfilter = params_asecellfilter
 
+        self.converged = None
+
         self.include_magmoms = include_magmoms
         self.include_dipoles = include_dipoles
 
@@ -241,6 +243,8 @@ class BaseCalculator(ABC):
             optimizer.attach(obs, interval=self.interval)
             optimizer.run(fmax=self.fmax, steps=self.steps)
             obs()
+
+            self.converged = optimizer.nsteps < self.steps
 
         if self.traj_file:
             obs.save(self.traj_file)
