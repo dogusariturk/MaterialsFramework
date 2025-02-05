@@ -1,3 +1,9 @@
+"""
+This module provides a class for performing calculations using the Grace potential.
+
+The `GraceCalculator` class is designed to calculate properties such as potential energy, forces,
+stresses, and magnetic moments, and to perform structure relaxation using a specified Grace model.
+"""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

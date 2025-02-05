@@ -1,5 +1,5 @@
 """
-This module provides a class for performing calculations and structure relaxation using the CHGNet potential.
+This module provides a class for performing calculations using the CHGNet potential.
 
 The `CHGNetCalculator` class is designed to calculate properties such as potential energy, forces,
 stresses, and magnetic moments, and to perform structure relaxation using a specified CHGNet model.

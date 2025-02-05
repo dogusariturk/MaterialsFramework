@@ -1,5 +1,5 @@
 """
-This module provides a class for performing calculations and structure relaxation using the MACE potential.
+This module provides a class for performing calculations using the MACE potential.
 
 The `MACECalculator` class is designed to calculate properties such as potential energy, free energy,
 forces, and stresses, and to perform structure relaxation using a specified MACE model.

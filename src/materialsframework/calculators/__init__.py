@@ -9,6 +9,7 @@ This module serves as a centralized collection of calculator classes to streamli
 the workflow of materials modeling and property prediction within the MaterialsFramework.
 """
 from .chgnet import CHGNetCalculator
+from .divenet import DiveNetCalculator
 from .eqv2 import EqV2Calculator
 from .grace import GraceCalculator
 from .m3gnet import M3GNetCalculator
@@ -22,6 +23,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 __all__ = ["CHGNetCalculator",
+           "DiveNetCalculator",
            "EqV2Calculator",
            "M3GNetCalculator",
            "GraceCalculator",

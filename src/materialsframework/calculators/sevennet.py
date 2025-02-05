@@ -22,7 +22,7 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
     """
-    A calculator class for performing material property calculations and structure relaxation using the ORB potential.
+    A calculator class for performing material property calculations and structure relaxation using the SevenNet potential.
 
     The `SevenNetCalculator` class supports the calculation of properties such as potential energy,
     forces, and stresses. It also allows for the relaxation of structures using a specified SevenNet model.
