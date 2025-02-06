@@ -7,7 +7,8 @@ applying deformations, or preparing structures for phonon calculations or other 
 """
 from .annni import ANNNIStackingFaultTransformation
 from .bain import BainDisplacementTransformation
-from .elastic_constants import CubicElasticConstantsDeformationTransformation
+from .cubic_elastic_constants import CubicElasticConstantsDeformationTransformation
+from .elastic_constants import ElasticConstantsDeformationTransformation
 from .eos import EOSTransformation
 from .phono3py import Phono3pyDisplacementTransformation
 from .phonopy import PhonopyDisplacementTransformation
@@ -19,6 +20,7 @@ __email__ = "dogu.sariturk@gmail.com"
 __all__ = ["ANNNIStackingFaultTransformation",
            "BainDisplacementTransformation",
            "CubicElasticConstantsDeformationTransformation",
+           "ElasticConstantsDeformationTransformation",
            "EOSTransformation",
            "Phono3pyDisplacementTransformation",
            "PhonopyDisplacementTransformation",
