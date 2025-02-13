@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import ase.units
 from elastic import elastic
 
 from materialsframework.calculators.m3gnet import M3GNetCalculator
@@ -38,7 +37,6 @@ class ElasticConstantsAnalyzer:
 
     def __init__(
             self,
-            eos_name: str = "birch_murnaghan",
             calculator: BaseCalculator | None = None,
             elastic_constant_transformation: ElasticConstantsDeformationTransformation | None = None
     ) -> None:
@@ -46,16 +44,12 @@ class ElasticConstantsAnalyzer:
         Initializes the `ElasticConstantsAnalyzer` object.
 
         Args:
-            eos_name (str, optional): The name of the equation of state (EOS) used for fitting energy-volume data.
-                                      Defaults to "birch_murnaghan".
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
                                                           Defaults to `M3GNetCalculator`.
             elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The transformation
                                                                                                     object used to apply
                                                                                                     cubic distortions.
         """
-        self._eos_name = eos_name
-
         self._calculator = calculator
         self._elastic_constant_transformation = elastic_constant_transformation
 
@@ -88,7 +82,10 @@ class ElasticConstantsAnalyzer:
         if not is_relaxed:
             structure: Structure = self.calculator.relax(structure)["final_structure"]
 
-        structure.calc = self.calculator
+        structure = structure.to_ase_atoms(msonable=False)
+        self.calculator.relax_cell = False
+        structure.calc = self.calculator.calculator
+
         self.elastic_constants_transformation.apply_transformation(structure)
 
         cij_order = elastic.get_cij_order(structure)
@@ -98,7 +95,7 @@ class ElasticConstantsAnalyzer:
         )
 
         return {
-            i: j / ase.units.GPa for i, j in zip(cij_order, Cij)
+                i: j * eV_A3_to_GPa for i, j in zip(cij_order, Cij)
         }
 
     @property
@@ -112,7 +109,7 @@ class ElasticConstantsAnalyzer:
             BaseCalculator: The calculator object used for energy calculations.
         """
         if self._calculator is None:
-            self._calculator = M3GNetCalculator()
+            self._calculator = M3GNetCalculator(fmax=0.01)
         return self._calculator
 
     @property

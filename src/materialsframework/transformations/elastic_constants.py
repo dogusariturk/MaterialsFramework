@@ -9,9 +9,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from elastic import elastic
+from pymatgen.core import Structure
 
 if TYPE_CHECKING:
-    from pymatgen.core import Structure
     from ase import Atoms
 
 __author__ = "Doguhan Sariturk"
@@ -53,9 +53,8 @@ class ElasticConstantsDeformationTransformation:
         Args:
             structure (Structure): The structure to apply the deformation transformation.
         """
-        ase_atoms = structure.to_ase_atoms()
         self.distorted_structures = elastic.get_elementary_deformations(
-                cryst=ase_atoms,
+                cryst=structure,
                 n=self.num_deform,
                 d=self.max_deform
         )
