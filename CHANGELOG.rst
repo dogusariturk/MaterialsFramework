@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.9.0
+===========
+- Added ``AlphaNet``, ``DeePMD``, ``DiveNet``, and ``eqV2`` implementations
+- Added ``Cahn Hilliard``, ``Sqs2tdb``, and ``Stability Map`` implementations
+
 Version 0.8.0
 ===========
 - Added ``GRACE`` implementation
