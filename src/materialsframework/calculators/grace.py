@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from tensorpotential.calculator.foundation_models import grace_fm
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -57,6 +55,8 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
             min_dist (float | None, optional): The minimum distance between atoms. Defaults to None.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
+        from tensorpotential.calculator.foundation_models import grace_fm
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

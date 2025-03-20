@@ -8,10 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import matgl
-
 if TYPE_CHECKING:
-    from matgl.models import MEGNet
     from pymatgen.core import Structure
 
 __author__ = "Doguhan Sariturk"
@@ -52,6 +49,9 @@ class MEGNetCalculator:
         Note:
             The remaining parameters for the MEGNet potential are set to their default values.
         """
+        import matgl
+        from matgl.models import MEGNet
+
         # MEGNet specific attributes
         self.model = model
 

@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-from sevenn.sevennet_calculator import SevenNetCalculator as SevenNetASECalculator
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -57,6 +55,8 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining values for the arguments are set to the default values for the SevenNet potential.
         """
+        from sevenn.sevennet_calculator import SevenNetCalculator as SevenNetASECalculator
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

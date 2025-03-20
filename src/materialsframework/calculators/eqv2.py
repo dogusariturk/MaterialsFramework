@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-from fairchem.core import OCPCalculator
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -58,6 +56,8 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
             seed (int, optional): The seed value for the model. Defaults to 42.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
+        from fairchem.core import OCPCalculator
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

@@ -9,9 +9,6 @@ from __future__ import annotations
 from typing import Literal, TYPE_CHECKING
 
 import torch
-from alphanet.config import All_Config
-from alphanet.infer.calc import AlphaNetCalculator as AlphaNetASECalculator
-from alphanet.models.model import AlphaNetWrapper
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -57,6 +54,10 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
+        from alphanet.config import All_Config
+        from alphanet.infer.calc import AlphaNetCalculator as AlphaNetASECalculator
+        from alphanet.models.model import AlphaNetWrapper
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

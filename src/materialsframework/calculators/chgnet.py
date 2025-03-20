@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-from chgnet.model import CHGNet, CHGNetCalculator as CHGNetASECalculator
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -70,6 +68,8 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the CHGNet potential are set to their default values.
         """
+        from chgnet.model import CHGNet, CHGNetCalculator as CHGNetASECalculator
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

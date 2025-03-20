@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-from mace.calculators import mace_mp
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -69,6 +67,8 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             The remaining parameters for the MACE potential are set to their default values, which are appropriate for general use cases.
             If needed, they can be adjusted based on specific calculation requirements.
         """
+        from mace.calculators import mace_mp
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

@@ -8,7 +8,9 @@ These calculators support advanced material simulations and structure relaxation
 This module serves as a centralized collection of calculator classes to streamline
 the workflow of materials modeling and property prediction within the MaterialsFramework.
 """
+from .alphanet import AlphaNetCalculator
 from .chgnet import CHGNetCalculator
+from .deepmd import DeePMDCalculator
 from .divenet import DiveNetCalculator
 from .eqv2 import EqV2Calculator
 from .grace import GraceCalculator
@@ -22,7 +24,9 @@ from .sevennet import SevenNetCalculator
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
-__all__ = ["CHGNetCalculator",
+__all__ = ["AlphaNetCalculator",
+           "CHGNetCalculator",
+           "DeePMDCalculator",
            "DiveNetCalculator",
            "EqV2Calculator",
            "M3GNetCalculator",

@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING, Union
 
-from deepmd.calculator import DP
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -50,6 +48,8 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
         Args:
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
+        from deepmd.calculator import DP
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

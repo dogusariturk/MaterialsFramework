@@ -8,17 +8,11 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-import dgl
-import matgl
-import torch
-from matgl.ext.ase import PESCalculator
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
-    from matgl.apps.pes import Potential
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -71,6 +65,12 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the M3GNet potential are set to their default values.
         """
+        import dgl
+        import matgl
+        import torch
+        from matgl.apps.pes import Potential
+        from matgl.ext.ase import PESCalculator
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 

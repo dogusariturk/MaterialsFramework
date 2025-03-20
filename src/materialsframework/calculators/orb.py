@@ -8,10 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-from orb_models.forcefield import pretrained
-from orb_models.forcefield.atomic_system import SystemConfig
-from orb_models.forcefield.calculator import ORBCalculator as ORBASECalculator
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -42,7 +38,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
             model: str = 'orb-v2',
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             brute_force_knn: bool | None = None,
-            system_config: SystemConfig = SystemConfig(radius=10.0, max_num_neighbors=20),
+            system_config: SystemConfig | None = None,
             **kwargs
     ) -> None:
         """
@@ -64,6 +60,10 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         Examples:
             >>> orb_calculator = ORBCalculator(model="orb-v2", device="cuda")
         """
+        from orb_models.forcefield import pretrained
+        from orb_models.forcefield.atomic_system import SystemConfig
+        from orb_models.forcefield.calculator import ORBCalculator as ORBASECalculator
+
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -75,7 +75,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         self.model = model
         self.device = device
         self.brute_force_knn = brute_force_knn
-        self.system_config = system_config
+        self.system_config = SystemConfig(radius=10.0, max_num_neighbors=20) if system_config is None else system_config
 
         self._potential = None
         self._calculator = None

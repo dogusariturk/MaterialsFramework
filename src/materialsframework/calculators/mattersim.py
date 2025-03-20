@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-from mattersim.forcefield import MatterSimCalculator as MatterSimASECalculator, Potential
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -66,6 +64,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the MatterSim potential are set to their default values.
         """
+        from mattersim.forcefield import MatterSimCalculator as MatterSimASECalculator, Potential
 
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
