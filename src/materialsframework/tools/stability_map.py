@@ -77,7 +77,7 @@ class StabilityMap:
             raise ValueError(f"Multiple phases found in the database. Please specify one of {list(self.dbf.phases.keys())}.")
 
         self.elements = sorted(list(self.dbf.elements)) if elements is None else elements
-        self.phase = list(db.phases.keys()) if phase is None else phase
+        self.phase = list(db.phases.keys())[0] if phase is None else phase
         self.compositions = self._generate_compositions(self.elements, step=step)
         self.temperature = temperature
         self.pressure = pressure
@@ -147,6 +147,7 @@ class StabilityMap:
             ValueError: If the calculation fails.
         """
         try:
+            print(self.phase)
             wks = Workspace(
                     database=self.dbf,
                     components=self.elements,
