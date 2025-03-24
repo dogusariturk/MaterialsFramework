@@ -1,7 +1,7 @@
 """
-This module provides various transformation classes for generating and manipulating crystal structures.
+This package provides various transformation classes for generating and manipulating crystal structures.
 
-The transformations in this module are designed to facilitate structure generation, manipulation,
+The transformations in this package are designed to facilitate structure generation, manipulation,
 and analysis. These transformations are commonly used for  generating special types of structures,
 applying deformations, or preparing structures for phonon calculations or other simulations.
 """

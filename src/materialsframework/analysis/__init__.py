@@ -1,4 +1,4 @@
-""" This module contains the analysis tools for MaterialsFramework. """
+""" This package contains the analysis tools for MaterialsFramework. """
 from .annni import ANNNIStackingFaultAnalyzer
 from .bain import BainPathAnalyzer
 from .cubic_elastic_constants import CubicElasticConstantsAnalyzer

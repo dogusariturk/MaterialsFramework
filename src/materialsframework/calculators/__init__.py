@@ -1,11 +1,11 @@
 """
-This module provides the calculator classes for the MaterialsFramework.
+This package provides the calculator classes for the MaterialsFramework.
 
-The module includes several calculators, each designed to interface with specific machine learning
+The package includes several calculators, each designed to interface with specific machine learning
 potentials and perform material property calculations such as potential energy, forces, and stresses.
 These calculators support advanced material simulations and structure relaxations.
 
-This module serves as a centralized collection of calculator classes to streamline
+This package serves as a centralized collection of calculator classes to streamline
 the workflow of materials modeling and property prediction within the MaterialsFramework.
 """
 from .alphanet import AlphaNetCalculator
