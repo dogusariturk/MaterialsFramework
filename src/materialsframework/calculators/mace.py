@@ -67,8 +67,6 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             The remaining parameters for the MACE potential are set to their default values, which are appropriate for general use cases.
             If needed, they can be adjusted based on specific calculation requirements.
         """
-        from mace.calculators import mace_mp
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -100,6 +98,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the MACE potential.
         """
         if self._calculator is None:
+            from mace.calculators import mace_mp
             self._calculator = mace_mp(
                     model=self.model,
                     device=self.device,

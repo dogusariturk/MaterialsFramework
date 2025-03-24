@@ -55,25 +55,6 @@ class MEGNetCalculator:
         # MEGNet specific attributes
         self.model = model
 
-        self._calculator = None
-        self._potential = None
-
-    @property
-    def potential(self) -> MEGNet:
-        """
-        Loads and returns the MEGNet potential associated with this calculator instance.
-
-        This property lazily loads the MEGNet model specified during initialization if it
-        has not already been loaded. The loaded potential is then used for all subsequent
-        calculations.
-
-        Returns:
-            MEGNet: The loaded MEGNet model instance used for calculations.
-        """
-        if self._potential is None:
-            self._potential = matgl.load_model(self.model)
-        return self._potential
-
     def calculate(
             self,
             structure: Structure
@@ -97,6 +78,7 @@ class MEGNetCalculator:
             >>> megnet_calculator = MEGNetCalculator()
             >>> result = megnet_calculator.calculate(structure=struct)
         """
+        potential = matgl.load_model(self.model)
         return {
-                "formation_energy": self.potential.predict_structure(structure)
+                "formation_energy": potential.predict_structure(structure)
         }

@@ -56,8 +56,6 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
             seed (int, optional): The seed value for the model. Defaults to 42.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        from fairchem.core import OCPCalculator
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -72,7 +70,6 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         self.device = device
         self.seed = seed
 
-        self._potential = None
         self._calculator = None
 
     @property
@@ -88,6 +85,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the EqV2 potential.
         """
         if self._calculator is None:
+            from fairchem.core import OCPCalculator
             self._calculator = OCPCalculator(
                     checkpoint_path=self.checkpoint_path,
                     model_name=self.model_name,

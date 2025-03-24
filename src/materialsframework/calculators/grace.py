@@ -55,8 +55,6 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
             min_dist (float | None, optional): The minimum distance between atoms. Defaults to None.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        from tensorpotential.calculator.foundation_models import grace_fm
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -70,7 +68,6 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
         self.pad_atoms_number=pad_atoms_number
         self.min_dist=min_dist
 
-        self._potential = None
         self._calculator = None
 
     @property
@@ -86,6 +83,7 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the Grace potential.
         """
         if self._calculator is None:
+            from tensorpotential.calculator.foundation_models import grace_fm
             self._calculator = grace_fm(
                 model=self.model,
                 pad_neighbors_fraction=self.pad_neighbors_fraction,

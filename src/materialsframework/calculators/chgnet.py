@@ -68,8 +68,6 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the CHGNet potential are set to their default values.
         """
-        from chgnet.model import CHGNet, CHGNetCalculator as CHGNetASECalculator
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -89,7 +87,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         self._potential = None
 
     @property
-    def potential(self) -> CHGNet:
+    def potential(self):
         """
         Loads and returns the CHGNet potential associated with this calculator instance.
 
@@ -101,6 +99,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             CHGNet: The loaded CHGNet model instance used for calculations.
         """
         if self._potential is None:
+            from chgnet.model import CHGNet
             self._potential = CHGNet.load(
                     model_name=self.model,
                     use_device=self.device,
@@ -122,6 +121,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the CHGNet potential.
         """
         if self._calculator is None:
+            from chgnet.model import CHGNetCalculator as CHGNetASECalculator
             self._calculator = CHGNetASECalculator(
                     model=self.potential,
                     use_device=self.device,

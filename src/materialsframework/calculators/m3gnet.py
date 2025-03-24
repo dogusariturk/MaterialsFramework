@@ -66,10 +66,7 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
             The remaining parameters for the M3GNet potential are set to their default values.
         """
         import dgl
-        import matgl
         import torch
-        from matgl.apps.pes import Potential
-        from matgl.ext.ase import PESCalculator
 
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
@@ -91,23 +88,6 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         torch.set_default_device(torch.device(self.device))
 
         self._calculator = None
-        self._potential = None
-
-    @property
-    def potential(self) -> Potential:
-        """
-        Loads and returns the M3GNet potential associated with this calculator instance.
-
-        This property lazily loads the M3GNet model specified during initialization if it
-        has not already been loaded. The loaded potential is then used for all subsequent
-        calculations.
-
-        Returns:
-            Potential: The loaded M3GNet model instance used for calculations.
-        """
-        if self._potential is None:
-            self._potential = matgl.load_model(self.model)
-        return self._potential
 
     @property
     def calculator(self) -> Calculator:
@@ -122,8 +102,11 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the M3GNet potential.
         """
         if self._calculator is None:
+            from matgl import load_model
+            from matgl.ext.ase import PESCalculator
+            from matgl.apps.pes import Potential
             self._calculator = PESCalculator(
-                    potential=self.potential,
+                    potential=matgl.load_model(self.model),
                     state_attr=self.state_attr,
                     stress_weight=self.stress_weight,
             )

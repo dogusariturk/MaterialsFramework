@@ -48,8 +48,6 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
         Args:
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        from deepmd.calculator import DP
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -60,7 +58,6 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
         # DeePMD specific attributes
         self.model = model
 
-        self._potential = None
         self._calculator = None
 
     @property
@@ -76,5 +73,6 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the DeePMD potential.
         """
         if self._calculator is None:
+            from deepmd.calculator import DP
             self._calculator = DP(model=self.model)
         return self._calculator

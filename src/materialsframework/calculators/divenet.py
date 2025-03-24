@@ -55,8 +55,6 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining values for the arguments are set to the default values for the DiveNet potential.
         """
-        from divenet.sevennet_calculator import SevenNetCalculator as DiveNetASECalculator
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -83,6 +81,7 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
             DiveNetCalculator: The ASE calculator associated with this instance.
         """
         if self._calculator is None:
+            from divenet.sevennet_calculator import SevenNetCalculator as DiveNetASECalculator
             self._calculator = DiveNetASECalculator(
                     model=self.model,
                     device=self.device,

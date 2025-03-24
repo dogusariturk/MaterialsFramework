@@ -64,8 +64,6 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the MatterSim potential are set to their default values.
         """
-        from mattersim.forcefield import MatterSimCalculator as MatterSimASECalculator, Potential
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -84,7 +82,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         self._potential = None
 
     @property
-    def potential(self) -> Potential:
+    def potential(self):
         """
         Loads and returns the MatterSim potential associated with this calculator instance.
 
@@ -96,6 +94,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
             Potential: The loaded MatterSim model instance used for calculations.
         """
         if self._potential is None:
+            from mattersim.forcefield import Potential
             self._potential = Potential.from_checkpoint(
                     load_path=self.model,
                     device=self.device
@@ -115,6 +114,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the MatterSim potential.
         """
         if self._calculator is None:
+            from mattersim.forcefield import MatterSimCalculator as MatterSimASECalculator
             self._calculator = MatterSimASECalculator(
                     potential=self.potential,
                     args_dict=self.args_dict,

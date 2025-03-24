@@ -55,8 +55,6 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining values for the arguments are set to the default values for the SevenNet potential.
         """
-        from sevenn.sevennet_calculator import SevenNetCalculator as SevenNetASECalculator
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -83,6 +81,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
             SevenNetCalculator: The ASE calculator associated with this instance.
         """
         if self._calculator is None:
+            from sevenn.sevennet_calculator import SevenNetCalculator as SevenNetASECalculator
             self._calculator = SevenNetASECalculator(
                     model=self.model,
                     device=self.device,

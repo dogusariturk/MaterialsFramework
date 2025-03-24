@@ -55,7 +55,6 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         from alphanet.config import All_Config
-        from alphanet.infer.calc import AlphaNetCalculator as AlphaNetASECalculator
         from alphanet.models.model import AlphaNetWrapper
 
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
@@ -72,7 +71,6 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         model.load_state_dict(torch.load(checkpoint, map_location=torch.device(self.device)))
         self.model = model
 
-        self._potential = None
         self._calculator = None
 
     @property
@@ -88,6 +86,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the AlphaNet potential.
         """
         if self._calculator is None:
+            from alphanet.infer.calc import AlphaNetCalculator as AlphaNetASECalculator
             self._calculator = AlphaNetASECalculator(
                     model=self.model,
                     device=self.device,
