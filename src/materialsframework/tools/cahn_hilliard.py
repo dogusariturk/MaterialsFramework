@@ -1,11 +1,16 @@
+""" This module implements a Cahn-Hilliard phase field model for simulating phase separation in materials.
+It uses a finite difference method to solve the Cahn-Hilliard equation and includes functionality for
+visualizing the results.
+"""
 import os
 
 import numpy as np
 from pycalphad import Database, calculate
 from scipy.optimize import curve_fit
 
-__author__ = ["Doguhan Sariturk", "Vahid Attari"]
-__email__ = ["dogu.sariturk@gmail.com", "attari.v@tamu.edu"]
+__authors__ = ["Doguhan Sariturk", "Vahid Attari"]
+__maintainer__ = "Doguhan Sariturk"
+__email__ = "dogu.sariturk@gmail.com"
 
 
 class SimulationGrid:
@@ -123,7 +128,7 @@ class PhaseFieldModel:
         np.random.seed(seed)
 
         self.grid = SimulationGrid() if simulation_grid is None else simulation_grid
-        self.material = MaterialParameters() if material_properties is None else material_properties
+        self.material = material_properties
         self.wrt_cycle = wrt_cycle
         self.stop_iter = stop_iter
 
@@ -186,7 +191,7 @@ class PhaseFieldModel:
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots()
         im = ax.imshow(self.grid.phi, cmap="binary_r", origin="lower",
-                       extent=[0, self.grid.Lx, 0, self.grid.Ly],
+                       extent=(0, self.grid.Lx, 0, self.grid.Ly),
                        interpolation="nearest", vmin=0, vmax=1)
         cbar = fig.colorbar(im, ax=ax)
         cbar.set_label("Composition φ")
