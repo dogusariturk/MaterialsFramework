@@ -30,7 +30,7 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "forces", and "stresses".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]
 
     def __init__(
             self,
