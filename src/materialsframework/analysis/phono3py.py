@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.phono3py import Phono3pyDisplacementTransformation
 
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
     from phono3py.conductivity.direct_solution import ConductivityLBTE
     from phono3py.conductivity.rta import ConductivityRTA
     from pymatgen.core import Structure
+    from typing import Literal
     from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
@@ -59,14 +62,17 @@ class Phono3pyAnalyzer:
             is_relaxed: bool = False,
             distance: float = 0.01,
             supercell_matrix: list | None = None,
-            primitive_matrix: list | None = None,
+            primitive_matrix: list | str | None = None,
             phonon_supercell_matrix: list | None = None,
             mesh: ArrayLike | float | None = None,
             is_lbte: bool = False,
+            is_isotope: bool = False,
+            conductivity_type: Literal["wigner", "kubo"] | None = None,
+            boundary_mfp: float | None = None,
             t_min: float | None = 0,
             t_max: float | None = 1000,
             t_step: float | None = 10,
-            log_level: int = 0
+            log_level: Literal[0, 1, 2] = 0
     ) -> dict[str, ConductivityRTA | ConductivityLBTE]:
         """
         Calculates the phonon properties of the given structure, including thermal conductivity.
@@ -79,14 +85,17 @@ class Phono3pyAnalyzer:
             is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
             distance (float, optional): The distance to displace atoms for force calculations. Defaults to 0.01.
             supercell_matrix (list, optional): The supercell matrix for generating supercells. Defaults to None.
-            primitive_matrix (list, optional): The primitive matrix for generating the primitive cell. Defaults to None.
+            primitive_matrix (list | str, optional): The primitive matrix for generating supercells. Defaults to None.
             phonon_supercell_matrix (list, optional): The supercell matrix for phonon calculations. Defaults to None.
             mesh (ArrayLike | float, optional): The mesh numbers for phonon calculations. Defaults to [20, 20, 20].
             is_lbte (bool, optional): Whether to use the Linearized Boltzmann Transport Equation (LBTE). Defaults to False.
+            is_isotope (bool, optional): Whether to include isotope scattering in the calculations. Defaults to False.
+            conductivity_type (Literal["wigner", "kubo"], optional): The type of conductivity calculation to perform. Defaults to None.
+            boundary_mfp (float, optional): Mean free path in micrometre to calculate simple boundary scattering contribution to thermal conductivity. None ignores this contribution.
             t_min (float, optional): The minimum temperature for thermal conductivity calculations. Defaults to 0.
             t_max (float, optional): The maximum temperature for thermal conductivity calculations. Defaults to 1000.
             t_step (float, optional): The step size for temperature increments. Defaults to 10.
-            log_level (int, optional): The log level for the calculations. Defaults to 0.
+            log_level (Literal[0, 1, 2], optional): The log level for Phono3py. Defaults to 0.
 
         Returns:
             dict[str, ConductivityRTA | ConductivityLBTE]: A dictionary containing the calculated thermal conductivity.
@@ -111,9 +120,13 @@ class Phono3pyAnalyzer:
 
         self.phonon.mesh_numbers = mesh
         self.phonon.init_phph_interaction()
+        self.phonon.run_phonon_solver()
 
         # Thermal Conductivity
         self.phonon.run_thermal_conductivity(is_LBTE=is_lbte,
+                                             is_isotope=is_isotope,
+                                             conductivity_type=conductivity_type,
+                                             boundary_mfp=boundary_mfp,
                                              temperatures=range(t_min, t_max + 1, t_step))
         self.thermal_conductivity: ConductivityRTA | ConductivityLBTE = self.phonon.thermal_conductivity
 
@@ -162,12 +175,12 @@ class Phono3pyAnalyzer:
         forces = [self.calculator.calculate(displaced_structure)["forces"].tolist()
                   for displaced_structure in
                   self.phono3py_transformation.supercells_with_displacements]
-        self.phonon.forces = forces
+        self.phonon.forces = np.array(forces)
 
         phonon_forces = [self.calculator.calculate(displaced_structure)["forces"].tolist()
                          for displaced_structure in
                          self.phono3py_transformation.phonon_supercells_with_displacements]
-        self.phonon.phonon_forces = phonon_forces
+        self.phonon.phonon_forces = np.array(phonon_forces)
 
         self.phonon.produce_fc3()
         self.phonon.produce_fc2()
