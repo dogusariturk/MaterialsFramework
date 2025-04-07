@@ -49,9 +49,6 @@ class MEGNetCalculator:
         Note:
             The remaining parameters for the MEGNet potential are set to their default values.
         """
-        import matgl
-        from matgl.models import MEGNet
-
         # MEGNet specific attributes
         self.model = model
 
@@ -78,6 +75,7 @@ class MEGNetCalculator:
             >>> megnet_calculator = MEGNetCalculator()
             >>> result = megnet_calculator.calculate(structure=struct)
         """
+        import matgl
         potential = matgl.load_model(self.model)
         return {
                 "formation_energy": potential.predict_structure(structure)

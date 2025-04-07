@@ -12,6 +12,7 @@ from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
+    import torch
     from ase.calculators.calculator import Calculator
 
 __author__ = "Doguhan Sariturk"
@@ -104,9 +105,8 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from matgl import load_model
             from matgl.ext.ase import PESCalculator
-            from matgl.apps.pes import Potential
             self._calculator = PESCalculator(
-                    potential=matgl.load_model(self.model),
+                    potential=load_model(self.model),
                     state_attr=self.state_attr,
                     stress_weight=self.stress_weight,
             )

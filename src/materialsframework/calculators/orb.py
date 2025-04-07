@@ -30,14 +30,13 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "forces", and "stress".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]
 
     def __init__(
             self,
             model: str = 'orb-v2',
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             brute_force_knn: bool | None = None,
-            system_config: SystemConfig | None = None,
             **kwargs
     ) -> None:
         """
@@ -52,15 +51,11 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             brute_force_knn (bool, optional): Whether to use brute-force k-nearest neighbors search.
                 Defaults to None.
-            system_config (SystemConfig, optional): The system configuration for the featurization.
-                Defaults to SystemConfig(radius=10.0, max_num_neighbors=20).
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
             >>> orb_calculator = ORBCalculator(model="orb-v2", device="cuda")
         """
-        from orb_models.forcefield.atomic_system import SystemConfig
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -72,7 +67,6 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         self.model = model
         self.device = device
         self.brute_force_knn = brute_force_knn
-        self.system_config = SystemConfig(radius=10.0, max_num_neighbors=20) if system_config is None else system_config
 
         self._potential = None
         self._calculator = None
@@ -113,6 +107,5 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
                     model=self.potential,
                     device=self.device,
                     brute_force_knn=self.brute_force_knn,
-                    system_config=self.system_config
             )
         return self._calculator

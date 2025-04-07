@@ -2,7 +2,7 @@
 This module provides a class for performing calculations and structure relaxation using the EqV2 potential.
 
 The `EqV2Calculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and magnetic moments, and to perform structure relaxation using a specified EqV2 model.
+stresses, and to perform structure relaxation using a specified EqV2 model.
 """
 from __future__ import annotations
 

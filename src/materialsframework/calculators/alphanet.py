@@ -2,7 +2,7 @@
 This module provides a class for performing calculations and structure relaxation using the AlphaNet potential.
 
 The `AlphaNetCalculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and magnetic moments, and to perform structure relaxation using a specified AlphaNet model.
+stresses, and to perform structure relaxation using a specified AlphaNet model.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "forces", and "stresses".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]
 
     def __init__(
             self,

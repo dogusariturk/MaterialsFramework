@@ -2,11 +2,11 @@
 This module provides a class for performing calculations and structure relaxation using the DeePMD potential.
 
 The `DeePMDCalculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and magnetic moments, and to perform structure relaxation using a specified DeePMD model.
+stresses, and to perform structure relaxation using a specified DeePMD model.
 """
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -31,7 +31,7 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "forces", and "stress".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "forces", "stress", "virial"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "virial", "stress"]
 
     def __init__(
             self,

@@ -30,7 +30,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "forces", and "stress".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "energies", "forces", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "energies", "free_energy", "forces", "stress"]
 
     def __init__(
             self,

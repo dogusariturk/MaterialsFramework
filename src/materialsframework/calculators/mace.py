@@ -32,7 +32,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "free_energy", "forces", and "stress".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "node_energy", "forces", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "node_energy", "forces", "stress"]
 
     def __init__(
             self,
@@ -81,7 +81,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
         self.model_type = model_type
 
         if include_dipoles:
-            self.__class__.AVAILABLE_PROPERTIES.append("dipoles")
+            self.__class__.AVAILABLE_PROPERTIES.append("dipole")
 
         self._calculator = None
 

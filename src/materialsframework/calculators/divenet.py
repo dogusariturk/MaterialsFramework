@@ -30,7 +30,7 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
                                           including "energy", "forces", and "stress".
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "energies", "forces", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "energies", "forces", "stress"]
 
     def __init__(
             self,
