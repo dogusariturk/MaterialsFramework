@@ -1,4 +1,8 @@
-import os
+"""Python wrapper for the sqs2tdb script.
+This module provides a class `Sqs2tdb` that allows users to fit a TDB model from SQS energies
+using ATAT's sqs2tdb script. The class handles the setup, execution, and output of the fitting process.
+It also includes methods for copying SQS from the database, calculating energies, and fitting a solution model.
+"""
 import shutil
 import subprocess
 from pathlib import Path
@@ -35,6 +39,7 @@ DOSTATIC
             self,
             md_temperature: float = 1000,
             md_pressure: float = 1,
+            md_timestep: float = 1.0,
             fmax: float = 0.001,
             verbose: bool = False,
             calculator: BaseCalculator | BaseMDCalculator | None = None,
@@ -45,7 +50,7 @@ DOSTATIC
         Args:
             md_temperature (float, optional): The temperature for MD calculations. Defaults to 1000 K.
             md_pressure (float, optional): The pressure for MD calculations. Defaults to 1 atm.
-            md_steps (int, optional): The number of MD steps to run. Defaults to 1000.
+            md_timestep (float, optional): The timestep for MD calculations. Defaults to 1 fs.
             fmax (float, optional): The maximum force tolerance for relaxation. Defaults to 0.001 eV/Å.
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
             calculator (BaseCalculator | BaseMDCalculator | None, optional): The calculator object used for energy calculations.
@@ -56,6 +61,7 @@ DOSTATIC
 
         self.md_temperature = md_temperature
         self.md_pressure = md_pressure
+        self.md_timestep = md_timestep
         self.fmax = fmax
         self.verbose = verbose
 
@@ -70,6 +76,7 @@ DOSTATIC
         self.bv = None
         self.phonon = None
         self.open_calphad = None
+        self.terms = None
 
         self.dbf = None
 
@@ -84,6 +91,7 @@ DOSTATIC
             bv: float = 5e-3,
             phonon: bool = False,
             open_calphad: bool = False,
+            terms: str | None = None
     ) -> None:
         """
         Copy SQS from the database to the current directory, calculate energies, and fit a TDB model.
@@ -98,6 +106,7 @@ DOSTATIC
             bv (float): The energy bump value. Defaults to 5e-3.
             phonon (bool): Whether to include phonons for end members. Defaults to False.
             open_calphad (bool): Whether to generate an Open Calphad-compliant .tdb file. Defaults to False.
+            terms (str | None): The terms to include in the model. Defaults to None.
         """
         if not all(prop in self.calculator.AVAILABLE_PROPERTIES for prop in ["energy", "forces", "stress"]):
             raise ValueError("The calculator object must have the 'energy', 'forces', and 'stress' properties implemented.")
@@ -114,6 +123,7 @@ DOSTATIC
         self.bv = bv
         self.phonon = phonon
         self.open_calphad = open_calphad
+        self.terms = terms
 
         self._copy_sqs()
         self._fit_model()
@@ -154,6 +164,7 @@ DOSTATIC
         self._calculator.logfile = '-' if self.verbose else None
         self._calculator.temperature = self.md_temperature
         self._calculator.pressure = self.md_pressure
+        self._calculator.timestep = self.md_timestep
 
         return self._calculator
 
@@ -173,14 +184,18 @@ DOSTATIC
         """
         structure = Structure.from_file(subdir / "POSCAR")
 
-        if "LIQUID" in subdir.name:
+        if "LIQUID" in subdir.parts:
             self.calculator.ensemble = "npt_nose_hoover"
-            res = self.calculator.run(structure=structure, steps=3000) # NPT for 3 ps
+            res = self.calculator.run(
+                    structure=structure,
+                    steps=int(3000 / self.md_timestep))  # NPT for 3 ps
 
             self.calculator.ensemble = "nvt_nose_hoover"
-            res = self.calculator.run(structure=res["final_structure"], steps=10000) # NVT for 10 ps
+            res = self.calculator.run(
+                    structure=res["final_structure"],
+                    steps=int(10000 / self.md_timestep))  # NVT for 10 ps
 
-            n_last = max(1, int(0.2 * self.md_steps))
+            n_last = max(1, int(0.2 * 13000))
             energy = np.mean(res["total_energy"][-n_last:])
             forces = np.mean(res["forces"][-n_last:], axis=0)
             stresses = np.mean(res["stresses"][-n_last:], axis=0)
@@ -269,7 +284,7 @@ DOSTATIC
 
             if self.phonon:
                 for endmember in lattice_path.glob("*/endmem"):
-                    self._run_command("fitfc", ["-si=str_relax.out", "-ernn=4", "-ns=1", "-nrr"],
+                    self._run_command("fitfc", ["-si=str_relax.out", "-ernn=3", "-ns=1", "-nrr"],
                                       cwd=endmember.parent)
 
                 for wait_file in lattice_path.rglob("wait"):
@@ -281,10 +296,10 @@ DOSTATIC
 
                 for endmember in lattice_path.glob("*/endmem"):
                     subdir = endmember.parent
-                    self._run_command("fitfc", ["-si=str_relax.out", "-f", "-fn", "-fu", "-frnn=2"], cwd=subdir)
+                    self._run_command("fitfc", ["-si=str_relax.out", "-f", "-frnn=1.5"], cwd=subdir)
                     self._run_command("robustrelax_vasp", ["-vib"], cwd=subdir)
 
-    def _fit_model(self) -> str:
+    def _fit_model(self) -> None:
         """
         Fit a solution model from SQS energies.
 
@@ -307,7 +322,8 @@ DOSTATIC
                     "1,0\n2,1"
                     if lattice in ["BCC_A2", "FCC_A1", "HCP_A3"]
                     else "1,0:1,0\n2,0:1,0\n"
-            )
+            ) if not self.terms else self.terms
+
             (lattice_path / "terms.in").write_text(terms_content)
 
             self._run_command("sqs2tdb", args, cwd=lattice_path)
