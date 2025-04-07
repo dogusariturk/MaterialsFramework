@@ -25,6 +25,7 @@ from materialsframework.tools.trajectory import TrajectoryObserver
 
 if TYPE_CHECKING:
     from ase import Atoms
+    from typing import Any
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -164,7 +165,7 @@ class BaseMDCalculator(ABC):
             self,
             structure: Atoms | Structure | Molecule,
             steps: int
-    ) -> dict[str, list]:
+    ) -> dict[str, Any]:
         """
         Executes the Molecular Dynamics (MD) simulation using the specified calculator.
 
@@ -237,9 +238,7 @@ class BaseMDCalculator(ABC):
                 dyn=self.dyn,
                 atoms=ase_atoms,
                 logfile=self.logfile,
-                header=True,
                 stress=True,
-                peratom=False,
         )
         self.dyn.attach(logger, interval=self.loginterval)
 

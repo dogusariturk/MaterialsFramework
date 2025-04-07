@@ -26,7 +26,7 @@ from materialsframework.tools.trajectory import TrajectoryObserver
 
 if TYPE_CHECKING:
     from ase import Atoms
-    from numpy.typing import ArrayLike
+    from typing import Any
     from ase.optimize.optimize import Optimizer
 
 __author__ = "Doguhan Sariturk"
@@ -186,7 +186,7 @@ class BaseCalculator(ABC):
             self,
             structure: Atoms | Structure | Molecule,
             **kwargs,
-    ) -> dict[Structure, float]:
+    ) -> dict[str, Any]:
         """
         Performs the relaxation of a given atomic structure using the specified optimizer and calculator.
 
@@ -267,7 +267,7 @@ class BaseCalculator(ABC):
     def calculate(
             self,
             structure: Atoms | Structure | Molecule,
-    ) -> dict[Structure, float | ArrayLike]:
+    ) -> dict[str, Any]:
         """
         Performs a single-point calculation on the given atomic structure using the specified calculator.
 
