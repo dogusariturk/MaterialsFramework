@@ -109,8 +109,8 @@ class PhaseFieldModel:
     """Implements the Cahn-Hilliard solver with output visualization."""
     def __init__(
             self,
+            material_properties: MaterialParameters,
             simulation_grid: SimulationGrid | None = None,
-            material_properties: MaterialParameters | None = None,
             wrt_cycle: int = 5000,
             stop_iter: int = 50000,
             seed: int = 42
@@ -119,16 +119,16 @@ class PhaseFieldModel:
         Initializes the phase field model with simulation grid and material properties.
 
         Args
-            simulation_grid (SimulationGrid): The grid for the simulation.
             material_properties (MaterialParameters): Material properties for the simulation.
+            simulation_grid (SimulationGrid): The grid for the simulation.
             wrt_cycle (int): Frequency of writing output files. Default is 5000.
             stop_iter (int): Number of iterations to run the simulation. Default is 50000.
             seed (int): Seed for the random number generator. Default is 42.
         """
         np.random.seed(seed)
 
-        self.grid = SimulationGrid() if simulation_grid is None else simulation_grid
         self.material = material_properties
+        self.grid = SimulationGrid() if simulation_grid is None else simulation_grid
         self.wrt_cycle = wrt_cycle
         self.stop_iter = stop_iter
 
