@@ -9,8 +9,6 @@ readme = "README.md"
 license = { text = "GPL-3.0-only" }
 classifiers = [
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Natural Language :: English",
     "Topic :: Scientific/Engineering",
     "Topic :: Utilities",
     "Programming Language :: Python"

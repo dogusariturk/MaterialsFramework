@@ -7,17 +7,13 @@ dependencies:
   - sqsgenerator
   - phonopy
   - phono3py
-  - pyg::pytorch-scatter
-  - pyg::pytorch-sparse
-  - pyg::pytorch-cluster
+  - pandas
+  - elastic
   - pip:
       - openpyxl
+      - pandarallel
+      - ase
+      - pymatgen
       - matgl
-      - chgnet
-      - mace-torch
-      - mattersim
-      - sevenn
       - orb-models
-      - git+https://github.com/dwastberg/pynanoflann
-      - git+https://github.com/FAIR-Chem/fairchem.git@omat24#egg=fairchem-core&subdirectory=packages/fairchem-core
-      - tensorpotential
+      - git+https://github.com/cjkunselman18/pycalphad.git
