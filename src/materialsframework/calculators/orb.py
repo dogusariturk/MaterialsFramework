@@ -34,9 +34,9 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = 'orb-v2',
+            model: str = "orb-v3-direct-inf-omat",
             device: Literal["cuda", "cpu", "mps"] = "cpu",
-            brute_force_knn: bool | None = None,
+            precision: Literal["float32-high", "float32-highest", "float64"] = "float32-high",
             **kwargs
     ) -> None:
         """
@@ -47,10 +47,9 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model (str, optional): The name of the ORB model to use. Defaults to 'orb-v2'.
+            model (str, optional): The name of the ORB model to use. Defaults to "orb-v2".
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
-            brute_force_knn (bool, optional): Whether to use brute-force k-nearest neighbors search.
-                Defaults to None.
+            precision (Literal["float32-high", "float32-highest", "float64"], optional): The floating point precision to use for the model.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
@@ -66,7 +65,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         # ORB specific attributes
         self.model = model
         self.device = device
-        self.brute_force_knn = brute_force_knn
+        self.precision = precision
 
         self._potential = None
         self._calculator = None
@@ -86,7 +85,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         if self._potential is None:
             from orb_models.forcefield import pretrained
             model = pretrained.ORB_PRETRAINED_MODELS[self.model]
-            self._potential = model(device=self.device)
+            self._potential = model(device=self.device, precision=self.precision)
         return self._potential
 
     @property
@@ -106,6 +105,5 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
             self._calculator = ORBASECalculator(
                     model=self.potential,
                     device=self.device,
-                    brute_force_knn=self.brute_force_knn,
             )
         return self._calculator
