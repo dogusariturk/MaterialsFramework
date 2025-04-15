@@ -19,6 +19,7 @@ from .mace import MACECalculator
 from .mattersim import MatterSimCalculator
 from .megnet import MEGNetCalculator
 from .orb import ORBCalculator
+from .posegnn import PosEGNNCalculator
 from .sevennet import SevenNetCalculator
 
 __author__ = "Doguhan Sariturk"
@@ -35,4 +36,5 @@ __all__ = ["AlphaNetCalculator",
            "MatterSimCalculator",
            "MEGNetCalculator",
            "ORBCalculator",
+           "PosEGNNCalculator",
            "SevenNetCalculator"]
