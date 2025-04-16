@@ -133,7 +133,7 @@ class PhonopyAnalyzer:
         self.phonon.run_mesh(mesh=pdos_mesh,
                              is_mesh_symmetry=False,
                              with_eigenvectors=True)
-        self.phonon.run_projected_dos(use_tetrahedron_method=True)
+        self.phonon.run_projected_dos()
         projected_dos = self.phonon.get_projected_dos_dict()
 
         return {

@@ -15,6 +15,7 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class SimulationGrid:
     """Handles the simulation grid and phase field variables."""
+
     def __init__(
             self,
             nx: int = 128,
@@ -50,6 +51,7 @@ class SimulationGrid:
 
 class MaterialParameters:
     """Stores material parameters such as energy and kinetic properties."""
+
     def __init__(
             self,
             db: Database | str,
@@ -72,6 +74,7 @@ class MaterialParameters:
         """
 
         def energy(x, a, b, c, d, e, f, g, h, i, j, k):
+            """Polynomial function for fitting."""
             return (a * x ** 10 +
                     b * x ** 9 +
                     c * x ** 8 +
@@ -89,10 +92,11 @@ class MaterialParameters:
 
         dbf = db if isinstance(db, Database) else Database(db)
         comps = sorted(dbf.elements) if elements is None else elements
-        if "/-" in comps: comps.remove("/-")
+        if "/-" in comps:
+            comps.remove("/-")
         phase = list(dbf.phases) if phase is None else phase
 
-        Gs = calculate(dbf, comps, phase, T=temperature, output="GM")
+        Gs = calculate(dbf, comps, phase, T=temperature)
         xs = Gs.X.sel(component=component.upper()).values.ravel()
         ys = Gs.GM.values.ravel()
         popt, _ = curve_fit(f=energy, xdata=xs, ydata=ys)
@@ -107,6 +111,7 @@ class MaterialParameters:
 
 class PhaseFieldModel:
     """Implements the Cahn-Hilliard solver with output visualization."""
+
     def __init__(
             self,
             material_properties: MaterialParameters,
@@ -210,5 +215,6 @@ class PhaseFieldModel:
             self.evolve()
             if step % self.wrt_cycle == 0:
                 print(f"Iteration {step}/{self.stop_iter}")
-                if plot: self.save_plot(step)
+                if plot:
+                    self.save_plot(step)
         print("Simulation finished!")

@@ -10,10 +10,10 @@ It can help identify regions of stability and phase separation in the system.
 """
 import itertools
 import warnings
-import psutil
 
 import numpy as np
 import pandas as pd
+import psutil
 from pandarallel import pandarallel
 from pycalphad import Database, Workspace, variables as v
 from pycalphad.property_framework import IsolatedPhase
@@ -23,6 +23,7 @@ warnings.filterwarnings("ignore")
 __authors__ = ["Doguhan Sariturk", "Courtney Kunselman"]
 __maintainer__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
+
 
 class StabilityMap:
     """
@@ -46,15 +47,19 @@ class StabilityMap:
     """
 
     O = np.array([
-        [-1, -1/np.sqrt(3), -1/np.sqrt(6), -1/np.sqrt(10), -1/np.sqrt(15), -1/np.sqrt(21), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [1, -1/np.sqrt(3), -1/np.sqrt(6), -1/np.sqrt(10), -1/np.sqrt(15), -1/np.sqrt(21), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [0, 2/np.sqrt(3), -1/np.sqrt(6), -1/np.sqrt(10), -1/np.sqrt(15), -1/np.sqrt(21), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [0, 0, np.sqrt(3)/np.sqrt(2), -1/np.sqrt(10), -1/np.sqrt(15), -1/np.sqrt(21), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [0, 0, 0, 2*np.sqrt(2)/np.sqrt(5), -1/np.sqrt(15), -1/np.sqrt(21), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [0, 0, 0, 0, np.sqrt(5)/np.sqrt(3), -1/np.sqrt(21), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [0, 0, 0, 0, 0, 2*np.sqrt(3)/np.sqrt(7), -1/(2*np.sqrt(7)), -1/6, -1/(3*np.sqrt(5))],
-        [0, 0, 0, 0, 0, 0, np.sqrt(7)/2, -1/6, -1/(3*np.sqrt(5))],
-        [0, 0, 0, 0, 0, 0, 0, 4/3, -1/(3*np.sqrt(5))]
+            [-1, -1 / np.sqrt(3), -1 / np.sqrt(6), -1 / np.sqrt(10), -1 / np.sqrt(15), -1 / np.sqrt(21), -1 / (2 * np.sqrt(7)), -1 / 6,
+             -1 / (3 * np.sqrt(5))],
+            [1, -1 / np.sqrt(3), -1 / np.sqrt(6), -1 / np.sqrt(10), -1 / np.sqrt(15), -1 / np.sqrt(21), -1 / (2 * np.sqrt(7)), -1 / 6,
+             -1 / (3 * np.sqrt(5))],
+            [0, 2 / np.sqrt(3), -1 / np.sqrt(6), -1 / np.sqrt(10), -1 / np.sqrt(15), -1 / np.sqrt(21), -1 / (2 * np.sqrt(7)), -1 / 6,
+             -1 / (3 * np.sqrt(5))],
+            [0, 0, np.sqrt(3) / np.sqrt(2), -1 / np.sqrt(10), -1 / np.sqrt(15), -1 / np.sqrt(21), -1 / (2 * np.sqrt(7)), -1 / 6,
+             -1 / (3 * np.sqrt(5))],
+            [0, 0, 0, 2 * np.sqrt(2) / np.sqrt(5), -1 / np.sqrt(15), -1 / np.sqrt(21), -1 / (2 * np.sqrt(7)), -1 / 6, -1 / (3 * np.sqrt(5))],
+            [0, 0, 0, 0, np.sqrt(5) / np.sqrt(3), -1 / np.sqrt(21), -1 / (2 * np.sqrt(7)), -1 / 6, -1 / (3 * np.sqrt(5))],
+            [0, 0, 0, 0, 0, 2 * np.sqrt(3) / np.sqrt(7), -1 / (2 * np.sqrt(7)), -1 / 6, -1 / (3 * np.sqrt(5))],
+            [0, 0, 0, 0, 0, 0, np.sqrt(7) / 2, -1 / 6, -1 / (3 * np.sqrt(5))],
+            [0, 0, 0, 0, 0, 0, 0, 4 / 3, -1 / (3 * np.sqrt(5))]
     ])
 
     def __init__(
@@ -93,7 +98,6 @@ class StabilityMap:
         self.temperature = temperature
         self.pressure = pressure
 
-
     def fit(self):
         """
         Fit the stability map by calculating eigenvalues and determining sections.
@@ -102,11 +106,10 @@ class StabilityMap:
         and determines the stability section for each composition.
         """
         eigenvalues = pd.DataFrame(self.compositions.parallel_apply(self._process_row, axis=1).tolist(), index=self.compositions.index)
-        eigenvalues.columns = [f"eigenvalue_{i+1}" for i in range(eigenvalues.shape[1])]
+        eigenvalues.columns = [f"eigenvalue_{i + 1}" for i in range(eigenvalues.shape[1])]
         self.compositions = pd.concat([self.compositions, eigenvalues], axis=1)
         self.compositions.dropna(inplace=True)
         self.compositions["negative_eigenvalues"] = self.compositions.apply(self._determine_section, axis=1)
-
 
     @staticmethod
     def _generate_compositions(elements: list, step: float = 0.05):
@@ -175,12 +178,12 @@ class StabilityMap:
 
             # Calculate second derivatives of Gibbs energy
             Hessian = np.array([
-                [dmu_dx[comp][i] - dmu_dx[self.elements[-1]][i] for comp in self.elements[:-1]]
-                for i in range(len(self.elements) - 1)
+                    [dmu_dx[comp][i] - dmu_dx[self.elements[-1]][i] for comp in self.elements[:-1]]
+                    for i in range(len(self.elements) - 1)
             ])
 
             # Transform Hessian to orthogonal space and perform eigenanalysis
-            orthogonalization_matrix = self.O[:len(self.elements)-1, :len(self.elements)-1]
+            orthogonalization_matrix = self.O[:len(self.elements) - 1, :len(self.elements) - 1]
             eigen_values = np.sort(np.linalg.eig(orthogonalization_matrix.T @ Hessian @ orthogonalization_matrix)[0])
 
             return eigen_values
@@ -241,7 +244,11 @@ class StabilityMap:
 
         fig, ax = plt.subplots()
 
-        scatter = ax.scatter(self.compositions["proj0"], self.compositions["proj1"], c=self.compositions["negative_eigenvalues"], cmap="viridis", alpha=0.7, vmin=0, vmax=len(self.elements)-1)
+        scatter = ax.scatter(self.compositions["proj0"], self.compositions["proj1"],
+                             c=self.compositions["negative_eigenvalues"],
+                             cmap="viridis",
+                             alpha=0.7,
+                             vmin=0, vmax=len(self.elements) - 1)
         cbar = plt.colorbar(scatter, label="Number of Negative Eigenvalues")
         cbar.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 

@@ -80,7 +80,7 @@ class ElasticConstantsAnalyzer:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
 
         if not is_relaxed:
-            structure: Structure = self.calculator.relax(structure)["final_structure"]
+            structure = self.calculator.relax(structure)["final_structure"]
 
         structure = structure.to_ase_atoms(msonable=False)
         self.calculator.relax_cell = False

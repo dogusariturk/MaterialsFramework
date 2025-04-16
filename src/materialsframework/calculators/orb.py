@@ -93,8 +93,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         """
         Creates and returns the ASE Calculator object associated with this calculator instance.
 
-        This property initializes the Calculator object using the ORB potential and other
-        relevant attributes such as `device`, `brute_force_knn`, and `system_config`. If the Calculator
+        This property initializes the Calculator object using the ORB potential. If the Calculator
         object has already been created, it will return the existing instance.
 
         Returns:

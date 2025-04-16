@@ -83,7 +83,7 @@ class PhonopyDisplacementTransformation:
             self,
             distance: float = 0.01,
             **kwargs
-    ) -> list[Structure, ...]:
+    ) -> list[Structure]:
         """
         Generates displaced structures using Phonopy.
 
@@ -94,7 +94,7 @@ class PhonopyDisplacementTransformation:
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.01.
 
         Returns:
-            list[Structure, ...]: A list of displaced structures for phonon calculations.
+            list[Structure]: A list of displaced structures for phonon calculations.
         """
         self.phonon.generate_displacements(distance=distance, **kwargs)
 

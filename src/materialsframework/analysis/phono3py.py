@@ -172,12 +172,12 @@ class Phono3pyAnalyzer:
         if self.phonon is None:
             raise RuntimeError("phono3py_transformation has to be called before trying to produce force constants.")
 
-        forces = [self.calculator.calculate(displaced_structure)["forces"].tolist()
+        forces = [self.calculator.calculate(displaced_structure)["forces"]
                   for displaced_structure in
                   self.phono3py_transformation.supercells_with_displacements]
         self.phonon.forces = np.array(forces)
 
-        phonon_forces = [self.calculator.calculate(displaced_structure)["forces"].tolist()
+        phonon_forces = [self.calculator.calculate(displaced_structure)["forces"]
                          for displaced_structure in
                          self.phono3py_transformation.phonon_supercells_with_displacements]
         self.phonon.phonon_forces = np.array(phonon_forces)

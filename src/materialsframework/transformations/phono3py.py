@@ -49,7 +49,7 @@ class Phono3pyDisplacementTransformation:
             structure: Structure,
             distance: float = 0.03,
             supercell_matrix: list | None = None,
-            primitive_matrix: list | None = None,
+            primitive_matrix: list | str = 'auto',
             phonon_supercell_matrix: list | None = None,
             log_level: int = 0,
             **kwargs
@@ -66,8 +66,7 @@ class Phono3pyDisplacementTransformation:
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
             supercell_matrix (list, optional): The supercell matrix for third-order force constant calculations.
                                                Defaults to a 2x2x2 supercell.
-            primitive_matrix (list, optional): The primitive matrix for second-order force constant calculations.
-                                               Defaults to None.
+            primitive_matrix (list | str, optional): The primitive matrix for the supercell. Defaults to 'auto'.
             phonon_supercell_matrix (list, optional): The supercell matrix for second-order force constant calculations.
                                                       Defaults to a 3x3x3 supercell.
             log_level (int, optional): The log level for Phono3py. Defaults to 0.
@@ -99,7 +98,7 @@ class Phono3pyDisplacementTransformation:
             distance: float = 0.03,
             is_plusminus: bool | str = "auto",
             is_diagonal: bool = True
-    ) -> tuple[list[Structure, ...], list[Structure, ...]]:
+    ) -> tuple[list[Structure], list[Structure]]:
         """
         Generates displaced structures using Phono3py.
 
@@ -113,7 +112,7 @@ class Phono3pyDisplacementTransformation:
             is_diagonal (bool, optional): Whether to only displace atoms along diagonal directions. Defaults to True.
 
         Returns:
-            tuple[list[Structure, ...], list[Structure, ...]]: Two lists of displaced structures for phonon (second-order)
+            tuple[list[Structure], list[Structure]]: Two lists of displaced structures for phonon (second-order)
                                                                and third-order force constant calculations.
         """
         self.phonon.generate_displacements(distance=distance,

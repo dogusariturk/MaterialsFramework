@@ -45,14 +45,17 @@ class ElasticConstantsDeformationTransformation:
 
     def apply_transformation(
             self,
-            structure: Structure,
+            structure: Structure | Atoms,
     ) -> None:
         """
         Applies the deformation transformation to the given structure and generates distorted structures.
 
         Args:
-            structure (Structure): The structure to apply the deformation transformation.
+            structure (Structure | Atoms): The structure to apply the deformation transformation.
         """
+        if isinstance(structure, Structure):
+            structure = structure.to_ase_atoms()
+
         self.distorted_structures = elastic.get_elementary_deformations(
                 cryst=structure,
                 n=self.num_deform,
