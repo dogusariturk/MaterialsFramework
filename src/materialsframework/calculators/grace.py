@@ -34,7 +34,7 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = 'GRACE_2L-OMAT',
+            model: str = 'GRACE-2L-OMAT',
             pad_neighbors_fraction: float = 0.05,
             pad_atoms_number: int = 1,
             min_dist: float | None = None,

@@ -27,8 +27,6 @@ class BainPathAnalyzer:
 
     The `BainPathAnalyzer` class provides methods to perform a Bain transformation on an undeformed
     structure and calculate the potential energies at various c/a ratios along the transformation path.
-    The Bain transformation path describes the transition from a body-centered cubic (BCC) phase to
-    a face-centered cubic (FCC) phase, with intermediate structures explored along the way.
     """
 
     def __init__(

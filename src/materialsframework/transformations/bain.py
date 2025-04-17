@@ -2,8 +2,7 @@
 This module provides a class to generate displaced structures along the Bain Path.
 
 The `BainDisplacementTransformation` class allows users to generate structures that are deformed
-along the Bain path, which describes the transition between body-centered cubic (BCC) and face-centered
-cubic (FCC) crystal structures through a continuous deformation of the lattice.
+along the Bain path through a continuous deformation of the lattice.
 This transformation is useful in studying martensitic transformations and phase transitions in materials.
 """
 from __future__ import annotations
