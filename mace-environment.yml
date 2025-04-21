@@ -1,0 +1,23 @@
+name: materialsframework-mace
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - sqsgenerator
+  - phonopy
+  - phono3py
+  - pandas
+  - elastic
+  - cpuonly
+  - pytorch=2.4.1
+  - numpy<2
+  - ase
+  - pymatgen
+  - pandas
+  - pip
+  - pip:
+      - openpyxl
+      - pandarallel
+      - e3nn==0.4.4                     # hard pin in MACE
+      - mace-torch

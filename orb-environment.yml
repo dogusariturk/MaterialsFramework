@@ -1,0 +1,23 @@
+name: materialsframework-orb
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - sqsgenerator
+  - phonopy
+  - phono3py
+  - pandas
+  - elastic
+  - cpuonly
+  - pytorch=2.6.*
+  - numpy>=1.26,<2
+  - ase
+  - pymatgen
+  - scipy
+  - tqdm
+  - pip
+  - pip:
+      - openpyxl
+      - pandarallel
+      - orb-models

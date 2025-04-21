@@ -1,0 +1,28 @@
+name: materialsframework-alphanet
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - sqsgenerator
+  - phonopy
+  - phono3py
+  - elastic
+  - cpuonly
+  - pytorch=2.1.2
+  - torchvision
+  - numpy<2
+  - ase
+  - pymatgen
+  - pandas
+  - pip
+  - pip:
+      - openpyxl
+      - pandarallel
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+      - --find-links https://pytorch-geometric.com/whl/torch-2.1.2%2Bcpu.html
+      - torch_geometric==2.5.3
+      - torch_scatter
+      - lightning
+      - tensorboard
+      - git+https://github.com/zmyybc/AlphaNet.git
