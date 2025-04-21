@@ -27,7 +27,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
 
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "energy", "forces", and "stresses".
+                                          including "energy", "forces", "hessian", and "stresses".
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "hessian", "stress"]
@@ -35,7 +35,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
     def __init__(
             self,
             model_path: str | Literal["ani1", "ani1x", "t1x"] = "t1x",
-            properties: list = ["energy", "free_energy", "forces"],
+            properties: list = ["energy", "free_energy", "forces", "hessian", "stress"],
             device: Literal["cpu", "cuda"] = "cpu",
             precision: Literal["float64", "float32", "float16"] = "float32",
             **kwargs
@@ -48,6 +48,10 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
+            model_path (str | Literal["ani1", "ani1x", "t1x"]): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
+            properties (list): List of properties to calculate, such as "energy", "forces", etc.
+            device (Literal["cpu", "cuda"]): The device to use for calculations. Defaults to "cpu".
+            precision (Literal["float64", "float32", "float16"]): Floating-point precision of the calculations. Defaults to "float32".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
