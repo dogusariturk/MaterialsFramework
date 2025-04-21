@@ -14,7 +14,6 @@ import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.analysis.eos import EOS
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.cubic_elastic_constants import CubicElasticConstantsDeformationTransformation
 
 if TYPE_CHECKING:
@@ -126,6 +125,7 @@ class CubicElasticConstantsAnalyzer:
             BaseCalculator: The calculator object used for energy calculations.
         """
         if self._calculator is None:
+            from materialsframework.calculators.m3gnet import M3GNetCalculator
             self._calculator = M3GNetCalculator()
         return self._calculator
 

@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.bain import BainDisplacementTransformation
 
 if TYPE_CHECKING:
@@ -95,6 +94,7 @@ class BainPathAnalyzer:
             BaseCalculator: The calculator object used for calculating energies.
         """
         if self._calculator is None:
+            from materialsframework.calculators.m3gnet import M3GNetCalculator
             self._calculator = M3GNetCalculator()
         return self._calculator
 

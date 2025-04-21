@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.phono3py import Phono3pyDisplacementTransformation
 
 if TYPE_CHECKING:
@@ -145,6 +144,7 @@ class Phono3pyAnalyzer:
             BaseCalculator: The calculator object used for force and energy calculations.
         """
         if self._calculator is None:
+            from materialsframework.calculators.m3gnet import M3GNetCalculator
             self._calculator = M3GNetCalculator()
         return self._calculator
 

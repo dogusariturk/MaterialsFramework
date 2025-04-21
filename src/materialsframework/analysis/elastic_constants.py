@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 
 from elastic import elastic
 
-from materialsframework.calculators.m3gnet import M3GNetCalculator
 from materialsframework.transformations.elastic_constants import ElasticConstantsDeformationTransformation
 
 if TYPE_CHECKING:
@@ -109,6 +108,7 @@ class ElasticConstantsAnalyzer:
             BaseCalculator: The calculator object used for energy calculations.
         """
         if self._calculator is None:
+            from materialsframework.calculators.m3gnet import M3GNetCalculator
             self._calculator = M3GNetCalculator(fmax=0.01)
         return self._calculator
 
