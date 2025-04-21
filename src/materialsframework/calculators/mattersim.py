@@ -34,7 +34,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = 'mattersim-v1.0.0-5m',
+            model: str = "mattersim-v1.0.0-5m",
             args_dict: dict | None = None,
             compute_stress: bool = True,
             stress_weight: float = 1.0,

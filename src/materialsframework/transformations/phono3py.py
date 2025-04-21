@@ -49,7 +49,7 @@ class Phono3pyDisplacementTransformation:
             structure: Structure,
             distance: float = 0.03,
             supercell_matrix: list | None = None,
-            primitive_matrix: list | str = 'auto',
+            primitive_matrix: list | str = "auto",
             phonon_supercell_matrix: list | None = None,
             log_level: int = 0,
             **kwargs

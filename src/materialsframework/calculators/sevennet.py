@@ -34,8 +34,8 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = 'SevenNet-0',
-            file_type: Literal["checkpoint", "torchscript"] = 'checkpoint',
+            model: str = "SevenNet-0",
+            file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
             device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
             **kwargs
     ) -> None:

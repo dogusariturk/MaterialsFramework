@@ -161,7 +161,7 @@ DOSTATIC
 
         self._calculator.fmax = self.fmax
         self._calculator.verbose = self.verbose
-        self._calculator.logfile = '-' if self.verbose else None
+        self._calculator.logfile = "-" if self.verbose else None
         self._calculator.temperature = self.md_temperature
         self._calculator.pressure = self.md_pressure
         self._calculator.timestep = self.md_timestep

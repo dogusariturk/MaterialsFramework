@@ -35,7 +35,7 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
     def __init__(
             self,
             model: str,
-            file_type: Literal["checkpoint", "torchscript"] = 'checkpoint',
+            file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
             device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
             **kwargs
     ) -> None:

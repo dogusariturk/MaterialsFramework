@@ -259,7 +259,7 @@ class StabilityMap:
         alignments = [("center", "center"), ("right", "center"), ("center", "center"), ("left", "center")]
 
         for (x, y), (ha, va), element in zip(positions, alignments, self.elements):
-            ax.text(x, y, element.title(), fontsize='large', ha=ha, va=va, transform=ax.transAxes)
+            ax.text(x, y, element.title(), fontsize="large", ha=ha, va=va, transform=ax.transAxes)
 
         if save:
             system_name = "_".join(self.elements)

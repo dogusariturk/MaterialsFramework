@@ -90,7 +90,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
                     checkpoint_path=self.checkpoint_path,
                     model_name=self.model_name,
                     local_cache=self.local_cache,
-                    cpu=self.device != 'cuda',
+                    cpu=self.device != "cuda",
                     seed=self.seed,
             )
         return self._calculator
