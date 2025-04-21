@@ -25,6 +25,7 @@ dependencies:
       - --find-links https://data.dgl.ai/wheels/torch-2.4/repo.html
       - dgl==2.4.0
       - --find-links https://data.pyg.org/whl/torch-2.4.0+cpu.html
+      - torch_cluster-1.6.3+pt24cpu
       - torch_scatter==2.1.2+pt24cpu
       - torch_geometric==2.5.3
       - e3nn>=0.5
@@ -36,3 +37,4 @@ dependencies:
       - git+https://github.com/facebookresearch/fairchem.git#subdirectory=packages/fairchem-core
       - git+https://github.com/atomly-materials-research-lab/GPTFF.git
       - tensorpotential==0.5.1
+      - git+https://github.com/THGLab/NewtonNet.git
