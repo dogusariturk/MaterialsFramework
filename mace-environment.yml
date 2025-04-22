@@ -7,17 +7,18 @@ dependencies:
   - sqsgenerator
   - phonopy
   - phono3py
-  - pandas
   - elastic
+  - pandas
   - cpuonly
   - pytorch=2.4.1
   - numpy<2
   - ase
   - pymatgen
-  - pandas
+  - scipy
   - pip
   - pip:
       - openpyxl
+      - pycalphad
       - pandarallel
       - e3nn==0.4.4                     # hard pin in MACE
       - mace-torch

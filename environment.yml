@@ -8,16 +8,18 @@ dependencies:
   - phonopy
   - phono3py
   - elastic
+  - pandas
   - cpuonly
   - pytorch=2.4.1
   - torchvision
   - numpy<2
   - ase
   - pymatgen
-  - pandas
+  - scipy
   - pip
   - pip:
       - openpyxl
+      - pycalphad
       - pandarallel
       - --find-links https://data.dgl.ai/wheels/torch-2.4/repo.html
       - dgl==2.4.0

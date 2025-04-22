@@ -7,8 +7,8 @@ dependencies:
   - sqsgenerator
   - phonopy
   - phono3py
-  - pandas
   - elastic
+  - pandas
   - cpuonly
   - pytorch=2.6.*
   - numpy>=1.26,<2
@@ -19,5 +19,6 @@ dependencies:
   - pip
   - pip:
       - openpyxl
+      - pycalphad
       - pandarallel
       - orb-models
