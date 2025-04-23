@@ -1,46 +1,86 @@
 <div align="center">
-  <h3 align="center">MaterialsFramework</h3>
-  <p align="center">
-    <br/>
-    <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=bug">Report Bug .</a>
-    <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=enhancement">Request Feature</a>
-  </p>
+
+# MaterialsFramework
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/license/gpl-3-0)
+[![Python](https://img.shields.io/badge/python-3.8+-brightgreen.svg)](https://www.python.org/)
+
+<p>
+  A modular and extensible framework for deploying, benchmarking, and experimenting with state-of-the-art machine learning potentials in materials science.
+</p>
+
+<p>
+  <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=bug">Report a Bug</a> |
+  <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=enhancement">Request a Feature</a>
+</p>
+
 </div>
 
-  ## Getting Started
+---
 
-To get a local copy up and running follow these simple example steps.
- ### Prerequisites
+## Getting Started
 
-This project relies on external libraries that require installation using conda. An 'environment.yml file' is provided with the framework to create a conda environment with all dependencies.
+Follow the steps below to get a local copy of the project up and running.
 
-- Create a conda environment from the supplied environment.yml file:
-  ```sh
-  conda env create -f environment.yml
-  ```
+### Prerequisites
+
+This project uses `conda` for managing dependencies. Several `environment.yml` files are provided to support different model groups.
+
+| Environment File             | Supported Models                                                                                            |
+|------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `environment.yml`            | M3GNet / MEGNet                                                                                             |
+| `main-environment.yml`       | CHGNet, DeepMD, EqV2 / eSEN, GPTFF, GRACE, HIENet, M3GNet / MEGNet, MatterSim, NewtonNet, PosEGNN, SevenNet |
+| `orb-environment.yml`        | ORB                                                                                                         |
+| `mace-environment.yml`       | MACE                                                                                                        |
+| `alphanet-environment.yml`   | AlphaNet                                                                                                    |
+
  ### Installation
 
-To get the framework local copy up and running, follow these simple steps:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/dogusariturk/MaterialsFramework.git
 
-1.  Activate the conda environment
+2.  **Navigate into the project directory:**
     ```sh
-    conda activate materialsframework
+    cd MaterialsFramework
     ```
-2. Clone the repo
+3.  **Create a conda environment from the desired file:**
+    ```sh
+    conda env create -f <environment_file.yml>
+    ```
+4.  **Activate the environment:**
+    ```sh
+    conda activate <environment_name>
+    ```
+5.  **Install the framework in editable mode:**
+    ```sh
+    pip install -e .
+    ```
+
+## Contributing
+
+Contributions are welcome and appreciated. To contribute:
+
+1. Fork the repository
+2. Create a new branch:
    ```sh
-   git clone http://github.com/dogusariturk/MaterialsFramework.git
+   git checkout -b feature/YourFeature
    ```
-3. Change directory
+3. Commit your changes:
    ```sh
-   cd MaterialsFramework
+   git commit -m 'Add your feature'
    ```
-4. Install the framework
+4. Push to your branch:
    ```sh
-   pip install -e .
+   git push origin feature/YourFeature
    ```
- ## License
+5. Open a pull request
+
+## License
 
 Distributed under the GPLv3 License. See [GPLv3 License](https://opensource.org/license/gpl-3-0) for more information.
- ## Contact
 
-Doguhan Sariturk - doguhan.sariturk@gmail.com
+## Contact
+
+Doguhan Sariturk - [doguhan.sariturk@gmail.com](mailto:doguhan.sariturk@gmail.com)
+
