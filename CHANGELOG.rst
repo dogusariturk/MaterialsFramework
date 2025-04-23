@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.10.0
+===========
+- Added ``PosEGNN``, ``GPTFF``, ``NewtonNet``, and ``eSEN`` implementations
+
 Version 0.9.0
 ===========
 - Added ``AlphaNet``, ``DeePMD``, ``DiveNet``, and ``eqV2`` implementations
