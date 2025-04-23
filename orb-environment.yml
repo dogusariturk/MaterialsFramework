@@ -19,6 +19,6 @@ dependencies:
   - pip
   - pip:
       - openpyxl
-      - pycalphad
+      - git+https://github.com/cjkunselman18/pycalphad.git
       - pandarallel
       - orb-models

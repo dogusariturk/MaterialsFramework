@@ -22,7 +22,7 @@ dependencies:
   - pip
   - pip:
       - openpyxl
-      - pycalphad
+      - git+https://github.com/cjkunselman18/pycalphad.git
       - pandarallel
       - --find-links https://data.dgl.ai/wheels/torch-2.4/repo.html
       - dgl==2.4.0

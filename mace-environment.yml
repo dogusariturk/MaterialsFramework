@@ -18,7 +18,7 @@ dependencies:
   - pip
   - pip:
       - openpyxl
-      - pycalphad
+      - git+https://github.com/cjkunselman18/pycalphad.git
       - pandarallel
       - e3nn==0.4.4                     # hard pin in MACE
       - mace-torch

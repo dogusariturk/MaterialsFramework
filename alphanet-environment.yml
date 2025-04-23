@@ -19,7 +19,7 @@ dependencies:
   - pip
   - pip:
       - openpyxl
-      - pycalphad
+      - git+https://github.com/cjkunselman18/pycalphad.git
       - pandarallel
       - --extra-index-url https://download.pytorch.org/whl/cu121
       - --find-links https://pytorch-geometric.com/whl/torch-2.1.2%2Bcpu.html
