@@ -34,7 +34,7 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model_name: str = 'eSEN-30M-OAM',
+            model_name: str = "eSEN-30M-OAM",
             checkpoint_path: str | None = None,
             local_cache: str = "~/.cache/esen/",
             device: Literal["cpu", "cuda"] = "cpu",
@@ -77,12 +77,12 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         """
         Creates and returns the ASE Calculator object associated with this calculator instance.
 
-        This property initializes the Calculator object using the EqV2 potential and other settings
+        This property initializes the Calculator object using the eSEN potential and other settings
         specified during the initialization of this calculator. The Calculator object is then returned
         to the caller. If the Calculator object has already been created, it is returned directly.
 
         Returns:
-            Calculator: The ASE Calculator object configured with the EqV2 potential.
+            Calculator: The ASE Calculator object configured with the eSEN potential.
         """
         if self._calculator is None:
             from fairchem.core import OCPCalculator

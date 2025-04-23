@@ -34,11 +34,11 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
+            model_name: str = "EquiformerV2-153M-OMAT24-MP-sAlex",
             checkpoint_path: str | None = None,
-            model_name: str | None = None,
-            local_cache: str | None = None,
+            local_cache: str = "~/.cache/eqv2/",
             device: Literal["cpu", "cuda"] = "cpu",
-            seed: int | None = 42,
+            seed: int | None = None,
             **kwargs
     ) -> None:
         """
@@ -49,11 +49,11 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
+            model_name (str): The name of the EqV2 model to use for calculations. Defaults to 'EquiformerV2-153M-OMAT24-MP-sAlex'.
             checkpoint_path (str, optional): The path to the checkpoint file for the EqV2 model.
-            model_name (str, optional): The name of the EqV2 model to use.
-            local_cache (str, optional): The path to the local cache directory for the EqV2 model.
+            local_cache (str): The path to the local cache directory for the EqV2 model. Defaults to "~/.cache/eqv2/".
             device (Literal["cpu", "cuda"], optional): The device to use for the calculations. Defaults to "cpu".
-            seed (int, optional): The seed value for the model. Defaults to 42.
+            seed (int, optional): The seed value for the model.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
@@ -64,8 +64,8 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # EqV2 specific attributes
-        self.checkpoint_path = checkpoint_path
         self.model_name = model_name
+        self.checkpoint_path = checkpoint_path
         self.local_cache = local_cache
         self.device = device
         self.seed = seed
@@ -87,10 +87,10 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from fairchem.core import OCPCalculator
             self._calculator = OCPCalculator(
-                    checkpoint_path=self.checkpoint_path,
                     model_name=self.model_name,
+                    checkpoint_path=self.checkpoint_path,
                     local_cache=self.local_cache,
-                    cpu=self.device != 'cuda',
+                    cpu=self.device != "cuda",
                     seed=self.seed,
             )
         return self._calculator
