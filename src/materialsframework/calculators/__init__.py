@@ -13,6 +13,7 @@ from .chgnet import CHGNetCalculator
 from .deepmd import DeePMDCalculator
 from .divenet import DiveNetCalculator
 from .eqv2 import EqV2Calculator
+from .esen import eSENCalculator
 from .gptff import GPTFFCalculator
 from .grace import GraceCalculator
 from .m3gnet import M3GNetCalculator
@@ -32,6 +33,7 @@ __all__ = ["AlphaNetCalculator",
            "DeePMDCalculator",
            "DiveNetCalculator",
            "EqV2Calculator",
+           "eSENCalculator",
            "GPTFFCalculator",
            "M3GNetCalculator",
            "GraceCalculator",

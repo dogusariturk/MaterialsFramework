@@ -1,8 +1,8 @@
 """
-This module provides a class for performing calculations and structure relaxation using the EqV2 potential.
+This module provides a class for performing calculations and structure relaxation using the eSEN potential.
 
-The `EqV2Calculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and to perform structure relaxation using a specified EqV2 model.
+The `eSENCalculator` class is designed to calculate properties such as potential energy, forces,
+stresses, and to perform structure relaxation using a specified eSEN model.
 """
 from __future__ import annotations
 
@@ -18,12 +18,12 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class EqV2Calculator(BaseCalculator, BaseMDCalculator):
+class eSENCalculator(BaseCalculator, BaseMDCalculator):
     """
-    A calculator class for performing material property calculations and structure relaxation using the EqV2 potential.
+    A calculator class for performing material property calculations and structure relaxation using the eSEN potential.
 
-    The `EqV2Calculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified EqV2 model.
+    The `eSENCalculator` class supports the calculation of properties such as potential energy,
+    forces, and stresses. It also allows for the relaxation of structures using a specified eSEN model.
 
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
@@ -34,24 +34,24 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model_name: str = "EquiformerV2-153M-OMAT24-MP-sAlex",
+            model_name: str = "eSEN-30M-OAM",
             checkpoint_path: str | None = None,
-            local_cache: str = "~/.cache/eqv2/",
+            local_cache: str = "~/.cache/esen/",
             device: Literal["cpu", "cuda"] = "cpu",
             seed: int | None = None,
             **kwargs
     ) -> None:
         """
-        Initializes the EqV2Calculator with the specified model and calculation settings.
+        Initializes the eSENCalculator with the specified model and calculation settings.
 
-        This method sets up the calculator with a predefined EqV2 model, which will be used
+        This method sets up the calculator with a predefined eSEN model, which will be used
         to calculate properties and perform structure relaxation. Additional parameters
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model_name (str): The name of the EqV2 model to use for calculations. Defaults to 'EquiformerV2-153M-OMAT24-MP-sAlex'.
-            checkpoint_path (str, optional): The path to the checkpoint file for the EqV2 model.
-            local_cache (str): The path to the local cache directory for the EqV2 model. Defaults to "~/.cache/eqv2/".
+            model_name (str): The name of the eSEN model to use for calculations. Defaults to 'eSEN-30M-OAM'.
+            checkpoint_path (str, optional): The path to the checkpoint file for the eSEN model.
+            local_cache (str): The path to the local cache directory for the eSEN model. Defaults to "~/.cache/esen/".
             device (Literal["cpu", "cuda"], optional): The device to use for the calculations. Defaults to "cpu".
             seed (int, optional): The seed value for the model.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
@@ -63,7 +63,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         BaseCalculator.__init__(self, **basecalculator_kwargs)
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
-        # EqV2 specific attributes
+        # eSEN specific attributes
         self.model_name = model_name
         self.checkpoint_path = checkpoint_path
         self.local_cache = local_cache
@@ -77,12 +77,12 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         """
         Creates and returns the ASE Calculator object associated with this calculator instance.
 
-        This property initializes the Calculator object using the EqV2 potential and other settings
+        This property initializes the Calculator object using the eSEN potential and other settings
         specified during the initialization of this calculator. The Calculator object is then returned
         to the caller. If the Calculator object has already been created, it is returned directly.
 
         Returns:
-            Calculator: The ASE Calculator object configured with the EqV2 potential.
+            Calculator: The ASE Calculator object configured with the eSEN potential.
         """
         if self._calculator is None:
             from fairchem.core import OCPCalculator
