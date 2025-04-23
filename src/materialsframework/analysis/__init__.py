@@ -4,6 +4,7 @@ from .bain import BainPathAnalyzer
 from .cubic_elastic_constants import CubicElasticConstantsAnalyzer
 from .elastic_constants import ElasticConstantsAnalyzer
 from .eos import EOSAnalyzer
+from .neb import NEBAnalyzer
 from .phono3py import Phono3pyAnalyzer
 from .phonopy import PhonopyAnalyzer
 
@@ -15,5 +16,6 @@ __all__ = ["ANNNIStackingFaultAnalyzer",
            "CubicElasticConstantsAnalyzer",
            "ElasticConstantsAnalyzer",
            "EOSAnalyzer",
+           "NEBAnalyzer",
            "Phono3pyAnalyzer",
            "PhonopyAnalyzer"]
