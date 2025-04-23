@@ -292,7 +292,11 @@ class BaseCalculator(ABC):
             atoms = self.ase_adaptor.get_atoms(atoms)
 
         atoms.calc = self.calculator
-        self.calculator.calculate(atoms=atoms)
+        self.calculator.calculate(
+                atoms=atoms,
+                properties=self.AVAILABLE_PROPERTIES,
+                system_changes=['positions', 'numbers', 'cell', 'pbc', 'initial_charges', 'initial_magmoms']
+        )
 
         out_dict = {
                 "final_structure": self.ase_adaptor.get_structure(atoms),
