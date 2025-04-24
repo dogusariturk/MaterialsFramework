@@ -1,8 +1,8 @@
 """
-This module provides a class for performing calculations using the DiveNet potential.
+This module provides a class for performing calculations using the HIENet potential.
 
-The `DiveNetCalculator` class is designed to calculate properties such as potential energy,
-forces, and stresses, and to perform structure relaxation using a specified DiveNet model.
+The `HIENetCalculator` class is designed to calculate properties such as potential energy,
+forces, and stresses, and to perform structure relaxation using a specified HIENet model.
 """
 from __future__ import annotations
 
@@ -18,12 +18,12 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
+class HIENetCalculator(BaseCalculator, BaseMDCalculator):
     """
-    A calculator class for performing material property calculations and structure relaxation using the DiveNet potential.
+    A calculator class for performing material property calculations and structure relaxation using the HIENet potential.
 
-    The `DiveNetCalculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified DiveNet model.
+    The `HIENetCalculator` class supports the calculation of properties such as potential energy,
+    forces, and stresses. It also allows for the relaxation of structures using a specified HIENet model.
 
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
@@ -36,24 +36,24 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
             self,
             model: str,
             file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
-            device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
+            device: Literal["cuda", "cpu", "mps", "auto"] = "cpu",
             **kwargs
     ) -> None:
         """
-        Initialize a DiveNetCalculator instance with a specified model and calculation settings.
+        Initialize a HIENetCalculator instance with a specified model and calculation settings.
 
         Args:
-            model (str): The path of the DiveNet model to use.
+            model (str): The path of the HIENet model to use.
             file_type (Literal["checkpoint", "torchscript"]): The format of the model file.
                 Defaults to 'checkpoint'.
             device (Literal["cuda", "cpu", "mps", "auto"], optional): The device to use for calculations. Defaults to "auto".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Example:
-            >>> divenet_calculator = DiveNetCalculator(model="checkpoint_600.pth", device="cuda")
+            >>> hienet_calculator = HIENetCalculator(model="checkpoint_600.pth", device="cuda")
 
         Note:
-            The remaining values for the arguments are set to the default values for the DiveNet potential.
+            The remaining values for the arguments are set to the default values for the HIENet potential.
         """
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
@@ -62,7 +62,7 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
         BaseCalculator.__init__(self, **basecalculator_kwargs)
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
-        # DiveNet specific attributes
+        # HIENet specific attributes
         self.model = model
         self.device = device
         self.file_type = file_type
@@ -78,13 +78,13 @@ class DiveNetCalculator(BaseCalculator, BaseMDCalculator):
         using the potential attribute of this instance.
 
         Returns:
-            DiveNetCalculator: The ASE calculator associated with this instance.
+            HIENetCalculator: The ASE calculator associated with this instance.
         """
         if self._calculator is None:
-            from divenet.sevennet_calculator import SevenNetCalculator as DiveNetASECalculator
-            self._calculator = DiveNetASECalculator(
+            from hienet.hienet_calculator import HIENetCalculator as HIENetASECalculator
+            self._calculator = HIENetASECalculator(
                     model=self.model,
-                    device=self.device,
                     file_type=self.file_type,
+                    device=self.device,
             )
         return self._calculator

@@ -38,6 +38,7 @@ dependencies:
       - matgl
       - mattersim
       - sevenn
+      - git+https://github.com/divelab/AIRS.git#subdirectory=OpenMat/HIENet
       - git+https://github.com/facebookresearch/fairchem.git#subdirectory=packages/fairchem-core
       - git+https://github.com/atomly-materials-research-lab/GPTFF.git
       - tensorpotential==0.5.1

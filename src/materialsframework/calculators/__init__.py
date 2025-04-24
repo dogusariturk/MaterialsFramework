@@ -11,7 +11,7 @@ the workflow of materials modeling and property prediction within the MaterialsF
 from .alphanet import AlphaNetCalculator
 from .chgnet import CHGNetCalculator
 from .deepmd import DeePMDCalculator
-from .divenet import DiveNetCalculator
+from .hienet import HIENetCalculator
 from .eqv2 import EqV2Calculator
 from .esen import eSENCalculator
 from .gptff import GPTFFCalculator
@@ -31,7 +31,7 @@ __email__ = "dogu.sariturk@gmail.com"
 __all__ = ["AlphaNetCalculator",
            "CHGNetCalculator",
            "DeePMDCalculator",
-           "DiveNetCalculator",
+           "HIENetCalculator",
            "EqV2Calculator",
            "eSENCalculator",
            "GPTFFCalculator",
