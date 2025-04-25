@@ -10,11 +10,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
 from elastic import elastic
+from pymatgen.analysis.elasticity import ElasticTensor
 
 from materialsframework.transformations.elastic_constants import ElasticConstantsDeformationTransformation
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
 
@@ -34,8 +37,31 @@ class ElasticConstantsAnalyzer:
     and Poisson's ratio.
     """
 
+    EQUIV = {
+            "cubic": [((0, 0), (1, 1), (2, 2)),
+                      ((0, 1), (0, 2), (1, 2)),
+                      ((3, 3), (4, 4), (5, 5))],
+            "hexagonal": [((0, 0), (1, 1)),
+                          ((0, 2), (1, 2)),
+                          ((3, 3), (4, 4))],
+            "tetragonal": [((0, 0), (1, 1)),
+                           ((0, 2), (1, 2)),
+                           ((3, 3), (4, 4))],
+            "trigonal": [((0, 0), (1, 1)),
+                         ((0, 2), (1, 2)),
+                         ((3, 3), (4, 4))],
+            "orthorhombic": [],
+            "monoclinic": [],
+            "triclinic": []
+    }
+
+    SPECIAL = {"hexagonal", "trigonal"}  # need C66 = ½(C11–C12)
+
     def __init__(
             self,
+            num_deform: int = 5,
+            max_deform: float = 2,
+            fmax: float = 0.01,
             calculator: BaseCalculator | None = None,
             elastic_constant_transformation: ElasticConstantsDeformationTransformation | None = None
     ) -> None:
@@ -43,12 +69,19 @@ class ElasticConstantsAnalyzer:
         Initializes the `ElasticConstantsAnalyzer` object.
 
         Args:
+            num_deform (int, optional): The number of deformations to apply. Defaults to 5.
+            max_deform (float, optional): The maximum deformation size in percent and degrees. Defaults to 2%.
+            fmax (float, optional): The maximum force for the calculator. Defaults to 0.01.
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
                                                           Defaults to `M3GNetCalculator`.
             elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The transformation
                                                                                                     object used to apply
                                                                                                     cubic distortions.
         """
+        self.num_deform = num_deform
+        self.max_deform = max_deform
+        self.fmax = fmax
+
         self._calculator = calculator
         self._elastic_constant_transformation = elastic_constant_transformation
 
@@ -92,9 +125,21 @@ class ElasticConstantsAnalyzer:
                 cryst=structure,
                 systems=self.elastic_constants_transformation.distorted_structures
         )
+        Cij *= eV_A3_to_GPa
+
+        elastic_tensor = self._build_elastic_tensor(Cij, cij_order, structure)
 
         return {
-                i: j * eV_A3_to_GPa for i, j in zip(cij_order, Cij)
+            **{i: j for i, j in zip(cij_order, Cij)},
+            "youngs_modulus": elastic_tensor.y_mod / 1e9,
+            "voigt_bulk_modulus": elastic_tensor.k_voigt,
+            "voigt_shear_modulus": elastic_tensor.g_voigt,
+            "reuss_bulk_modulus": elastic_tensor.k_reuss,
+            "reuss_shear_modulus": elastic_tensor.g_reuss,
+            "voigt_reuss_hill_bulk_modulus": elastic_tensor.k_vrh,
+            "voigt_reuss_hill_shear_modulus": elastic_tensor.g_vrh,
+            "poisson_ratio": elastic_tensor.homogeneous_poisson,
+            "pugh_ratio": elastic_tensor.g_vrh / elastic_tensor.k_vrh,
         }
 
     @property
@@ -109,7 +154,7 @@ class ElasticConstantsAnalyzer:
         """
         if self._calculator is None:
             from materialsframework.calculators.m3gnet import M3GNetCalculator
-            self._calculator = M3GNetCalculator(fmax=0.01)
+            self._calculator = M3GNetCalculator(fmax=self.fmax)
         return self._calculator
 
     @property
@@ -123,5 +168,42 @@ class ElasticConstantsAnalyzer:
             ElasticConstantsDeformationTransformation: The transformation object used to apply distortions.
         """
         if self._elastic_constant_transformation is None:
-            self._elastic_constant_transformation = ElasticConstantsDeformationTransformation()
+            self._elastic_constant_transformation = ElasticConstantsDeformationTransformation(
+                num_deform=self.num_deform,
+                max_deform=self.max_deform
+            )
         return self._elastic_constant_transformation
+
+    def _build_elastic_tensor(
+            self,
+            Cij: list,
+            cij_order: list,
+            structure: Atoms
+    ) -> ElasticTensor:
+        """
+        Builds the elastic tensor from the given Cij and cij_order.
+
+        Args:
+            Cij (list): The list of elastic constants.
+            cij_order (list): The order of the elastic constants.
+            structure (Atoms): The input structure.
+
+        Returns:
+            ElasticTensor: The constructed elastic tensor.
+        """
+        elastic_tensor = np.zeros([6, 6])
+
+        for val, sym in zip(Cij, cij_order):
+            i, j = int(sym[2]) - 1, int(sym[3]) - 1
+            elastic_tensor[i, j] = elastic_tensor[j, i] = val
+
+        for block in self.EQUIV.get(sys := elastic.get_lattice_type(structure)[1], []):
+            ref = elastic_tensor[block[0]]
+            for (p, q) in block:
+                elastic_tensor[p, q] = elastic_tensor[q, p] = ref
+
+        # add the derived C66 if required
+        if sys in self.SPECIAL and elastic_tensor[5, 5] == 0:
+            elastic_tensor[5, 5] = 0.5 * (elastic_tensor[0, 0] - elastic_tensor[0, 1])
+
+        return ElasticTensor.from_voigt(elastic_tensor)
