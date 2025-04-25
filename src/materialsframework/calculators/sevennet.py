@@ -34,7 +34,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = "SevenNet-0",
+            model: str = "7net-mf-ompa",
             file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
             device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
             **kwargs
@@ -81,7 +81,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
             SevenNetCalculator: The ASE calculator associated with this instance.
         """
         if self._calculator is None:
-            from sevenn.sevennet_calculator import SevenNetCalculator as SevenNetASECalculator
+            from sevenn.calculator import SevenNetCalculator as SevenNetASECalculator
             self._calculator = SevenNetASECalculator(
                     model=self.model,
                     device=self.device,
