@@ -36,7 +36,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str | Path = "large",
+            model: str | Path = "medium-mpa-0",
             include_dipoles: bool = False,
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             default_dtype: str = "",
@@ -52,7 +52,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
 
         Args:
             model (str | Path, optional): The MACE model to use. This can be the name of a predefined model
-                (e.g., "large"), a path to a custom model file, or a URL. Defaults to "large".
+                (e.g., "medium-omat-0"), a path to a custom model file, or a URL. Defaults to "medium-mpa-0".
             include_dipoles (bool, optional): Determines whether dipole properties are included in the model. Defaults to False.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             default_dtype (str, optional): The default data type to be used for the model. Defaults to an empty string,
@@ -61,7 +61,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
-            >>> mace_calculator = MACECalculator(model="medium", device="cuda")
+            >>> mace_calculator = MACECalculator(model="large", device="cuda")
 
         Note:
             The remaining parameters for the MACE potential are set to their default values, which are appropriate for general use cases.
