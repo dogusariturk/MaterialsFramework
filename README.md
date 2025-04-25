@@ -22,17 +22,19 @@
 
 Follow the steps below to get a local copy of the project up and running.
 
+
 ### Prerequisites
 
 This project uses `conda` for managing dependencies. Several `environment.yml` files are provided to support different model groups.
 
-| Environment File             | Supported Models                                                                                            |
-|------------------------------|-------------------------------------------------------------------------------------------------------------|
-| `environment.yml`            | M3GNet / MEGNet                                                                                             |
-| `main-environment.yml`       | CHGNet, DeepMD, EqV2 / eSEN, GPTFF, GRACE, HIENet, M3GNet / MEGNet, MatterSim, NewtonNet, PosEGNN, SevenNet |
-| `orb-environment.yml`        | ORB                                                                                                         |
-| `mace-environment.yml`       | MACE                                                                                                        |
-| `alphanet-environment.yml`   | AlphaNet                                                                                                    |
+| Environment File           | Supported Models                                                                                            |
+|----------------------------|-------------------------------------------------------------------------------------------------------------|
+| `environment.yml`          | M3GNet / MEGNet                                                                                             |
+| `main-environment.yml`     | CHGNet, DeepMD, EqV2 / eSEN, GPTFF, GRACE, HIENet, M3GNet / MEGNet, MatterSim, NewtonNet, PosEGNN, SevenNet |
+| `orb-environment.yml`      | ORB                                                                                                         |
+| `mace-environment.yml`     | MACE                                                                                                        |
+| `alignn-environment.yml`   | ALIGNN-FF                                                                                                   |
+| `alphanet-environment.yml` | AlphaNet                                                                                                    |
 
  ### Installation
 
