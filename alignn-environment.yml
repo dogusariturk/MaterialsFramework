@@ -1,0 +1,24 @@
+name: materialsframework-alignn
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - sqsgenerator
+  - phonopy
+  - phono3py
+  - elastic
+  - pandas
+  - cpuonly
+  - pytorch=2.2.1
+  - torchvision
+  - numpy<2
+  - ase
+  - pymatgen
+  - scipy
+  - pip
+  - pip:
+      - openpyxl
+      - git+https://github.com/cjkunselman18/pycalphad.git
+      - pandarallel
+      - alignn
