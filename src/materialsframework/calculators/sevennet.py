@@ -35,6 +35,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
     def __init__(
             self,
             model: str = "7net-mf-ompa",
+            modal: Literal["mpa", "omat24"] = "mpa",
             file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
             device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
             **kwargs
@@ -43,7 +44,8 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         Initialize a SevenNetCalculator instance with a specified model and calculation settings.
 
         Args:
-            model (str, optional): The name or the path of the SevenNet model to use. Defaults to 'SevenNet-0'.
+            model (str, optional): The name or the path of the SevenNet model to use. Defaults to '7net-mf-ompa'.
+            modal (Literal["mpa", "omat24"], optional): The fidelity of the model to use. Defaults to 'mpa'.
             file_type (Literal["checkpoint", "torchscript"]): The format of the model file.
                 Defaults to 'checkpoint'.
             device (Literal["cuda", "cpu", "mps", "auto"], optional): The device to use for calculations. Defaults to "auto".
@@ -64,6 +66,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
 
         # SevenNet specific attributes
         self.model = model
+        self.modal = modal
         self.device = device
         self.file_type = file_type
 
@@ -84,6 +87,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
             from sevenn.calculator import SevenNetCalculator as SevenNetASECalculator
             self._calculator = SevenNetASECalculator(
                     model=self.model,
+                    modal=self.modal,
                     device=self.device,
                     file_type=self.file_type,
             )
