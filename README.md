@@ -59,25 +59,6 @@ This project uses `conda` for managing dependencies. Several `environment.yml` f
     pip install -e .
     ```
 
-## Contributing
-
-Contributions are welcome and appreciated. To contribute:
-
-1. Fork the repository
-2. Create a new branch:
-   ```sh
-   git checkout -b feature/YourFeature
-   ```
-3. Commit your changes:
-   ```sh
-   git commit -m 'Add your feature'
-   ```
-4. Push to your branch:
-   ```sh
-   git push origin feature/YourFeature
-   ```
-5. Open a pull request
-
 ## License
 
 Distributed under the GPLv3 License. See [GPLv3 License](https://opensource.org/license/gpl-3-0) for more information.
