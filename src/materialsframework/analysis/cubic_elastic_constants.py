@@ -145,15 +145,15 @@ class CubicElasticConstantsAnalyzer:
 
     def _fit_eos(
             self,
-            volumes: list[float, ...],
-            energies: list[float, ...]
+            volumes: list[float],
+            energies: list[float]
     ) -> float:
         """
         Fits the equation of state (EOS) to the given volumes and energies, returning the bulk modulus.
 
         Args:
-            volumes (list[float, ...]): A list of volumes.
-            energies (list[float, ...]): A list of energies.
+            volumes (list[float]): A list of volumes.
+            energies (list[float]): A list of energies.
 
         Returns:
             float: The bulk modulus obtained from the EOS fit in GPa.
@@ -163,16 +163,16 @@ class CubicElasticConstantsAnalyzer:
 
     @staticmethod
     def _fit_poly(
-            deltas: list[float, ...],
-            energies: list[float, ...],
+            deltas: list[float],
+            energies: list[float],
             degree: int = 2
     ) -> float:
         """
         Fits a polynomial to the given deltas and energies data points and calculates the second-order coefficient.
 
         Args:
-            deltas (list[float, ...]): The array of delta values.
-            energies (list[float, ...]): The array of energy values.
+            deltas (list[float]): The array of delta values.
+            energies (list[float]): The array of energy values.
             degree (int, optional): The degree of the polynomial to fit. Defaults to 2.
 
         Returns:
