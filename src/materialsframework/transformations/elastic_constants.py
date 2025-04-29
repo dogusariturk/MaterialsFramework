@@ -41,7 +41,7 @@ class ElasticConstantsDeformationTransformation:
         self.num_deform = num_deform
         self.max_deform = max_deform
 
-        self.distorted_structures: [Atoms] = []
+        self.distorted_structures: list[Atoms] = []
 
     def apply_transformation(
             self,
