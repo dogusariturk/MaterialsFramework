@@ -89,7 +89,7 @@ class EOSAnalyzer:
                 "strains": strain_list,
                 "volumes": volume_list,
                 "energies": energy_list,
-                "eos_results": eos_fit.results
+                **eos_fit.results
         }
 
     @property
