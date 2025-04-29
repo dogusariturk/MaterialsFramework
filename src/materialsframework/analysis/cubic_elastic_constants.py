@@ -76,8 +76,22 @@ class CubicElasticConstantsAnalyzer:
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
-            dict[str, float]: A dictionary containing the calculated cubic elastic constants (C11, C12, C44) and
-                              various derived mechanical properties.
+            dict[str, float]: A dictionary with the following keys:
+                - "C11": The C11 elastic constant in GPa.
+                - "C12": The C12 elastic constant in GPa.
+                - "C44": The C44 elastic constant in GPa.
+                - "young_modulus": The Young's modulus in GPa.
+                - "voigt_bulk_modulus": The Voigt bulk modulus in GPa.
+                - "voigt_shear_modulus": The Voigt shear modulus in GPa.
+                - "reuss_bulk_modulus": The Reuss bulk modulus in GPa.
+                - "reuss_shear_modulus": The Reuss shear modulus in GPa.
+                - "voigt_reuss_hill_bulk_modulus": The Voigt-Reuss-Hill bulk modulus in GPa.
+                - "voigt_reuss_hill_shear_modulus": The Voigt-Reuss-Hill shear modulus in GPa.
+                - "poisson_ratio": The Poisson's ratio.
+                - "pugh_ratio": The Pugh's ratio (G_VRH / K_VRH).
+
+        Raises:
+            ValueError: If the calculator object does not have the 'energy' property implemented.
         """
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")

@@ -68,7 +68,17 @@ class EOSAnalyzer:
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
-            dict[str, list]: A dictionary containing the calculated strains, volumes, energies, and the EOS fitting results.
+            dict[str, list]: A dictionary with the following keys:
+                - "strains": A list of strain values corresponding to the deformed structures.
+                - "volumes": A list of volumes for each deformed structure.
+                - "energies": A list of potential energies for each deformed structure.
+                - "e0": The minimum energy of the system.
+                - "b0": The bulk modulus in units of energy/unit of volume^3.
+                - "b1": The derivative of bulk modulus with respect to pressure.
+                - "v0": The minimum volume of the system in Ang^3.
+
+        Raises:
+            ValueError: If the calculator object does not have the 'energy' property implemented.
         """
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")

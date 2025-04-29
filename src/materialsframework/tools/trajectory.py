@@ -37,7 +37,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         include_dipoles (bool): Whether to save the dipoles. Defaults to False.
 
     Note:
-        This class was adapted from the matgl code and extended to include the capability
+        This class was adapted from the matgl code and extended to include the ability
         to save additional property values.
     """
     def __init__(
@@ -150,22 +150,20 @@ class TrajectoryObserver(collections.abc.Sequence):
         """
         Returns a dictionary containing all recorded properties from the relaxation process.
 
-        The dictionary includes:
-            - "total_energies": List of total energies recorded at each step.
-            - "potential_energies": List of potential energies recorded at each step.
-            - "kinetic_energies": List of kinetic energies recorded at each step.
-            - "forces": List of forces on atoms recorded at each step.
-            - "stresses": List of stresses on the structure recorded at each step.
-            - "cells": List of cell parameters recorded at each step.
-            - "atom_positions": List of atomic positions recorded at each step.
-            - "atomic_numbers": List of atomic numbers recorded at each step.
-            - "chemical_symbols": List of chemical symbols recorded at each step.
-            - "temperatures" (optional): List of temperatures recorded at each step, if applicable.
-            - "magmoms" (optional): List of magnetic moments recorded at each step, if applicable.
-            - "dipoles" (optional): List of dipoles recorded at each step, if applicable.
-
         Returns:
-            dict[str, Any]: A dictionary where each key corresponds to a property and each value is a list of recorded values.
+            dict[str, Any]: A dictionary with the following keys:
+                - "total_energies": List of total energies recorded at each step.
+                - "potential_energies": List of potential energies recorded at each step.
+                - "kinetic_energies": List of kinetic energies recorded at each step.
+                - "forces": List of forces on atoms recorded at each step.
+                - "stresses": List of stresses on the structure recorded at each step.
+                - "cells": List of cell parameters recorded at each step.
+                - "atom_positions": List of atomic positions recorded at each step.
+                - "atomic_numbers": List of atomic numbers recorded at each step.
+                - "chemical_symbols": List of chemical symbols recorded at each step.
+                - "temperatures" (optional): List of temperatures recorded at each step, if applicable.
+                - "magmoms" (optional): List of magnetic moments recorded at each step, if applicable.
+                - "dipoles" (optional): List of dipoles recorded at each step, if applicable.
         """
         out_dict = {
                 "total_energies": self.total_energies,

@@ -103,7 +103,17 @@ class ElasticConstantsAnalyzer:
                                          Defaults to False.
 
         Returns:
-            dict[str, float]: A dictionary containing the elastic constants and their values in GPa.
+            dict[str, float]: A dictionary with the following keys:
+                - C_ij: The elastic constants in GPa.
+                - youngs_modulus: Young's modulus in GPa.
+                - voigt_bulk_modulus: Voigt bulk modulus in GPa.
+                - voigt_shear_modulus: Voigt shear modulus in GPa.
+                - reuss_bulk_modulus: Reuss bulk modulus in GPa.
+                - reuss_shear_modulus: Reuss shear modulus in GPa.
+                - voigt_reuss_hill_bulk_modulus: Voigt-Reuss-Hill bulk modulus in GPa.
+                - voigt_reuss_hill_shear_modulus: Voigt-Reuss-Hill shear modulus in GPa.
+                - poisson_ratio: Poisson's ratio.
+                - pugh_ratio: Pugh's ratio.
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' property implemented.

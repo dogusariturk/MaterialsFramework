@@ -86,7 +86,12 @@ class SqsgenTransformation:
             shell_weights (dict[int, float], optional): The weights for the coordination shells. Defaults to {1: 1.0, 2: 0.5}.
 
         Returns:
-            dict[str, Any]: A dictionary containing the generated SQS structure and the objective value.
+            dict[str, Any]: A dictionary with the following keys:
+                - "structure" (Any): The generated SQS structure.
+                - "objective" (float): The final objective value from the SQS optimization.
+
+        Raises:
+            ValueError: If the crystal structure is invalid.
         """
         self._supercell_size = supercell_size
         self._lattice = self._get_lattice(composition=composition,

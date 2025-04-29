@@ -97,7 +97,11 @@ class Phono3pyAnalyzer:
             log_level (Literal[0, 1, 2], optional): The log level for Phono3py. Defaults to 0.
 
         Returns:
-            dict[str, ConductivityRTA | ConductivityLBTE]: A dictionary containing the calculated thermal conductivity.
+            dict[str, ConductivityRTA | ConductivityLBTE]: A dictionary with the following key:
+                - "thermal_conductivity": The calculated thermal conductivity object (RTA or LBTE).
+
+        Raises:
+            ValueError: If the calculator object does not have the 'forces' property implemented.
         """
         if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'forces' property implemented.")

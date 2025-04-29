@@ -21,6 +21,9 @@ __email__ = "dogu.sariturk@gmail.com"
 class Sqs2tdb:
     """
     Python wrapper for the sqs2tdb script.
+
+    Attributes:
+        dbf (Database): The TDB database object.
     """
 
     VASP_WRAP = """[INCAR]
@@ -55,6 +58,9 @@ DOSTATIC
             verbose (bool, optional): Whether to print verbose output. Defaults to False.
             calculator (BaseCalculator | BaseMDCalculator | None, optional): The calculator object used for energy calculations.
                                                           Defaults to `ORBCalculator`.
+
+        Raises:
+            EnvironmentError: If the sqs2tdb script is not found in the system's PATH.
         """
         if shutil.which("sqs2tdb") is None:
             raise EnvironmentError("sqs2tdb is not installed or not found in the system's PATH.")
@@ -107,6 +113,10 @@ DOSTATIC
             phonon (bool): Whether to include phonons for end members. Defaults to False.
             open_calphad (bool): Whether to generate an Open Calphad-compliant .tdb file. Defaults to False.
             terms (str | None): The terms to include in the model. Defaults to None.
+
+        Raises:
+            ValueError: If the calculator object does not implement the required properties.
+            ValueError: If the lattice type is not valid.
         """
         if not all(prop in self.calculator.AVAILABLE_PROPERTIES for prop in ["energy", "forces", "stress"]):
             raise ValueError("The calculator object must have the 'energy', 'forces', and 'stress' properties implemented.")
@@ -185,6 +195,8 @@ DOSTATIC
         structure = Structure.from_file(subdir / "POSCAR")
 
         if "LIQUID" in subdir.parts:
+            structure.make_supercell(2)
+
             self.calculator.ensemble = "npt_nose_hoover"
             res = self.calculator.run(
                     structure=structure,
@@ -224,8 +236,7 @@ DOSTATIC
         if stresses.shape == (6,):
             from ase.stress import voigt_6_to_full_3x3_stress
             stresses = voigt_6_to_full_3x3_stress(stresses)
-
-            np.savetxt(subdir / "stress.out", stresses, fmt="%.7e")
+        np.savetxt(subdir / "stress.out", stresses, fmt="%.7e")
 
     @staticmethod
     def _run_command(

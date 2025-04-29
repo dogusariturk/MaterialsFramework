@@ -63,8 +63,12 @@ class BainPathAnalyzer:
             is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
 
         Returns:
-            dict[str, list]: A dictionary containing the c/a ratios (`c_a_list`) and the corresponding calculated potential
-                            energies (`energy_list`) along the Bain Path.
+            dict[str, list]: A dictionary with the following keys:
+                - "c_a_list": A list of c/a ratios corresponding to the deformed structures.
+                - "energy_list": A list of potential energies for each deformed structure.
+
+        Raises:
+            ValueError: If the calculator object does not have the 'energy' property implemented.
         """
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")

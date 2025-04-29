@@ -54,7 +54,7 @@ class ANNNIStackingFaultAnalyzer:
     def calculate(
             self,
             composition: Composition | str
-    ) -> dict:
+    ) -> dict[str, float]:
         """
         Calculates intrinsic and extrinsic stacking fault energies (ISFE and ESFE) using the second-order ANNNI formulae.
 
@@ -67,8 +67,12 @@ class ANNNIStackingFaultAnalyzer:
                                                    or as a string.
 
         Returns:
-            dict: A dictionary containing the intrinsic stacking fault energy (`isfe`) and extrinsic stacking fault
-                  energy (`esfe`), both normalized by the FCC unit cell area.
+            dict[str, float]: A dictionary with the following keys:
+                - "isfe": The intrinsic stacking fault energy (ISFE) in eV/Å².
+                - "esfe": The extrinsic stacking fault energy (ESFE) in eV/Å².
+
+        Raises:
+            ValueError: If the calculator object does not have the 'energy' property implemented.
         """
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")

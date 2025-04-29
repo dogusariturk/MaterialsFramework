@@ -94,7 +94,13 @@ class PhonopyAnalyzer:
             log_level (int, optional): The log level for the phonon calculations. Defaults to 0.
 
         Returns:
-            dict[str, dict]: A dictionary containing the calculated total DOS, thermal properties, and projected DOS.
+            dict[str, dict]: A dictionary with the following keys:
+                - "total_dos": A dictionary containing the total density of states.
+                - "thermal_properties": A dictionary containing the thermal properties.
+                - "projected_dos": A dictionary containing the projected density of states.
+
+        Raises:
+            ValueError: If the calculator object does not have the 'forces' property implemented.
         """
         if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'forces' property implemented.")

@@ -64,13 +64,16 @@ class MaterialParameters:
         """
         Initializes material parameters with given composition and potential values.
 
-        Args
+        Args:
             db (Database | str): pycalphad Database object or path to the database file.
             temperature (float): Temperature in Kelvin.
             component (str): Component name.
             composition (float): Composition value.
             elements (list[str] | None): List of elements. Default is None.
             phase (str | None): Phase name. Default is None.
+
+        Raises:
+            ValueError: If multiple phases are found in the database and no phase is specified.
         """
 
         def energy(x, a, b, c, d, e, f, g, h, i, j, k):
