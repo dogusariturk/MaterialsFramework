@@ -67,7 +67,7 @@ class PhonopyDisplacementTransformation:
             The generated displaced structures are stored in the `displaced_structures` attribute, and the
             displacement vectors are stored in `displacements`.
         """
-        supercell_matrix = supercell_matrix or np.eye(3) * np.array((2, 2, 2))
+        supercell_matrix = np.diag(supercell_matrix) or np.diag([2, 2, 2])
 
         phonopy_structure = get_phonopy_structure(structure)
 
