@@ -36,7 +36,7 @@ class PhonopyDisplacementTransformation:
         """
         self.phonon: Phonopy | None = None
         self.displacements: np.ndarray | list | None = None
-        self.displaced_structures: list[Structure, ...] | None = None
+        self.displaced_structures: list[Structure] | None = None
 
     def apply_transformation(
             self,
