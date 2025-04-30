@@ -87,7 +87,7 @@ class ElasticConstantsAnalyzer:
 
     def calculate(
             self,
-            structure: Structure,
+            structure: Structure | Atoms,
             is_relaxed: bool = False
     ) -> dict[str, float]:
         """
@@ -98,7 +98,7 @@ class ElasticConstantsAnalyzer:
         constant names as keys and the corresponding values in GPa.
 
         Args:
-            structure (Structure): The input structure to calculate the elastic constants.
+            structure (Structure | Atoms): The input structure to calculate the elastic constants.
             is_relaxed (bool, optional): A flag to indicate whether the input structure is already relaxed.
                                          Defaults to False.
 
@@ -124,7 +124,9 @@ class ElasticConstantsAnalyzer:
         if not is_relaxed:
             structure = self.calculator.relax(structure)["final_structure"]
 
-        structure = structure.to_ase_atoms(msonable=False)
+        if isinstance(structure, Structure):
+            structure = structure.to_ase_atoms(msonable=False)
+
         self.calculator.relax_cell = False
         structure.calc = self.calculator.calculator
 

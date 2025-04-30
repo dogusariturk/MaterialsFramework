@@ -11,8 +11,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+from ase import Atoms
 from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.analysis.eos import EOS
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.transformations.cubic_elastic_constants import CubicElasticConstantsDeformationTransformation
 
@@ -39,6 +41,8 @@ class CubicElasticConstantsAnalyzer:
     def __init__(
             self,
             eos_name: str = "birch_murnaghan",
+            delta_max: float = 0.05,
+            step_size: float = 0.01,
             calculator: BaseCalculator | None = None,
             cubic_transformation: CubicElasticConstantsDeformationTransformation | None = None
     ) -> None:
@@ -54,14 +58,17 @@ class CubicElasticConstantsAnalyzer:
                                                                                                     object used to apply
                                                                                                     cubic distortions.
         """
-        self._eos_name = eos_name
+        self.eos_name = eos_name
+        self.delta_max = delta_max
+        self.step_size = step_size
 
+        self.ase_adaptor = AseAtomsAdaptor()
         self._calculator = calculator
         self._cubic_transformation = cubic_transformation
 
     def calculate(
             self,
-            structure: Structure,
+            structure: Structure | Atoms,
             is_relaxed: bool = False
     ) -> dict[str, float]:
         """
@@ -72,7 +79,7 @@ class CubicElasticConstantsAnalyzer:
         energy differences, and additional mechanical properties are computed.
 
         Args:
-            structure (Structure): The input structure.
+            structure (Structure | Atoms): The input structure.
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
@@ -95,6 +102,9 @@ class CubicElasticConstantsAnalyzer:
         """
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
+
+        if isinstance(structure, Atoms):
+            structure = self.ase_adaptor.get_structure(structure)
 
         if not is_relaxed:
             structure: Structure = self.calculator.relax(structure)["final_structure"]
@@ -154,7 +164,10 @@ class CubicElasticConstantsAnalyzer:
             CubicElasticConstantsDeformationTransformation: The transformation object used for cubic distortions.
         """
         if self._cubic_transformation is None:
-            self._cubic_transformation = CubicElasticConstantsDeformationTransformation()
+            self._cubic_transformation = CubicElasticConstantsDeformationTransformation(
+                    delta_max=self.delta_max,
+                    step_size=self.step_size
+            )
         return self._cubic_transformation
 
     def _fit_eos(
@@ -172,7 +185,7 @@ class CubicElasticConstantsAnalyzer:
         Returns:
             float: The bulk modulus obtained from the EOS fit in GPa.
         """
-        eos_fit = EOS(eos_name=self._eos_name).fit(volumes=volumes, energies=energies)
+        eos_fit = EOS(eos_name=self.eos_name).fit(volumes=volumes, energies=energies)
         return eos_fit.b0_GPa
 
     @staticmethod

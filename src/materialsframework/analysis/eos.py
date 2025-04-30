@@ -10,7 +10,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ase import Atoms
 from pymatgen.analysis.eos import EOS
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.transformations.eos import EOSTransformation
 
@@ -33,6 +35,9 @@ class EOSAnalyzer:
 
     def __init__(
             self,
+            start: float = -0.01,
+            stop: float = 0.01,
+            num: int = 5,
             eos_name: str = "birch_murnaghan",
             calculator: BaseCalculator | None = None,
             eos_transformation: EOSTransformation | None = None
@@ -41,19 +46,26 @@ class EOSAnalyzer:
         Initializes the `EOSAnalyzer` object.
 
         Args:
+            start (float, optional): The starting strain value to apply to the structure. Defaults to -0.01.
+            stop (float, optional): The stopping strain value to apply to the structure. Defaults to 0.01.
+            num (int, optional): The number of strain values to generate between the start and stop. Defaults to 5.
             eos_name (str, optional): The name of the equation of state (EOS) used for fitting. Defaults to "birch_murnaghan".
             calculator (BaseCalculator | None, optional): The calculator used for energy calculations. Defaults to `M3GNetCalculator`.
             eos_transformation (EOSTransformation | None, optional): The transformation used to generate deformed structures.
                                                                          Defaults to `EOSTransformation`.
         """
-        self._eos_name = eos_name
-        self._calculator = calculator
+        self.start = start
+        self.stop = stop
+        self.num = num
+        self.eos_name = eos_name
 
+        self.ase_adaptor = AseAtomsAdaptor()
+        self._calculator = calculator
         self._eos_transformation = eos_transformation
 
     def calculate(
             self,
-            structure: Structure,
+            structure: Structure | Atoms,
             is_relaxed: bool = False
     ) -> dict[str, list]:
         """
@@ -64,7 +76,7 @@ class EOSAnalyzer:
         equation of state (EOS).
 
         Args:
-            structure (Structure): The undeformed structure to be analyzed.
+            structure (Structure | Atoms): The undeformed structure to be analyzed.
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
@@ -83,6 +95,9 @@ class EOSAnalyzer:
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
 
+        if isinstance(structure, Atoms):
+            structure = self.ase_adaptor.get_structure(structure)
+
         if not is_relaxed:
             structure: Structure = self.calculator.relax(structure)["final_structure"]
 
@@ -92,7 +107,7 @@ class EOSAnalyzer:
                 *[(strain, deformed_structure.volume, self.calculator.calculate(structure=deformed_structure)["energy"]) for
                   strain, deformed_structure in self.eos_transformation.structures.items()])
 
-        eos = EOS(eos_name=self._eos_name)
+        eos = EOS(eos_name=self.eos_name)
         eos_fit = eos.fit(volumes=volume_list, energies=energy_list)
 
         return {
@@ -128,5 +143,9 @@ class EOSAnalyzer:
             EOSTransformation: The transformation object used for EOS analysis.
         """
         if self._eos_transformation is None:
-            self._eos_transformation = EOSTransformation()
+            self._eos_transformation = EOSTransformation(
+                    start=self.start,
+                    stop=self.stop,
+                    num=self.num
+            )
         return self._eos_transformation

@@ -10,6 +10,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+from ase import Atoms
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.transformations.phono3py import Phono3pyDisplacementTransformation
 
@@ -49,6 +51,7 @@ class Phono3pyAnalyzer:
             phono3py_transformation (Phono3pyDisplacementTransformation, optional): The transformation object used
                                                                                    to generate displaced structures.
         """
+        self.ase_adaptor = AseAtomsAdaptor()
         self._calculator = calculator
         self._phono3py_transformation = phono3py_transformation
 
@@ -57,7 +60,7 @@ class Phono3pyAnalyzer:
 
     def calculate(
             self,
-            structure: Structure,
+            structure: Structure | Atoms,
             is_relaxed: bool = False,
             distance: float = 0.01,
             supercell_matrix: list | None = None,
@@ -80,7 +83,7 @@ class Phono3pyAnalyzer:
         and computes thermal conductivity based on the chosen method (RTA or LBTE).
 
         Args:
-            structure (Structure): The structure to calculate phonon properties for.
+            structure (Structure | Atoms): The structure to calculate phonon properties for.
             is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
             distance (float, optional): The distance to displace atoms for force calculations. Defaults to 0.01.
             supercell_matrix (list, optional): The supercell matrix for generating supercells. Defaults to None.
@@ -105,6 +108,9 @@ class Phono3pyAnalyzer:
         """
         if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'forces' property implemented.")
+
+        if isinstance(structure, Atoms):
+            structure = self.ase_adaptor.get_structure(structure)
 
         if not is_relaxed:
             structure: Structure = self.calculator.relax(structure)["final_structure"]
