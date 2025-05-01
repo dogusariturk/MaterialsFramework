@@ -28,6 +28,9 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", "hessian", and "stresses".
+
+    References:
+        - NewtonNet: https://doi.org/10.1039/D2DD00008C
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "hessian", "stress"]

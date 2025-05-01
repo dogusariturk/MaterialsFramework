@@ -28,6 +28,10 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stresses".
+
+    References:
+        - ALIGNN: https://doi.org/10.1038/s41524-021-00650-1
+        - ALIGNN-FF: https://doi.org/10.1039/D2DD00096B
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

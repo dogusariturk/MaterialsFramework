@@ -28,6 +28,9 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - MatterSim: https://doi.org/10.48550/arXiv.2405.04967
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]

@@ -28,6 +28,10 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - Orb-v3: https://doi.org/10.48550/arXiv.2504.06231
+        - Orb-v2: https://doi.org/10.48550/arXiv.2410.22570
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]

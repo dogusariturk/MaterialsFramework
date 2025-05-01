@@ -29,6 +29,9 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", "stress", and "magmoms".
+
+    References:
+        - CHGNet: https://doi.org/10.1038/s42256-023-00716-3
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress", "magmoms"]

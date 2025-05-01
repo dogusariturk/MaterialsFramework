@@ -29,6 +29,9 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "potential_energy", "forces", and "stress".
+
+    References:
+        - M3GNet: https://doi.org/10.1038/s43588-022-00349-3
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

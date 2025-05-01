@@ -27,4 +27,5 @@ dependencies:
       - torch_scatter
       - lightning
       - tensorboard
+      - pydantic-settings
       - git+https://github.com/zmyybc/AlphaNet.git

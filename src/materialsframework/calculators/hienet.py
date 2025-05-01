@@ -28,6 +28,9 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - HIENet: https://doi.org/10.48550/arXiv.2503.05771
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "energies", "forces", "stress"]

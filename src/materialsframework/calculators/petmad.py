@@ -28,6 +28,9 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stresses".
+
+    References:
+        - PET-MAD: https://doi.org/10.48550/arXiv.2503.14118
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

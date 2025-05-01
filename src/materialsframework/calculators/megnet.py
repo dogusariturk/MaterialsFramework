@@ -26,7 +26,11 @@ class MEGNetCalculator:
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute.
                                           Currently, only "formation_energy" is supported.
+
+    References:
+        - MEGNet: https://doi.org/10.1021/acs.chemmater.9b01294
     """
+
     AVAILABLE_PROPERTIES: list[str] = ["formation_energy"]
 
     def __init__(

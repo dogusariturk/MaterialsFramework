@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import Literal, TYPE_CHECKING
 
-import torch
-
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 
@@ -30,16 +28,20 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stresses".
+
+    References:
+        - AlphaNet: https://doi.org/10.48550/arXiv.2501.07155
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]
 
     def __init__(
-            self,
-            config: str,
-            checkpoint: str,
-            device: Literal["cuda", "cpu", "mps"] = "cpu",
-            **kwargs
+        self,
+        checkpoint_path: str,
+        config: str,
+        device: Literal["cuda", "cpu", "mps"] = "cpu",
+        precision: Literal["32", "64"] = "32",
+        **kwargs,
     ) -> None:
         """
         Initializes the AlphaNetCalculator with the specified model and calculation settings.
@@ -49,14 +51,12 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
+            checkpoint_path (str): The path to the model checkpoint file.
             config (str): The path to the configuration file for the AlphaNet model.
-            checkpoint (str): The path to the model checkpoint file.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
+            precision (Literal["32", "64"], optional): The precision of the calculations. Defaults to "32".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        from alphanet.config import All_Config
-        from alphanet.models.model import AlphaNetWrapper
-
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
         basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
@@ -65,11 +65,10 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # AlphaNet specific attributes
+        self.checkpoint_path = checkpoint_path
+        self.config = config
         self.device = device
-        self.config = All_Config().from_json(config)
-        model = AlphaNetWrapper(self.config.model)
-        model.load_state_dict(torch.load(checkpoint, map_location=torch.device(self.device)))
-        self.model = model
+        self.precision = precision
 
         self._calculator = None
 
@@ -87,8 +86,13 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         """
         if self._calculator is None:
             from alphanet.infer.calc import AlphaNetCalculator as AlphaNetASECalculator
+            from alphanet.config import All_Config
+
+            config = All_Config().from_json(self.config)
             self._calculator = AlphaNetASECalculator(
-                    model=self.model,
-                    device=self.device,
+                ckpt_path=self.checkpoint_path,
+                config=config.model,
+                device=self.device,
+                precision=self.precision,
             )
         return self._calculator

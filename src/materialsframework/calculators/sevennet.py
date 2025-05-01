@@ -28,6 +28,10 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - SevenNet: https://doi.org/10.1021/acs.jctc.4c00190
+        - SevenNet-MF: https://doi.org/10.1021/jacs.4c14455
     """
 
     AVAILABLE_PROPERTIES = ["energy", "energies", "free_energy", "forces", "stress"]

@@ -28,6 +28,9 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stresses".
+
+    References:
+        - GPTFF: https://doi.org/10.1016/j.scib.2024.08.039
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]

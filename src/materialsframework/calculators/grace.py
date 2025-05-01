@@ -28,6 +28,9 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - Grace: https://doi.org/10.1103/PhysRevX.14.021036
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "free_energy", "stress"]

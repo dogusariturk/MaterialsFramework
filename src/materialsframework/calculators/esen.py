@@ -28,6 +28,9 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - eSEN: https://doi.org/10.48550/arXiv.2502.12147
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

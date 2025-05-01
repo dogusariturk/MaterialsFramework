@@ -29,6 +29,11 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - DeePMD-kit: https://doi.org/10.1016/j.cpc.2018.03.016
+        - DeePMD-kit v2: https://doi.org/10.1063/5.0155600
+        - DeePMD-kit v3: https://doi.org/10.48550/arXiv.2502.19161
     """
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "virial", "stress"]

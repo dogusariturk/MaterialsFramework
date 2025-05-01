@@ -28,6 +28,9 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
                                           including "energy", "forces", and "stress".
+
+    References:
+        - POS-EGNN: https://github.com/ibm/materials
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

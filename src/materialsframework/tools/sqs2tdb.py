@@ -24,6 +24,9 @@ class Sqs2tdb:
 
     Attributes:
         dbf (Database): The TDB database object.
+
+    References:
+        - ATAT sqs2tdb: https://doi.org/10.1016/j.calphad.2017.05.005
     """
 
     VASP_WRAP = """[INCAR]
