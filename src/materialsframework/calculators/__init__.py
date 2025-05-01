@@ -22,6 +22,7 @@ from .mace import MACECalculator
 from .mattersim import MatterSimCalculator
 from .megnet import MEGNetCalculator
 from .newtonnet import NewtonNetCalculator
+from .petmad import PetMadCalculator
 from .orb import ORBCalculator
 from .posegnn import PosEGNNCalculator
 from .sevennet import SevenNetCalculator
@@ -43,6 +44,7 @@ __all__ = ["AlignnCalculator",
            "MatterSimCalculator",
            "MEGNetCalculator",
            "NewtonNetCalculator",
+           "PetMadCalculator",
            "ORBCalculator",
            "PosEGNNCalculator",
            "SevenNetCalculator"]
