@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.11.0
+===========
+- Added ``PET-MAD`` implementation
+
+
 Version 0.10.0
 ===========
 - Added ``PosEGNN``, ``GPTFF``, ``NewtonNet``, and ``eSEN`` implementations

@@ -1,6 +1,6 @@
 [project]
 name = "materialsframework"
-version = "0.10.0"
+version = "0.11.0"
 authors = [
     { name = "Doguhan Sariturk", email = "doguhan.sariturk@gmail.com" },
 ]
