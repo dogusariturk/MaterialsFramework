@@ -42,5 +42,6 @@ dependencies:
       - git+https://github.com/facebookresearch/fairchem.git#subdirectory=packages/fairchem-core
       - git+https://github.com/atomly-materials-research-lab/GPTFF.git
       - tensorpotential==0.5.1
+      - git+https://github.com/zmyybc/AlphaNet.git
       - git+https://github.com/THGLab/NewtonNet.git
       - git+https://github.com/lab-cosmo/pet-mad.git
