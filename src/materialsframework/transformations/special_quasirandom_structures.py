@@ -13,11 +13,11 @@ from functools import reduce
 from typing import Any, Literal, TYPE_CHECKING
 
 import numpy as np
-from pymatgen.core import Lattice
+from pymatgen.core import Composition, Lattice
 from sqsgenerator import sqs_optimize
 
 if TYPE_CHECKING:
-    from pymatgen.core import Composition, Structure
+    from pymatgen.core import Structure
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -71,7 +71,7 @@ class SqsgenTransformation:
 
     def generate(
             self,
-            composition: Composition,
+            composition: Composition | str,
             crystal_structure: str = "FCC",
             supercell_size: tuple[int, int, int] = (5, 5, 5),
             shell_weights: dict[int, float] | None = None,
@@ -80,7 +80,7 @@ class SqsgenTransformation:
         Generates a supercell using the SQS (Special Quasirandom Structures) method.
 
         Args:
-            composition (Composition): The composition of the supercell.
+            composition (Composition | str): The composition of the supercell.
             crystal_structure (str, optional): The crystal structure of the supercell. Defaults to "FCC".
             supercell_size (tuple[int, int, int], optional): The size of the supercell. Defaults to (5, 5, 5).
             shell_weights (dict[int, float], optional): The weights for the coordination shells. Defaults to {1: 1.0, 2: 0.5}.
@@ -93,6 +93,9 @@ class SqsgenTransformation:
         Raises:
             ValueError: If the crystal structure is invalid.
         """
+        if isinstance(composition, str):
+            composition = Composition(composition)
+
         self._supercell_size = supercell_size
         self._lattice = self._get_lattice(composition=composition,
                                           crystal_structure=crystal_structure.lower())
