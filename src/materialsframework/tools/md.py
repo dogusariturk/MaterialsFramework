@@ -17,7 +17,7 @@ from ase.calculators.calculator import Calculator
 from ase.constraints import FixSymmetry
 from ase.md import MDLogger, VelocityVerlet
 from ase.md.npt import NPT
-from ase.md.nptberendsen import NPTBerendsen
+from ase.md.nptberendsen import NPTBerendsen, Inhomogeneous_NPTBerendsen
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary, ZeroRotation
 from pymatgen.core import Molecule, Structure
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -83,7 +83,7 @@ class BaseMDCalculator(ABC):
         Raises:
             ValueError: If an unsupported ensemble type is provided.
         """
-        if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover", "npt_berendsen"]:
+        if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover", "npt_berendsen", "inhomogeneous_npt_berendsen"]:
             raise ValueError("Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover'")
 
         self.fix_symmetry: bool = fix_symmetry
@@ -188,6 +188,23 @@ class BaseMDCalculator(ABC):
                 compressibility=self.compressibility / units.bar,
         )
 
+    def _initialize_inhomogeneous_npt_berendsen(self, ase_atoms: Atoms) -> None:
+        """
+        Initializes the Inhomogeneous NPT Berendsen ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+        """
+        self.dyn = Inhomogeneous_NPTBerendsen(
+                atoms=ase_atoms,
+                timestep=self.timestep * units.fs,
+                temperature=self.temperature,
+                pressure_au=self.pressure * 1.01325 * units.bar,
+                taut=self.taut * units.fs,
+                taup=self.taup * units.fs,
+                compressibility=self.compressibility / units.bar,
+        )
+
     def run(
             self,
             structure: Atoms | Structure | Molecule,
@@ -232,6 +249,8 @@ class BaseMDCalculator(ABC):
             self._initialize_nve(ase_atoms)
         elif self.ensemble.lower() == "npt_berendsen":
             self._initialize_npt_berendsen(ase_atoms)
+        elif self.ensemble.lower() == "inhomogeneous_npt_berendsen":
+            self._initialize_inhomogeneous_npt_berendsen(ase_atoms)
 
         if self.logfile:
             self._initialize_logger(ase_atoms)
