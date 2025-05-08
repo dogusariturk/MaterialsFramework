@@ -17,6 +17,7 @@ from ase.calculators.calculator import Calculator
 from ase.constraints import FixSymmetry
 from ase.md import MDLogger, VelocityVerlet
 from ase.md.npt import NPT
+from ase.md.nptberendsen import NPTBerendsen
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary, ZeroRotation
 from pymatgen.core import Molecule, Structure
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -50,6 +51,9 @@ class BaseMDCalculator(ABC):
             pressure: float = 1,  # atm
             ttime: float = 10.0,  # fs
             pfactor: float = 75.0 ** 2.0,  # fs ** 2
+            taut: float = 0.5e3,  # fs
+            taup: float = 1e3,  # fs
+            compressibility: float = 5e-7,  # 1/bar
             stationary: bool = True,
             zero_rotation: bool = True,
             logfile: str | None = None,
@@ -67,6 +71,9 @@ class BaseMDCalculator(ABC):
             pressure (float, optional): The pressure in atmospheres (atm) for the NPT ensemble. Defaults to 1 atm.
             ttime (float, optional): The time constant for temperature control in femtoseconds (fs). Defaults to 10.0 fs.
             pfactor (float, optional): Pressure factor for the NPT ensemble in fs^2. Defaults to 75.0^2 fs^2.
+            taut (float, optional): Time constant for Berendsen temperature coupling in fs. Defaults to 0.5e3 fs.
+            taup (float, optional): Time constant for Berendsen pressure coupling in fs. Defaults to 1e3 fs.
+            compressibility (float, optional): Compressibility for the NPT ensemble in 1/bar. Defaults to 5e-7 1/bar.
             stationary (bool, optional): Whether to set the center-of-mass motion to zero. Defaults to True.
             zero_rotation (bool, optional): Whether to set the total angular momentum to zero. Defaults to True.
             logfile (str | None, optional): The file to log simulation output. If None, no logging occurs. Defaults to None.
@@ -76,7 +83,7 @@ class BaseMDCalculator(ABC):
         Raises:
             ValueError: If an unsupported ensemble type is provided.
         """
-        if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover"]:
+        if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover", "npt_berendsen"]:
             raise ValueError("Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover'")
 
         self.fix_symmetry: bool = fix_symmetry
@@ -85,6 +92,9 @@ class BaseMDCalculator(ABC):
         self.temperature: float = temperature
         self.pressure: float = pressure
         self.pfactor: float = pfactor
+        self.taut: float = taut
+        self.taup: float = taup
+        self.compressibility: float = compressibility
         self.ttime: float = ttime
         self.stationary: bool = stationary
         self.zero_rotation: bool = zero_rotation
@@ -161,6 +171,23 @@ class BaseMDCalculator(ABC):
                 timestep=self.timestep * units.fs,
         )
 
+    def _initialize_npt_berendsen(self, ase_atoms: Atoms) -> None:
+        """
+        Initializes the NPT Berendsen ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+        """
+        self.dyn = NPTBerendsen(
+                atoms=ase_atoms,
+                timestep=self.timestep * units.fs,
+                temperature=self.temperature,
+                pressure_au=self.pressure * 1.01325 * units.bar,
+                taut=self.taut * units.fs,
+                taup=self.taup * units.fs,
+                compressibility=self.compressibility / units.bar,
+        )
+
     def run(
             self,
             structure: Atoms | Structure | Molecule,
@@ -203,6 +230,8 @@ class BaseMDCalculator(ABC):
             self._initialize_nvt_nose_hoover(ase_atoms)
         elif self.ensemble.lower() == "nve":
             self._initialize_nve(ase_atoms)
+        elif self.ensemble.lower() == "npt_berendsen":
+            self._initialize_npt_berendsen(ase_atoms)
 
         if self.logfile:
             self._initialize_logger(ase_atoms)
