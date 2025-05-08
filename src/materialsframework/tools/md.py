@@ -257,7 +257,8 @@ class BaseMDCalculator(ABC):
 
         self.trajectory = TrajectoryObserver(
                 ase_atoms,
-                include_temperature=True
+                include_temperature=True,
+                include_velocities=True
         )
         self.dyn.attach(self.trajectory, interval=self.interval)
 
@@ -270,6 +271,7 @@ class BaseMDCalculator(ABC):
                 "forces": self.trajectory.forces,
                 "stresses": self.trajectory.stresses,
                 "temperature": self.trajectory.temperatures,
+                "velocities": self.trajectory.velocities,
                 "final_structure": self.ase_adaptor.get_structure(self.dyn.atoms),
         }
 

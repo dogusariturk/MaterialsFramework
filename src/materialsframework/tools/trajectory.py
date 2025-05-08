@@ -35,6 +35,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         include_temperature (bool): Whether to save the temperature values. Defaults to False.
         include_magmoms (bool): Whether to save the magnetic moments. Defaults to False.
         include_dipoles (bool): Whether to save the dipoles. Defaults to False.
+        include_velocities (bool): Whether to save the velocities. Defaults to False.
 
     Note:
         This class was adapted from the matgl code and extended to include the ability
@@ -46,6 +47,7 @@ class TrajectoryObserver(collections.abc.Sequence):
             include_temperature: bool = False,
             include_magmoms: bool = False,
             include_dipoles: bool = False,
+            include_velocities: bool = False,
     ) -> None:
         """
         Initializes the TrajectoryObserver with the ASE Atoms object and optional flags
@@ -59,11 +61,14 @@ class TrajectoryObserver(collections.abc.Sequence):
                 at each step. Defaults to False.
             include_dipoles (bool, optional): If True, the observer will record the dipoles
                 at each step. Defaults to False.
+            include_velocities (bool, optional): If True, the observer will record the velocities
+                at each step. Defaults to False.
         """
         self.atoms = atoms
         self.include_temperature = include_temperature
         self.include_magmoms = include_magmoms
         self.include_dipoles = include_dipoles
+        self.include_velocities = include_velocities
 
         self.total_energies: list[float] = []
         self.potential_energies: list[float] = []
@@ -77,6 +82,8 @@ class TrajectoryObserver(collections.abc.Sequence):
             self.magmoms: list[ArrayLike] = []
         if self.include_dipoles:
             self.dipoles: list[ArrayLike] = []
+        if self.include_velocities:
+            self.velocities: list[ArrayLike] = []
         self.atom_positions: list[ArrayLike] = []
         self.atomic_numbers: list[int] = []
         self.chemical_symbols: list[str] = []
@@ -84,7 +91,7 @@ class TrajectoryObserver(collections.abc.Sequence):
     def __call__(self) -> None:
         """
         Records the current state of the atoms, including energies, forces, stresses,
-        and optionally, temperatures, magnetic moments, and dipoles.
+        and optionally, temperatures, magnetic moments,dipoles, and velocities.
 
         This method captures and stores various properties of the ASE Atoms object at the current
         step of the relaxation process.
@@ -101,6 +108,8 @@ class TrajectoryObserver(collections.abc.Sequence):
             self.magmoms.append(self.atoms.get_magnetic_moments())
         if self.include_dipoles:
             self.dipoles.append(self.atoms.get_array("dipole"))
+        if self.include_velocities:
+            self.velocities.append(self.atoms.get_velocities())
         self.atom_positions.append(self.atoms.get_positions())
         self.atomic_numbers.append(self.atoms.get_atomic_numbers())
         self.chemical_symbols.append(self.atoms.get_chemical_symbols())
@@ -115,7 +124,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         Returns:
             tuple: A tuple containing the total energies, potential energies, kinetic energies,
             forces, stresses, cell parameters, atomic positions, atomic numbers, chemical symbols,
-            and, if applicable, temperatures, magnetic moments, and dipoles at the specified step.
+            and, if applicable, temperatures, magnetic moments, dipoles, and velocities at the specified step.
         """
         item_properties = (
                 self.total_energies[item],
@@ -134,6 +143,8 @@ class TrajectoryObserver(collections.abc.Sequence):
             item_properties += self.magmoms[item],
         if self.include_dipoles:
             item_properties += self.dipoles[item],
+        if self.include_velocities:
+            item_properties += self.velocities[item],
         return item_properties
 
     def __len__(self):
@@ -164,6 +175,7 @@ class TrajectoryObserver(collections.abc.Sequence):
                 - "temperatures" (optional): List of temperatures recorded at each step, if applicable.
                 - "magmoms" (optional): List of magnetic moments recorded at each step, if applicable.
                 - "dipoles" (optional): List of dipoles recorded at each step, if applicable.
+                - "velocities" (optional): List of velocities recorded at each step, if applicable.
         """
         out_dict = {
                 "total_energies": self.total_energies,
@@ -182,6 +194,8 @@ class TrajectoryObserver(collections.abc.Sequence):
             out_dict["magmoms"] = self.magmoms
         if self.include_dipoles:
             out_dict["dipoles"] = self.dipoles
+        if self.include_velocities:
+            out_dict["velocities"] = self.velocities
         return out_dict
 
     def as_pandas(self) -> pd.DataFrame:
@@ -190,7 +204,8 @@ class TrajectoryObserver(collections.abc.Sequence):
 
         The DataFrame will contain columns for total energies, potential energies,
         kinetic energies, forces, stresses, cell parameters, atomic positions,
-        atomic numbers, chemical symbols, and, if applicable, temperatures, magnetic moments, and dipoles.
+        atomic numbers, chemical symbols, and, if applicable, temperatures, magnetic moments, dipoles,
+        and velocities.
 
         Returns:
             pd.DataFrame: A DataFrame where each row corresponds to a step in the trajectory,
