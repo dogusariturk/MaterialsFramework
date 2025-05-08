@@ -76,8 +76,12 @@ class Phono3pyDisplacementTransformation:
             The generated displaced supercells are stored in `phonon_supercells_with_displacements` (for phonon calculations)
             and `supercells_with_displacements` (for third-order force constants).
         """
-        supercell_matrix = np.diag(supercell_matrix) or np.diag([2, 2, 2])
-        phonon_supercell_matrix = np.diag(phonon_supercell_matrix) or np.diag([3, 3, 3])
+        supercell_matrix = (
+                np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
+        )
+        phonon_supercell_matrix = (
+                np.diag(phonon_supercell_matrix) if phonon_supercell_matrix else np.diag([3, 3, 3])
+        )
 
         phonopy_structure = get_phonopy_structure(structure)
 
