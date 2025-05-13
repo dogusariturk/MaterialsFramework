@@ -3,9 +3,11 @@ This module provides the `BaseMDCalculator` class, which is used to perform
 Molecular Dynamics (MD) simulations.
 
 The `BaseMDCalculator` class allows users to set up and run MD simulations with different ensembles,
-including NVE, NVT (Nose-Hoover), and NPT (Nose-Hoover). The calculator is designed to handle advanced
-MD settings such as velocity initialization, pressure control, and symmetry constraints.
+including NVE, NVT (Nose-Hoover), NPT (Nose-Hoover), NPT (Berendsen), and Inhomogeneous NPT (Berendsen).
+The calculator is designed to handle advanced MD settings such as velocity initialization, pressure control,
+and symmetry constraints.
 """
+
 from __future__ import annotations
 
 from abc import ABC
@@ -18,7 +20,11 @@ from ase.constraints import FixSymmetry
 from ase.md import MDLogger, VelocityVerlet
 from ase.md.npt import NPT
 from ase.md.nptberendsen import NPTBerendsen, Inhomogeneous_NPTBerendsen
-from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary, ZeroRotation
+from ase.md.velocitydistribution import (
+    MaxwellBoltzmannDistribution,
+    Stationary,
+    ZeroRotation,
+)
 from pymatgen.core import Molecule, Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
@@ -43,22 +49,29 @@ class BaseMDCalculator(ABC):
     """
 
     def __init__(
-            self,
-            fix_symmetry: bool = False,
-            ensemble: Literal["nve", "nvt_nose_hoover", "npt_nose_hoover"] = "nve",
-            timestep: float = 1.0,  # fs
-            temperature: int = 300,  # K
-            pressure: float = 1,  # atm
-            ttime: float = 10.0,  # fs
-            pfactor: float = 75.0 ** 2.0,  # fs ** 2
-            taut: float = 0.5e3,  # fs
-            taup: float = 1e3,  # fs
-            compressibility: float = 5e-7,  # 1/bar
-            stationary: bool = True,
-            zero_rotation: bool = True,
-            logfile: str | None = None,
-            loginterval: int = 1,
-            interval: int = 1,
+        self,
+        fix_symmetry: bool = False,
+        ensemble: Literal[
+            "nve",
+            "nvt_nose_hoover",
+            "npt_nose_hoover",
+            "npt_berendsen",
+            "inhomogeneous_npt_berendsen",
+        ] = "nve",
+        timestep: float = 1.0,  # fs
+        temperature: int = 300,  # K
+        pressure: float = 1,  # atm
+        ttime: float = 10.0,  # fs
+        pfactor: float = 75.0**2.0,  # fs ** 2
+        taut: float = 0.5e3,  # fs
+        taup: float = 1e3,  # fs
+        compressibility: float = 5e-7,  # 1/bar
+        mask: tuple[int] = (1, 1, 1),
+        stationary: bool = True,
+        zero_rotation: bool = True,
+        logfile: str | None = None,
+        loginterval: int = 1,
+        interval: int = 1,
     ) -> None:
         """
         Initializes the `BaseMDCalculator` with the specified parameters for running MD simulations.
@@ -74,6 +87,7 @@ class BaseMDCalculator(ABC):
             taut (float, optional): Time constant for Berendsen temperature coupling in fs. Defaults to 0.5e3 fs.
             taup (float, optional): Time constant for Berendsen pressure coupling in fs. Defaults to 1e3 fs.
             compressibility (float, optional): Compressibility for the NPT ensemble in 1/bar. Defaults to 5e-7 1/bar.
+            mask (tuple[int], optional): Specifies which axes participate in the barostat for the Inhomogeneous NPT Berendsen ensemble. Defaults to (1, 1, 1).
             stationary (bool, optional): Whether to set the center-of-mass motion to zero. Defaults to True.
             zero_rotation (bool, optional): Whether to set the total angular momentum to zero. Defaults to True.
             logfile (str | None, optional): The file to log simulation output. If None, no logging occurs. Defaults to None.
@@ -83,8 +97,16 @@ class BaseMDCalculator(ABC):
         Raises:
             ValueError: If an unsupported ensemble type is provided.
         """
-        if ensemble not in ["nve", "nvt_nose_hoover", "npt_nose_hoover", "npt_berendsen", "inhomogeneous_npt_berendsen"]:
-            raise ValueError("Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover'")
+        if ensemble not in [
+            "nve",
+            "nvt_nose_hoover",
+            "npt_nose_hoover",
+            "npt_berendsen",
+            "inhomogeneous_npt_berendsen",
+        ]:
+            raise ValueError(
+                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover', 'npt_berendsen', or 'inhomogeneous_npt_berendsen'."
+            )
 
         self.fix_symmetry: bool = fix_symmetry
         self.ensemble: str = ensemble
@@ -95,6 +117,7 @@ class BaseMDCalculator(ABC):
         self.taut: float = taut
         self.taup: float = taup
         self.compressibility: float = compressibility
+        self.mask: tuple[int] = mask
         self.ttime: float = ttime
         self.stationary: bool = stationary
         self.zero_rotation: bool = zero_rotation
@@ -135,12 +158,12 @@ class BaseMDCalculator(ABC):
         """
         self._upper_triangular_cell(ase_atoms)
         self.dyn = NPT(
-                atoms=ase_atoms,
-                timestep=self.timestep * units.fs,
-                temperature_K=self.temperature,
-                externalstress=self.pressure * 1.01325 * units.bar,
-                ttime=self.ttime * units.fs,
-                pfactor=self.pfactor * units.fs,
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            externalstress=self.pressure * 1.01325 * units.bar,
+            ttime=self.ttime * units.fs,
+            pfactor=self.pfactor * units.fs,
         )
 
     def _initialize_nvt_nose_hoover(self, ase_atoms: Atoms) -> None:
@@ -152,11 +175,11 @@ class BaseMDCalculator(ABC):
         """
         self._upper_triangular_cell(ase_atoms)
         self.dyn = NPT(
-                atoms=ase_atoms,
-                timestep=self.timestep * units.fs,
-                temperature_K=self.temperature,
-                ttime=self.ttime * units.fs,
-                pfactor=None,
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            ttime=self.ttime * units.fs,
+            pfactor=None,
         )
 
     def _initialize_nve(self, ase_atoms: Atoms) -> None:
@@ -167,8 +190,8 @@ class BaseMDCalculator(ABC):
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         self.dyn = VelocityVerlet(
-                atoms=ase_atoms,
-                timestep=self.timestep * units.fs,
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
         )
 
     def _initialize_npt_berendsen(self, ase_atoms: Atoms) -> None:
@@ -179,13 +202,13 @@ class BaseMDCalculator(ABC):
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         self.dyn = NPTBerendsen(
-                atoms=ase_atoms,
-                timestep=self.timestep * units.fs,
-                temperature=self.temperature,
-                pressure_au=self.pressure * 1.01325 * units.bar,
-                taut=self.taut * units.fs,
-                taup=self.taup * units.fs,
-                compressibility=self.compressibility / units.bar,
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature=self.temperature,
+            pressure_au=self.pressure * 1.01325 * units.bar,
+            taut=self.taut * units.fs,
+            taup=self.taup * units.fs,
+            compressibility=self.compressibility / units.bar,
         )
 
     def _initialize_inhomogeneous_npt_berendsen(self, ase_atoms: Atoms) -> None:
@@ -196,13 +219,14 @@ class BaseMDCalculator(ABC):
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         self.dyn = Inhomogeneous_NPTBerendsen(
-                atoms=ase_atoms,
-                timestep=self.timestep * units.fs,
-                temperature=self.temperature,
-                pressure_au=self.pressure * 1.01325 * units.bar,
-                taut=self.taut * units.fs,
-                taup=self.taup * units.fs,
-                compressibility=self.compressibility / units.bar,
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature=self.temperature,
+            pressure_au=self.pressure * 1.01325 * units.bar,
+            taut=self.taut * units.fs,
+            taup=self.taup * units.fs,
+            compressibility=self.compressibility / units.bar,
+            mask=self.mask,
         )
 
     def run(
@@ -225,9 +249,11 @@ class BaseMDCalculator(ABC):
                              total energy, potential energy, kinetic energy, forces, stresses, and temperature.
         """
 
-        ase_atoms = self.ase_adaptor.get_atoms(structure) \
-            if isinstance(structure, (Structure, Molecule)) \
+        ase_atoms = (
+            self.ase_adaptor.get_atoms(structure)
+            if isinstance(structure, (Structure, Molecule))
             else structure.copy()
+        )
 
         MaxwellBoltzmannDistribution(ase_atoms, temperature_K=self.temperature)
 
@@ -255,24 +281,20 @@ class BaseMDCalculator(ABC):
         if self.logfile:
             self._initialize_logger(ase_atoms)
 
-        self.trajectory = TrajectoryObserver(
-                ase_atoms,
-                include_temperature=True,
-                include_velocities=True
-        )
+        self.trajectory = TrajectoryObserver(ase_atoms, include_temperature=True, include_velocities=True)
         self.dyn.attach(self.trajectory, interval=self.interval)
 
         self.dyn.run(steps)
 
         self.results = {
-                "total_energy": self.trajectory.total_energies,
-                "potential_energy": self.trajectory.potential_energies,
-                "kinetic_energy": self.trajectory.kinetic_energies,
-                "forces": self.trajectory.forces,
-                "stresses": self.trajectory.stresses,
-                "temperature": self.trajectory.temperatures,
-                "velocities": self.trajectory.velocities,
-                "final_structure": self.ase_adaptor.get_structure(self.dyn.atoms),
+            "total_energy": self.trajectory.total_energies,
+            "potential_energy": self.trajectory.potential_energies,
+            "kinetic_energy": self.trajectory.kinetic_energies,
+            "forces": self.trajectory.forces,
+            "stresses": self.trajectory.stresses,
+            "temperature": self.trajectory.temperatures,
+            "velocities": self.trajectory.velocities,
+            "final_structure": self.ase_adaptor.get_structure(self.dyn.atoms),
         }
 
         return self.results
@@ -285,10 +307,10 @@ class BaseMDCalculator(ABC):
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
         """
         logger = MDLogger(
-                dyn=self.dyn,
-                atoms=ase_atoms,
-                logfile=self.logfile,
-                stress=True,
+            dyn=self.dyn,
+            atoms=ase_atoms,
+            logfile=self.logfile,
+            stress=True,
         )
         self.dyn.attach(logger, interval=self.loginterval)
 
@@ -313,12 +335,12 @@ class BaseMDCalculator(ABC):
             cos_a, cos_b, cos_g = np.cos(angles)
             cos_p = (cos_g - cos_a * cos_b) / (sin_a * sin_b)
             cos_p = np.clip(cos_p, -1, 1)
-            sin_p = (1 - cos_p ** 2) ** 0.5
+            sin_p = (1 - cos_p**2) ** 0.5
 
             new_basis = [
-                    (a * sin_b * sin_p, a * sin_b * cos_p, a * cos_b),
-                    (0, b * sin_a, b * cos_a),
-                    (0, 0, c),
+                (a * sin_b * sin_p, a * sin_b * cos_p, a * cos_b),
+                (0, b * sin_a, b * cos_a),
+                (0, 0, c),
             ]
 
             atoms.set_cell(new_basis, scale_atoms=True)
