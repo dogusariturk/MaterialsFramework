@@ -29,17 +29,17 @@ class EOSTransformation:
 
     def __init__(
             self,
-            start: float = -0.01,
-            stop: float = 0.01,
-            num: int = 5,
+            start: float = -0.1,
+            stop: float = 0.1,
+            num: int = 11,
     ) -> None:
         """
         Initializes the `EOSTransformation` object.
 
         Args:
-            start (float, optional): The starting strain value to apply to the structure. Defaults to -0.01.
-            stop (float, optional): The stopping strain value to apply to the structure. Defaults to 0.01.
-            num (int, optional): The number of strain values to generate between the start and stop. Defaults to 5.
+            start (float, optional): The starting strain value to apply to the structure. Defaults to -0.1.
+            stop (float, optional): The stopping strain value to apply to the structure. Defaults to 0.1.
+            num (int, optional): The number of strain values to generate between the start and stop. Defaults to 11.
 
         Note:
             The strains are applied as uniform volumetric deformations to the structure, meaning

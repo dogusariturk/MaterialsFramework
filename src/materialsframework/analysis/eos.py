@@ -35,9 +35,9 @@ class EOSAnalyzer:
 
     def __init__(
             self,
-            start: float = -0.01,
-            stop: float = 0.01,
-            num: int = 5,
+            start: float = -0.1,
+            stop: float = 0.1,
+            num: int = 11,
             eos_name: str = "birch_murnaghan",
             calculator: BaseCalculator | None = None,
             eos_transformation: EOSTransformation | None = None
@@ -46,9 +46,9 @@ class EOSAnalyzer:
         Initializes the `EOSAnalyzer` object.
 
         Args:
-            start (float, optional): The starting strain value to apply to the structure. Defaults to -0.01.
-            stop (float, optional): The stopping strain value to apply to the structure. Defaults to 0.01.
-            num (int, optional): The number of strain values to generate between the start and stop. Defaults to 5.
+            start (float, optional): The starting strain value to apply to the structure. Defaults to -0.1.
+            stop (float, optional): The stopping strain value to apply to the structure. Defaults to 0.1.
+            num (int, optional): The number of strain values to generate between the start and stop. Defaults to 11.
             eos_name (str, optional): The name of the equation of state (EOS) used for fitting. Defaults to "birch_murnaghan".
             calculator (BaseCalculator | None, optional): The calculator used for energy calculations. Defaults to `M3GNetCalculator`.
             eos_transformation (EOSTransformation | None, optional): The transformation used to generate deformed structures.
@@ -67,7 +67,7 @@ class EOSAnalyzer:
             self,
             structure: Structure | Atoms,
             is_relaxed: bool = False
-    ) -> dict[str, list]:
+    ) -> dict[str, list | float]:
         """
         Calculates the potential energies and volumes to construct the EOS for the given undeformed structure.
 
@@ -80,12 +80,13 @@ class EOSAnalyzer:
             is_relaxed (bool, optional): Whether the structure is already relaxed. Defaults to False.
 
         Returns:
-            dict[str, list]: A dictionary with the following keys:
+            dict[str, list | float]: A dictionary with the following keys:
                 - "strains": A list of strain values corresponding to the deformed structures.
                 - "volumes": A list of volumes for each deformed structure.
                 - "energies": A list of potential energies for each deformed structure.
                 - "e0": The minimum energy of the system.
                 - "b0": The bulk modulus in units of energy/unit of volume^3.
+                - "b0_GPa": The bulk modulus in GPa.
                 - "b1": The derivative of bulk modulus with respect to pressure.
                 - "v0": The minimum volume of the system in Ang^3.
 
@@ -99,12 +100,15 @@ class EOSAnalyzer:
             structure = self.ase_adaptor.get_structure(structure)
 
         if not is_relaxed:
+            self.calculator.relax_cell = True
             structure: Structure = self.calculator.relax(structure)["final_structure"]
+            self.calculator.relax_cell = False
 
+        self.calculator.relax_cell = False
         self.eos_transformation.apply_transformation(structure)
 
         strain_list, volume_list, energy_list = zip(
-                *[(strain, deformed_structure.volume, self.calculator.calculate(structure=deformed_structure)["energy"]) for
+                *[(strain, deformed_structure.volume, self.calculator.relax(structure=deformed_structure)["energy"]) for
                   strain, deformed_structure in self.eos_transformation.structures.items()])
 
         eos = EOS(eos_name=self.eos_name)
@@ -114,7 +118,11 @@ class EOSAnalyzer:
                 "strains": strain_list,
                 "volumes": volume_list,
                 "energies": energy_list,
-                **eos_fit.results
+                "e0": eos_fit.e0,
+                "b0": eos_fit.b0,
+                "b0_GPa": eos_fit.b0_GPa,
+                "b1": eos_fit.b1,
+                "v0": eos_fit.v0,
         }
 
     @property
