@@ -13,12 +13,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 from elastic import elastic
 from pymatgen.analysis.elasticity import ElasticTensor
+from pymatgen.core import Structure
 
 from materialsframework.transformations.elastic_constants import ElasticConstantsDeformationTransformation
 
 if TYPE_CHECKING:
     from ase import Atoms
-    from pymatgen.core import Structure
     from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
