@@ -45,3 +45,4 @@ dependencies:
       - git+https://github.com/zmyybc/AlphaNet.git
       - git+https://github.com/THGLab/NewtonNet.git
       - git+https://github.com/lab-cosmo/pet-mad.git
+      - git+https://github.com/yzchen08/eqnorm.git
