@@ -11,10 +11,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from elastic import elastic
 from pymatgen.analysis.elasticity import ElasticTensor
 from pymatgen.core import Structure
 
+from materialsframework.tools import elastic
 from materialsframework.transformations.elastic_constants import ElasticConstantsDeformationTransformation
 
 if TYPE_CHECKING:
@@ -23,8 +23,6 @@ if TYPE_CHECKING:
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
-
-eV_A3_to_GPa: float = 160.21766208
 
 
 class ElasticConstantsAnalyzer:
@@ -132,12 +130,14 @@ class ElasticConstantsAnalyzer:
 
         self.elastic_constants_transformation.apply_transformation(structure)
 
+        for distorted_structure in self.elastic_constants_transformation.distorted_structures:
+            distorted_structure.calc = self.calculator.calculator
+
         cij_order = elastic.get_cij_order(structure)
         Cij, Bij = elastic.get_elastic_tensor(
                 cryst=structure,
                 systems=self.elastic_constants_transformation.distorted_structures
         )
-        Cij *= eV_A3_to_GPa
 
         elastic_tensor = self._build_elastic_tensor(Cij, cij_order, structure)
 
@@ -209,7 +209,7 @@ class ElasticConstantsAnalyzer:
             i, j = int(sym[2]) - 1, int(sym[3]) - 1
             elastic_tensor[i, j] = elastic_tensor[j, i] = val
 
-        for block in self.EQUIV.get(sys := elastic.get_lattice_type(structure)[1], []):
+        for block in self.EQUIV.get(sys := elastic.get_lattice_type(structure)[1].lower(), []):
             ref = elastic_tensor[block[0]]
             for (p, q) in block:
                 elastic_tensor[p, q] = elastic_tensor[q, p] = ref

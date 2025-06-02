@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from elastic import elastic
 from pymatgen.core import Structure
+
+from materialsframework.tools import elastic
 
 if TYPE_CHECKING:
     from ase import Atoms
