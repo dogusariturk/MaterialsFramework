@@ -241,36 +241,37 @@ DOSTATIC
             stresses = voigt_6_to_full_3x3_stress(stresses)
         np.savetxt(subdir / "stress.out", stresses, fmt="%.7e")
 
-    @staticmethod
     def _run_command(
+            self,
             command: str,
             args: list[str],
-            cwd=None,
-    ) -> str:
+            cwd: Path | None = None
+    ) -> None:
         """
-        Run a shell command with arguments.
+        Run a shell command with arguments and print stdout and stderr if verbose turned on.
 
         Args:
             command (str): The command to execute.
-            args (list): A list of arguments for the command.
-            cwd (str, optional): The working directory for the command.
-
-        Returns:
-            str: The command's output, or an error message if it fails.
+            args (list[str]): A list of arguments for the command.
+            cwd (str | None): The working directory for the command.
         """
         try:
             result = subprocess.run(
-                    [command, *args],
-                    cwd=cwd,
-                    text=True,
-                    capture_output=True,
-                    timeout=60
+                args=[command, *args],
+                cwd=cwd,
+                text=True,
+                capture_output=True,
+                timeout=60,
+                check=True
             )
-            output = result.stdout.strip()
-        except Exception as e:
-            output = f"Unexpected error: {e}"
 
-        return output
+            if self.verbose:
+                print("STDOUT:", result.stdout.strip())
+                print("STDERR:", result.stderr.strip())
+        except subprocess.CalledProcessError as e:
+            print(f"Command failed with exit code {e.returncode}: {e.stderr.strip()}")
+        except Exception as e:
+            print("Unexpected error:", e)
 
     def _copy_sqs(self) -> None:
         """
