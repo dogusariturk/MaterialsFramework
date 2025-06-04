@@ -78,6 +78,22 @@ class NEBAnalyzer:
             is_relaxed: bool = False,
             **kwargs
     ) -> None:
+        """
+        Perform the NEB calculation between two structures.
+
+        This method generates intermediate images between the initial and final structures, applies the NEB method,
+        and optimizes the path using the specified calculator. If the structures are not relaxed, they will be relaxed
+        before the NEB calculation.
+
+        Args:
+            initial_structure (Structure): The initial structure for the NEB calculation.
+            final_structure (Structure): The final structure for the NEB calculation.
+            is_relaxed (bool, optional): Whether the structures are already relaxed. Defaults to False.
+            **kwargs: Additional keyword arguments passed to the calculator's optimizer.
+
+        Raises:
+            ValueError: If the calculator does not implement the 'energy' property.
+        """
         if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
             raise ValueError("The calculator object must have the 'energy' property implemented.")
 
