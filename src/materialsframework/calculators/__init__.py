@@ -12,39 +12,43 @@ from .alignn import AlignnCalculator
 from .alphanet import AlphaNetCalculator
 from .chgnet import CHGNetCalculator
 from .deepmd import DeePMDCalculator
-from .hienet import HIENetCalculator
+from .eqnorm import EqnormCalculator
 from .eqv2 import EqV2Calculator
 from .esen import eSENCalculator
 from .gptff import GPTFFCalculator
 from .grace import GraceCalculator
+from .hienet import HIENetCalculator
 from .m3gnet import M3GNetCalculator
 from .mace import MACECalculator
 from .mattersim import MatterSimCalculator
 from .megnet import MEGNetCalculator
 from .newtonnet import NewtonNetCalculator
-from .petmad import PetMadCalculator
 from .orb import ORBCalculator
+from .petmad import PetMadCalculator
 from .posegnn import PosEGNNCalculator
 from .sevennet import SevenNetCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
-__all__ = ["AlignnCalculator",
-           "AlphaNetCalculator",
-           "CHGNetCalculator",
-           "DeePMDCalculator",
-           "HIENetCalculator",
-           "EqV2Calculator",
-           "eSENCalculator",
-           "GPTFFCalculator",
-           "M3GNetCalculator",
-           "GraceCalculator",
-           "MACECalculator",
-           "MatterSimCalculator",
-           "MEGNetCalculator",
-           "NewtonNetCalculator",
-           "PetMadCalculator",
-           "ORBCalculator",
-           "PosEGNNCalculator",
-           "SevenNetCalculator"]
+__all__ = [
+    "AlignnCalculator",
+    "AlphaNetCalculator",
+    "CHGNetCalculator",
+    "DeePMDCalculator",
+    "EqnormCalculator",
+    "EqV2Calculator",
+    "eSENCalculator",
+    "GPTFFCalculator",
+    "GraceCalculator",
+    "HIENetCalculator",
+    "M3GNetCalculator",
+    "MACECalculator",
+    "MatterSimCalculator",
+    "MEGNetCalculator",
+    "NewtonNetCalculator",
+    "ORBCalculator",
+    "PetMadCalculator",
+    "PosEGNNCalculator",
+    "SevenNetCalculator",
+]
