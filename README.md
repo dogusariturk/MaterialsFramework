@@ -75,13 +75,13 @@ Below are the main modules and classes for analysis and tools:
 - **`CubicElasticConstantsAnalyzer`**
   Provides methods to calculate cubic elastic constants (C11, C12, C44) and derived properties like Young's modulus, bulk modulus, shear modulus, Poisson's ratio, and Pugh's ratio.
 
-    > [!CAUTION]
-    > This analyzer only works with cubic/orthogonal cells. 
+> [!CAUTION]
+> `CubicElasticConstantsAnalyzer` only works with cubic/orthogonal cells. 
 
 
 - **`ElasticConstantsAnalyzer`**
   General tools for calculating elastic constants from stress-strain data, including methods for fitting and extracting Voigt-Reuss-Hill averages.
-- 
+
 
 - **`EOSAnalyzer`**  
   Equation of State (EOS) fitting and analysis tools, including routines to fit energy-volume data and extract bulk properties.
