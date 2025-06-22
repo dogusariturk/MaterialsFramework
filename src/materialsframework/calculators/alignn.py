@@ -38,7 +38,7 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            path: str | None = None,
+            model: str | None = None,
             model_filename="best_model.pt",
             config_filename="config.json",
             device: Literal["cuda", "cpu", "mps"] = "cpu",
@@ -52,7 +52,7 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            path (str | None): The path to the directory containing the ALIGNN-FF model files.
+            model (str | None): The path to the directory containing the ALIGNN-FF model files.
                                If None, 'v12.2.2024_dft_3d_307k' model will be used.
             model_filename (str): The filename of the model file. Defaults to "best_model.pt".
             config_filename (str): The filename of the configuration file. Defaults to "config.json".
@@ -67,7 +67,7 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # ALIGNN-FF specific attributes
-        self.path = path
+        self.model = model
         self.model_filename = model_filename
         self.config_filename = config_filename
         self.device = device
@@ -89,7 +89,7 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from alignn.ff.calculators import AlignnAtomwiseCalculator
             self._calculator = AlignnAtomwiseCalculator(
-                path=self.path,
+                path=self.model,
                 model_filename=self.model_filename,
                 config_filename=self.config_filename,
                 device=self.device,

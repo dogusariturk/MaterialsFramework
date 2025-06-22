@@ -37,7 +37,7 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
         self,
-        model_variant: Literal["eqnorm-mptrj", "eqnorm-pro-mptrj"] = "eqnorm-mptrj",
+        model: Literal["eqnorm-mptrj", "eqnorm-pro-mptrj"] = "eqnorm-mptrj",
         model_name: str = "eqnorm",
         train_progress: str = "1.0",
         device: str = "cpu",
@@ -65,8 +65,8 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # Eqnorm specific attributes
+        self.model = model
         self.model_name = model_name
-        self.model_variant = model_variant
         self.train_progress = train_progress
         self.device = device
 
@@ -87,8 +87,8 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from eqnorm.calculator import EqnormCalculator
             self._calculator = EqnormCalculator(
+                    model_variant=self.model,
                     model_name=self.model_name,
-                    model_variant=self.model_variant,
                     train_progress=self.train_progress,
                     device=self.device
             )

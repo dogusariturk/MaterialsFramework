@@ -37,7 +37,7 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            checkpoint: str,
+            model: str,
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             compute_stress: bool = True,
             **kwargs
@@ -46,7 +46,7 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         Initialize a PosEGNNCalculator instance with a specified model and calculation settings.
 
         Args:
-            checkpoint (str, optional): The name or the path of the PosEGNN model to use. Defaults to 'PosEGNN-0'.
+            model (str, optional): The name or the path of the PosEGNN model to use. Defaults to 'PosEGNN-0'.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             compute_stress (bool, optional): Whether to compute stress. Defaults to True.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
@@ -62,7 +62,7 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # PosEGNN specific attributes
-        self.checkpoint = checkpoint
+        self.model = model
         self.device = device
         self.compute_stress = compute_stress
 
@@ -82,7 +82,7 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from posegnn.calculator import PosEGNNCalculator as PosEGNNASECalculator
             self._calculator = PosEGNNASECalculator(
-                    checkpoint=self.checkpoint,
+                    checkpoint=self.model,
                     device=self.device,
                     compute_stress=self.compute_stress,
             )

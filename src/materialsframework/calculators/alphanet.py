@@ -37,7 +37,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
         self,
-        checkpoint_path: str,
+        model: str,
         config: str,
         device: Literal["cuda", "cpu", "mps"] = "cpu",
         precision: Literal["32", "64"] = "32",
@@ -51,7 +51,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            checkpoint_path (str): The path to the model checkpoint file.
+            model (str): The path to the model checkpoint file.
             config (str): The path to the configuration file for the AlphaNet model.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             precision (Literal["32", "64"], optional): The precision of the calculations. Defaults to "32".
@@ -65,7 +65,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # AlphaNet specific attributes
-        self.checkpoint_path = checkpoint_path
+        self.model = model
         self.config = config
         self.device = device
         self.precision = precision
@@ -90,7 +90,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
 
             config = All_Config().from_json(self.config)
             self._calculator = AlphaNetASECalculator(
-                ckpt_path=self.checkpoint_path,
+                ckpt_path=self.model,
                 config=config.model,
                 device=self.device,
                 precision=self.precision,

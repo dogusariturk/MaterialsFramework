@@ -37,7 +37,7 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model_path: str,
+            model: str,
             device: Literal["cpu", "cuda"] = "cpu",
             **kwargs
     ) -> None:
@@ -49,7 +49,7 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model_path (str): Path to the GPTFF model file.
+            model (str): Path to the GPTFF model file.
             device (Literal["cpu", "cuda"]): Device to use for calculations ("cpu" or "cuda").
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
@@ -60,8 +60,8 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
         BaseCalculator.__init__(self, **basecalculator_kwargs)
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
-        # GPTFF specific attributes
-        self.model_path = model_path
+        # GPTFF-specific attributes
+        self.model = model
         self.device = device
 
         self._calculator = None
@@ -81,7 +81,7 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from gptff.model.mpredict import ASECalculator as GPTFFASECalculator
             self._calculator = GPTFFASECalculator(
-                    model_path=self.model_path,
+                    model_path=self.model,
                     device=self.device
             )
         return self._calculator

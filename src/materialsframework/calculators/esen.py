@@ -37,7 +37,7 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model_name: str = "eSEN-30M-OAM",
+            model: str = "eSEN-30M-OAM",
             checkpoint_path: str | None = None,
             local_cache: str = "~/.cache/esen/",
             device: Literal["cpu", "cuda"] = "cpu",
@@ -52,7 +52,7 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model_name (str): The name of the eSEN model to use for calculations. Defaults to 'eSEN-30M-OAM'.
+            model (str): The name of the eSEN model to use for calculations. Defaults to 'eSEN-30M-OAM'.
             checkpoint_path (str, optional): The path to the checkpoint file for the eSEN model.
             local_cache (str): The path to the local cache directory for the eSEN model. Defaults to "~/.cache/esen/".
             device (Literal["cpu", "cuda"], optional): The device to use for the calculations. Defaults to "cpu".
@@ -67,7 +67,7 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # eSEN specific attributes
-        self.model_name = model_name
+        self.model = model
         self.checkpoint_path = checkpoint_path
         self.local_cache = local_cache
         self.device = device
@@ -90,7 +90,7 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from fairchem.core import OCPCalculator
             self._calculator = OCPCalculator(
-                    model_name=self.model_name,
+                    model_name=self.model,
                     checkpoint_path=self.checkpoint_path,
                     local_cache=self.local_cache,
                     cpu=self.device != "cuda",

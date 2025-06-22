@@ -37,7 +37,7 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
         self,
-        version: str = "latest",
+        model: str = "1.0.1",
         checkpoint_path: Optional[str] = None,
         device: Literal["cuda", "cpu", "mps"] = "cpu",
         **kwargs,
@@ -50,7 +50,7 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            version (str): The version of the PET-MAD model to use. Default is "latest".
+            model (str): The version of the PET-MAD model to use. Default is "1.0.1".
             checkpoint_path (str, optional): Path to the model checkpoint file. If not provided,
                                                 the model will be downloaded using the "version" parameter.
             device (str): The device to use for calculations. Options are "cuda", "cpu", or "mps".
@@ -64,7 +64,7 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # PET-MAD specific attributes
-        self.version = version
+        self.model = model
         self.checkpoint_path = checkpoint_path
         self.device = device
 
@@ -85,7 +85,7 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from pet_mad.calculator import PETMADCalculator
             self._calculator = PETMADCalculator(
-                version=self.version,
+                version=self.model,
                 checkpoint_path=self.checkpoint_path,
                 device=self.device,
             )

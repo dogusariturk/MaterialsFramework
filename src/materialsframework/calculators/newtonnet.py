@@ -37,7 +37,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model_path: str | Literal["ani1", "ani1x", "t1x"] = "t1x",
+            model: str | Literal["ani1", "ani1x", "t1x"] = "t1x",
             properties: list = ["energy", "free_energy", "forces", "hessian", "stress"],
             device: Literal["cpu", "cuda"] = "cpu",
             precision: Literal["float64", "float32", "float16"] = "float32",
@@ -51,7 +51,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         for the relaxation process can be passed via `basecalculator_kwargs`.
 
         Args:
-            model_path (str | Literal["ani1", "ani1x", "t1x"]): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
+            model (str | Literal["ani1", "ani1x", "t1x"]): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
             properties (list): List of properties to calculate, such as "energy", "forces", etc.
             device (Literal["cpu", "cuda"]): The device to use for calculations. Defaults to "cpu".
             precision (Literal["float64", "float32", "float16"]): Floating-point precision of the calculations. Defaults to "float32".
@@ -65,7 +65,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # NewtonNet specific attributes
-        self.model_path = model_path
+        self.model = model
         self.properties = properties
         self.device = device
         self.precision = precision
@@ -87,7 +87,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         if self._calculator is None:
             from newtonnet.utils.ase_interface import MLAseCalculator as NewtonNetASECalculator
             self._calculator = NewtonNetASECalculator(
-                    model_path=self.model_path,
+                    model_path=self.model,
                     properties=self.properties,
                     device=self.device,
                     precision=self.precision
