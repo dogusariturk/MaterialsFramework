@@ -15,6 +15,7 @@ dependencies:
   - ase
   - pymatgen
   - scipy
+  - icet
   - pip
   - pip:
       - openpyxl
