@@ -3,7 +3,7 @@
 # MaterialsFramework
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/license/gpl-3-0)
-[![Python](https://img.shields.io/badge/python-3.8+-brightgreen.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.11+-brightgreen.svg)](https://www.python.org/)
 
 <p>
   A modular and extensible framework for deploying, benchmarking, and experimenting with state-of-the-art machine learning potentials in materials science.
@@ -33,7 +33,7 @@ This project uses `conda` for managing dependencies. Several `environment.yml` f
 | `main-environment.yml`     | AlphaNet, CHGNet, DeepMD, Eqnorm, EqV2 / eSEN, GPTFF, GRACE, HIENet, M3GNet / MEGNet, MatterSim, NewtonNet, PET-MAD, PosEGNN, SevenNet |
 | `orb-environment.yml`      | ORB                                                                                                                                    |
 | `mace-environment.yml`     | MACE                                                                                                                                   |
-| `alignn-environment.yml`   | ALIGNN-FF                                                                                                                              ||                                                                                               |
+| `alignn-environment.yml`   | ALIGNN-FF                                                                                                                              |                                                                                               |
 
  ### Installation
 
@@ -57,6 +57,159 @@ This project uses `conda` for managing dependencies. Several `environment.yml` f
     ```sh
     pip install -e .
     ```
+
+## Modules
+
+Below are the main modules and classes for analysis and tools:
+
+### `analysis`
+
+- **`ANNNIStackingFaultAnalyzer`**  
+  Tools for simulating and analyzing the Axial Next-Nearest-Neighbor Ising (ANNNI) model, useful for studying magnetic and structural phase transitions.
+
+
+- **`BainPathAnalyzer`**  
+  Implements the Bain transformation, providing utilities to analyze and visualize the transformation path between fcc and bcc crystal structures.
+
+
+- **`CubicElasticConstantsAnalyzer`**
+  Provides methods to calculate cubic elastic constants (C11, C12, C44) and derived properties like Young's modulus, bulk modulus, shear modulus, Poisson's ratio, and Pugh's ratio.
+
+    > [!CAUTION]
+    > This analyzer only works with cubic/orthogonal cells. 
+
+
+- **`ElasticConstantsAnalyzer`**
+  General tools for calculating elastic constants from stress-strain data, including methods for fitting and extracting Voigt-Reuss-Hill averages.
+- 
+
+- **`EOSAnalyzer`**  
+  Equation of State (EOS) fitting and analysis tools, including routines to fit energy-volume data and extract bulk properties.
+
+
+- **`PhonopyAnalyzer`**  
+  Interfaces and helpers for phonon calculations using the Phonopy package, including phonon band structure and density of states analysis.
+
+
+- **`Phono3pyAnalyzer`**  
+  Tools for third-order phonon calculations with Phono3py, enabling analysis of lattice thermal conductivity and anharmonic effects.
+
+
+### `tools`
+
+- **`ClusterExpansion`**  
+  Provides tools for constructing and analyzing cluster expansions, including fitting methods and validation routines.
+
+
+- **`PhaseFieldModel`**  
+  Implements the Cahn-Hilliard equation for simulating phase separation and microstructure evolution in materials.
+
+
+- **`Sqs2tdb`**  
+  Converts Special Quasirandom Structures (SQS) data to thermodynamic database (TDB) files for use in thermodynamic modeling.
+
+
+- **`StabilityMap`**
+    Tools for generating stability maps of materials, visualizing phase stability as a function of composition and temperature.
+
+
+## Example Workflows
+
+The following example scripts demonstrate typical use cases:
+
+- **Geometry Optimization**
+    ```python
+    from ase.build import bulk
+    from materialsframework.calculators import GraceCalculator
+    
+    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
+    
+    calc = GraceCalculator()
+    res = calc.relax(struct)
+    
+    print(res["final_structure"])
+    print(res["forces"])
+    print(res["stress"])
+    ```
+
+- **Cubic Elastic Constants**  
+    ```python
+    from ase.build import bulk
+    from materialsframework.calculators import GraceCalculator
+    from materialsframework.analysis import CubicElasticConstantsAnalyzer
+    
+    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
+    
+    calc = GraceCalculator()
+    cubic_elastic_constants = CubicElasticConstantsAnalyzer(calculator=calc)
+    res = cubic_elastic_constants.calculate(struct)
+    
+    print(res["c11"])
+    print(res["c12"])
+    print(res["c44"])
+    print(res["youngs_modulus"])
+    print(res["voigt_reuss_hill_bulk_modulus"])
+    print(res["voigt_reuss_hill_shear_modulus"])
+    print(res["poisson_ratio"])
+    print(res["pugh_ratio"])
+    ```
+
+- **Equation Of State Analysis**  
+    ```python
+    from ase.build import bulk
+    from materialsframework.calculators import GraceCalculator
+    from materialsframework.analysis import EOSAnalyzer
+    
+    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
+    
+    calc = GraceCalculator()
+    eos_analyzer = EOSAnalyzer(calculator=calc)
+    res = eos_analyzer.calculate(struct)
+    
+    print(res["e0"])
+    print(res["b0"])
+    print(res["b0_GPa"])
+    print(res["b1"])
+    print(res["v0"])
+    ```
+
+- **Phonon Calculations**
+    ```python
+    from ase.build import bulk
+    from materialsframework.calculators import GraceCalculator
+    from materialsframework.analysis import PhonopyAnalyzer
+    
+    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
+    
+    calc = GraceCalculator()
+    phonopy_analyzer = PhonopyAnalyzer(calculator=calc)
+    res = phonopy_analyzer.calculate(struct)
+    
+    print(res["total_dos"])
+    print(res["projected_dos"])
+    print(res["thermal_properties"])
+    ```
+
+- **Molecular Dynamics**
+    ```python
+    from ase.build import bulk
+    from materialsframework.calculators import GraceCalculator
+    
+    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
+    
+    calc = GraceCalculator(ensemble="nvt_nose_hoover", verbose=True, temperature=300)
+    res = calc.run(structure=struct, steps=1000)
+    
+    print(res["total_energy"])
+    print(res["potential_energy"])
+    print(res["kinetic_energy"])
+    print(res["temperature"])
+    print(res["final_structure"])
+    ```
+
+## Citing
+
+We are currently preparing a preprint for publication.
 
 ## License
 
