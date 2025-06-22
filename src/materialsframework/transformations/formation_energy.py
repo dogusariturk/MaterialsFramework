@@ -39,5 +39,5 @@ class FormationEnergyTransformation:
             structure (Structure): The structure to apply the transformation.
         """
         for element, comp in structure.composition.items():
-            atoms = bulk(str(element), cubic=True)  # TODO: Fix this for elements without a basis in the reference_states dict
+            atoms = bulk(str(element), cubic=True)  # TODO: Refactor this for elements without a basis in the reference_states dict
             self.pure_structures[comp] = atoms
