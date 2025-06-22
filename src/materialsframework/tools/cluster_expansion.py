@@ -77,7 +77,7 @@ class ClusterExpansion:
 
     def fit(
         self,
-        structures=None,
+        structures: list[Atoms] | SQLite3Database = None,
         primitive_structure: Atoms | None = None,
         cutoffs: list[float] | None = None,
         chemical_symbols: list[str] | list[list[str]] | None = None,
@@ -154,14 +154,14 @@ class ClusterExpansion:
         if self.verbose:
             print(opt)
 
-        ce = IcetClusterExpansion(
-            cluster_space=self.cluster_space,
-            parameters=opt.parameters,
-            metadata=opt.summary,
+        self.cluster_expansion = IcetClusterExpansion(
+                cluster_space=self.cluster_space,
+                parameters=opt.parameters,
+                metadata=opt.summary,
         )
 
         if self.verbose:
-            print(ce)
+            print(self.cluster_expansion)
 
     @property
     def calculator(self) -> BaseCalculator:
