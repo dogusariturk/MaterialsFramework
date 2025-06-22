@@ -87,6 +87,10 @@ Below are the main modules and classes for analysis and tools:
   Equation of State (EOS) fitting and analysis tools, including routines to fit energy-volume data and extract bulk properties.
 
 
+- **`FormationEnergyAnalyzer`**
+  Computes the formation energy of a material based on its composition and structure. The class can be used to analyze the stability of materials.
+
+
 - **`PhonopyAnalyzer`**  
   Interfaces and helpers for phonon calculations using the Phonopy package, including phonon band structure and density of states analysis.
 
