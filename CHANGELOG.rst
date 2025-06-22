@@ -2,10 +2,17 @@
 Changelog
 =========
 
+Version 0.12.0
+==============
+- Added NPT Berendsen ensemble to MD
+- Added Inhomogeneous NPT Berendsen ensemble to MD
+- Added ``ClusterExpansion`` and ``FormationEnergyAnalyzer`` implementations
+- Added ``Eqnorm`` implementation
+- Implemented ``elastic`` module for calculating elastic tensor components
+
 Version 0.11.0
 ==============
 - Added ``PET-MAD`` implementation
-
 
 Version 0.10.0
 ==============
