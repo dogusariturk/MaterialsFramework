@@ -2,6 +2,7 @@
 
 # MaterialsFramework
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15731044.svg)](https://doi.org/10.5281/zenodo.15731044)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/license/gpl-3-0)
 [![Python](https://img.shields.io/badge/python-3.11+-brightgreen.svg)](https://www.python.org/)
 
@@ -213,8 +214,21 @@ The following example scripts demonstrate typical use cases:
 
 ## Citing
 
-We are currently preparing a preprint for publication.
+We are currently preparing a preprint for publication. If you use MaterialsFramework in your research, please cite the following:
 
+> Sarıtürk, D., & Arroyave, R. (2025). MaterialsFramework. Zenodo. https://doi.org/10.5281/zenodo.15731044
+
+```bibtex
+@software{sariturk_2025_15731044,
+  author       = {Sarıtürk, Doğuhan and Arroyave, Raymundo},
+  title        = {MaterialsFramework},
+  month        = jun,
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.15731044},
+  url          = {https://doi.org/10.5281/zenodo.15731044},
+}
+```
 ## License
 
 Distributed under the GPLv3 License. See [GPLv3 License](https://opensource.org/license/gpl-3-0) for more information.
