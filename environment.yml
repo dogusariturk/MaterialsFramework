@@ -4,10 +4,9 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - sqsgenerator
+  - sqsgenerator=0.3
   - phonopy
   - phono3py
-  - elastic
   - pandas
   - cpuonly
   - pytorch=2.4.1

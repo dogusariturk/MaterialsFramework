@@ -27,6 +27,7 @@ from .orb import ORBCalculator
 from .petmad import PetMadCalculator
 from .posegnn import PosEGNNCalculator
 from .sevennet import SevenNetCalculator
+from .uma import UMACalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -51,4 +52,5 @@ __all__ = [
     "PetMadCalculator",
     "PosEGNNCalculator",
     "SevenNetCalculator",
+    "UMACalculator"
 ]
