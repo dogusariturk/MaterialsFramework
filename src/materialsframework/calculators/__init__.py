@@ -1,5 +1,4 @@
-"""
-This package provides the calculator classes for the MaterialsFramework.
+"""This package provides the calculator classes for the MaterialsFramework.
 
 The package includes several calculators, each designed to interface with specific machine learning
 potentials and perform material property calculations such as potential energy, forces, and stresses.
@@ -8,6 +7,7 @@ These calculators support advanced material simulations and structure relaxation
 This package serves as a centralized collection of calculator classes to streamline
 the workflow of materials modeling and property prediction within the MaterialsFramework.
 """
+
 from .alignn import AlignnCalculator
 from .alphanet import AlphaNetCalculator
 from .chgnet import CHGNetCalculator
@@ -28,6 +28,7 @@ from .petmad import PetMadCalculator
 from .posegnn import PosEGNNCalculator
 from .sevennet import SevenNetCalculator
 from .uma import UMACalculator
+from .vasp import VASPCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -52,5 +53,6 @@ __all__ = [
     "PetMadCalculator",
     "PosEGNNCalculator",
     "SevenNetCalculator",
-    "UMACalculator"
+    "UMACalculator",
+    "VASPCalculator",
 ]
