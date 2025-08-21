@@ -46,8 +46,6 @@ class VASPCalculator(BaseCalculator, BaseMDCalculator):
         "energy",
         "free_energy",
         "forces",
-        "dipole",
-        "fermi",
         "stress",
         "magmom",
         "magmoms",
