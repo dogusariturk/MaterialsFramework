@@ -8,10 +8,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from pymatgen.core import Molecule, Structure
+
 from materialsframework.tools.calculator import BaseCalculator
-from materialsframework.tools.md import BaseMDCalculator
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from ase.calculators.calculator import Calculator  # ASE base type
 
 
@@ -19,7 +21,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class VASPCalculator(BaseCalculator, BaseMDCalculator):
+class VASPCalculator(BaseCalculator):
     """A calculator class for performing material property calculations and relaxations using VASP via ASE.
 
     The `VASPCalculator` configures INCAR/KPOINTS/POTCAR settings through ASE’s `Vasp`
@@ -103,16 +105,14 @@ class VASPCalculator(BaseCalculator, BaseMDCalculator):
             setups: Pseudopotential setups, e.g. "minimal", "recommended", "materialsproject", etc.
             lreal: Real-space projection setting, e.g. "Auto", "True", "False".
             ncore: Parallelization knob controlling VASP workload distribution (see VASP manual).
-            **kwargs: Additional keyword arguments passed to `BaseCalculator`, `BaseMDCalculator`,
+            **kwargs: Additional keyword arguments passed to `BaseCalculator`
                       and any remaining to `ase.calculators.vasp.Vasp`. Common VASP/INCAR/KPOINTS options exposed for convenience.
                       Any of these left as None are simply not written—VASP defaults apply. (ASE will only write non-None INCAR keys.)
         """
         basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
-        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
 
-        # BaseCalculator and BaseMDCalculator specific attributes
+        # BaseCalculator specific attributes
         BaseCalculator.__init__(self, **basecalculator_kwargs)
-        BaseMDCalculator.__init__(self, **basemd_kwargs)
 
         # VASP specific attributes
         self._vasp_core: dict[str, Any] = {
@@ -155,3 +155,95 @@ class VASPCalculator(BaseCalculator, BaseMDCalculator):
 
             self._calculator = Vasp(**vasp_kwargs)
         return self._calculator
+
+    def relax(
+        self,
+        structure: Atoms | Structure | Molecule,
+        **kwargs,
+    ) -> dict[str, Any]:
+        """Performs relaxation on a structure.
+
+        Args:
+            structure (Atoms | Structure | Molecule | Molecule): Structure to relax.
+            **kwargs: Additional keyword arguments passed to `ase.calculators.vasp.Vasp`
+
+        Returns:
+            dict: A dictionary containing the final relaxed structure and any computed properties listed in `AVAILABLE_PROPERTIES`.
+
+            Keys in the dictionary:
+                - "final_structure" (Structure): The final relaxed structure.
+                - Other keys corresponding to properties in `AVAILABLE_PROPERTIES`, each containing the respective value
+                  from the calculator's results.
+        """
+        atoms = structure.copy()
+
+        if isinstance(atoms, (Structure, Molecule)):
+            atoms = self.ase_adaptor.get_atoms(atoms)
+
+        relax_params = {
+            "isif": self._vasp_core.get("isif") or 3,
+            "ibrion": self._vasp_core.get("ibrion") or 2,
+            "nsw": self._vasp_core.get("nsw") or 100,
+        }
+
+        self.calculator.set(**relax_params)
+
+        atoms.calc = self.calculator
+        self.calculator.calculate(
+            atoms=atoms,
+            properties=self.AVAILABLE_PROPERTIES,
+            system_changes=["positions", "numbers", "cell", "pbc", "initial_charges", "initial_magmoms"],
+        )
+
+        out_dict = {
+            "final_structure": self.ase_adaptor.get_structure(atoms),
+        }
+
+        out_dict.update({prop: self.calculator.results[prop] for prop in self.__class__.AVAILABLE_PROPERTIES})
+
+        return out_dict
+
+    def calculate(
+        self,
+        structure: Atoms | Structure | Molecule,
+    ) -> dict[str, Any]:
+        """Performs a static calculation.
+
+        Args:
+            structure (Atoms | Structure | Molecule): Structure to calculate.
+
+        Returns:
+            dict: A dictionary containing the final calculated structure and any computed properties listed in
+            `AVAILABLE_PROPERTIES`.
+            Keys in the dictionary:
+            - "final_structure" (Structure): The final calculated structure.
+            - Other keys corresponding to properties in `AVAILABLE_PROPERTIES`, each containing the respective value
+                  from the calculator's results.
+        """
+        atoms = structure.copy()
+
+        if isinstance(atoms, (Structure, Molecule)):
+            atoms = self.ase_adaptor.get_atoms(atoms)
+
+        calculate_params = {
+            "isif": None,
+            "nsw": None,
+            "ibrion": None,
+        }
+
+        self.calculator.set(**calculate_params)
+
+        atoms.calc = self.calculator
+        self.calculator.calculate(
+            atoms=atoms,
+            properties=self.AVAILABLE_PROPERTIES,
+            system_changes=["positions", "numbers", "cell", "pbc", "initial_charges", "initial_magmoms"],
+        )
+
+        out_dict = {
+            "final_structure": self.ase_adaptor.get_structure(atoms),
+        }
+
+        out_dict.update({prop: self.calculator.results[prop] for prop in self.__class__.AVAILABLE_PROPERTIES})
+
+        return out_dict
