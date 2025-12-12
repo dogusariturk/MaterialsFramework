@@ -1,5 +1,4 @@
-"""
-This module provides a class to perform an Equation of State (EOS) analysis on a given structure.
+"""This module provides a class to perform an Equation of State (EOS) analysis on a given structure.
 
 The `EOSAnalyzer` class allows users to perform an EOS analysis by applying a series of volume changes
 to a structure and calculating the corresponding energies. The resulting data is used to fit a chosen
@@ -25,8 +24,7 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class EOSAnalyzer:
-    """
-    A class used to perform Equation of State (EOS) analysis for a given structure.
+    """A class used to perform Equation of State (EOS) analysis for a given structure.
 
     The `EOSAnalyzer` class provides methods to fit energy-volume data to an EOS (such as Birch-Murnaghan)
     for determining material properties like the bulk modulus. The class uses deformation transformations
@@ -42,8 +40,7 @@ class EOSAnalyzer:
             calculator: BaseCalculator | None = None,
             eos_transformation: EOSTransformation | None = None
     ) -> None:
-        """
-        Initializes the `EOSAnalyzer` object.
+        """Initializes the `EOSAnalyzer` object.
 
         Args:
             start (float, optional): The starting strain value to apply to the structure. Defaults to -0.1.
@@ -68,8 +65,7 @@ class EOSAnalyzer:
             structure: Structure | Atoms,
             is_relaxed: bool = False
     ) -> dict[str, list | float]:
-        """
-        Calculates the potential energies and volumes to construct the EOS for the given undeformed structure.
+        """Calculates the potential energies and volumes to construct the EOS for the given undeformed structure.
 
         This method applies a series of volume deformations to the input structure, generating a set of strained
         structures. It then calculates the corresponding potential energies and fits the data to the specified
@@ -100,22 +96,19 @@ class EOSAnalyzer:
             structure = self.ase_adaptor.get_structure(structure)
 
         if not is_relaxed:
-            self.calculator.relax_cell = True
             structure: Structure = self.calculator.relax(structure)["final_structure"]
-            self.calculator.relax_cell = False
 
-        self.calculator.relax_cell = False
         self.eos_transformation.apply_transformation(structure)
 
-        strain_list, volume_list, energy_list = zip(
-                *[(strain, deformed_structure.volume, self.calculator.relax(structure=deformed_structure)["energy"]) for
-                  strain, deformed_structure in self.eos_transformation.structures.items()])
+        volume_list, energy_list = map(
+            list,
+            zip(*[(deformed_structure.volume, self.calculator.relax(structure=deformed_structure)["energy"]) for deformed_structure in self.eos_transformation.structures]),
+        )
 
         eos = EOS(eos_name=self.eos_name)
         eos_fit = eos.fit(volumes=volume_list, energies=energy_list)
 
         return {
-                "strains": strain_list,
                 "volumes": volume_list,
                 "energies": energy_list,
                 "e0": eos_fit.e0,
@@ -127,8 +120,7 @@ class EOSAnalyzer:
 
     @property
     def calculator(self) -> BaseCalculator:
-        """
-        Returns the calculator instance used for energy calculations.
+        """Returns the calculator instance used for energy calculations.
 
         If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
@@ -142,8 +134,7 @@ class EOSAnalyzer:
 
     @property
     def eos_transformation(self) -> EOSTransformation:
-        """
-        Returns the EOS transformation object used to generate deformed structures.
+        """Returns the EOS transformation object used to generate deformed structures.
 
         If the transformation instance is not already initialized, this method creates a new `EOSTransformation` instance.
 
