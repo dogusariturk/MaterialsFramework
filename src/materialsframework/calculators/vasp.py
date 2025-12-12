@@ -14,7 +14,7 @@ from materialsframework.tools.calculator import BaseCalculator
 
 if TYPE_CHECKING:
     from ase import Atoms
-    from ase.calculators.calculator import Calculator  # ASE base type
+    from ase.calculators.calculator import Calculator
 
 
 __author__ = "Doguhan Sariturk"
