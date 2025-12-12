@@ -1,5 +1,4 @@
-"""
-This package provides the calculator classes for the MaterialsFramework.
+"""This package provides the calculator classes for the MaterialsFramework.
 
 The package includes several calculators, each designed to interface with specific machine learning
 potentials and perform material property calculations such as potential energy, forces, and stresses.
@@ -22,6 +21,7 @@ from .m3gnet import M3GNetCalculator
 from .mace import MACECalculator
 from .mattersim import MatterSimCalculator
 from .megnet import MEGNetCalculator
+from .nequip import NequIPCalculator
 from .newtonnet import NewtonNetCalculator
 from .orb import ORBCalculator
 from .petmad import PetMadCalculator
@@ -47,6 +47,7 @@ __all__ = [
     "MACECalculator",
     "MatterSimCalculator",
     "MEGNetCalculator",
+    "NequIPCalculator",
     "NewtonNetCalculator",
     "ORBCalculator",
     "PetMadCalculator",
