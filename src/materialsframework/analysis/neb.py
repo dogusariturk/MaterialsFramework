@@ -1,47 +1,46 @@
-"""
-This module provides a class to perform NEB (Nudged Elastic Band) calculations using a specified calculator.
+"""This module provides a class to perform NEB (Nudged Elastic Band) calculations using a specified calculator.
 
 The `NEBAnalyzer` class facilitates the calculation of minimum energy paths between two structures. It uses
 interpolation to generate intermediate images and optimizes the path using the NEB method. The class supports
 various NEB methods and allows customization of parameters such as spring constants, climbing image, and
 periodic boundary conditions.
 """
+
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from ase.mep import NEB
-from pymatgen.core import Structure
 
-from materialsframework.tools.calculator import BaseCalculator
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+
+    from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
 class NEBAnalyzer:
-    """
-    A class used to perform the Nudged Elastic Band (NEB) calculation.
-    """
+    """A class used to perform the Nudged Elastic Band (NEB) calculation."""
 
     def __init__(
-            self,
-            k: float | list[float] = 0.1,
-            climb: bool = False,
-            remove_rotation_and_translation: bool = False,
-            method: Literal['aseneb', 'improvedtangent', 'eb', 'spline', 'string'] = 'aseneb',
-            n_images: int = 5,
-            interpolate_lattices: bool = False,
-            pbc: bool = True,
-            autosort_tol: float = 0.5,
-            end_amplitude: float = 1,
-            calculator: BaseCalculator | None = None
+        self,
+        spring_constant: float | list[float] = 0.1,
+        climb: bool = False,
+        remove_rotation_and_translation: bool = False,
+        method: Literal["aseneb", "improvedtangent", "eb", "spline", "string"] = "aseneb",
+        n_images: int = 5,
+        interpolate_lattices: bool = False,
+        pbc: bool = True,
+        autosort_tol: float = 0.5,
+        end_amplitude: float = 1,
+        calculator: BaseCalculator | None = None,
     ) -> None:
-        """
-        Initialize the NEB class.
+        """Initialize the NEB class.
 
         Args:
-            k (float | list[float], optional): Spring constant(s) for the NEB calculation. Defaults to 0.1 eV/Ang.
+            spring_constant (float | list[float], optional): Spring constant(s) for the NEB calculation. Defaults to 0.1 eV/Ang.
             climb (bool, optional): Whether to use the climbing image method. Defaults to False.
             remove_rotation_and_translation (bool, optional): Whether to remove rotation and translation of images.
                                                             Defaults to False.
@@ -56,7 +55,7 @@ class NEBAnalyzer:
                                                           Defaults to `M3GNetCalculator`.
         """
         # NEB specific attributes
-        self.k = k
+        self.spring_constant = spring_constant
         self.climb = climb
         self.remove_rotation_and_translation = remove_rotation_and_translation
         self.method = method
@@ -71,15 +70,8 @@ class NEBAnalyzer:
         self.neb = None
         self._calculator = calculator
 
-    def calculate(
-            self,
-            initial_structure: Structure,
-            final_structure: Structure,
-            is_relaxed: bool = False,
-            **kwargs
-    ) -> None:
-        """
-        Perform the NEB calculation between two structures.
+    def calculate(self, initial_structure: Structure, final_structure: Structure, is_relaxed: bool = False, **kwargs) -> None:
+        """Perform the NEB calculation between two structures.
 
         This method generates intermediate images between the initial and final structures, applies the NEB method,
         and optimizes the path using the specified calculator. If the structures are not relaxed, they will be relaxed
@@ -102,12 +94,12 @@ class NEBAnalyzer:
             final_structure: Structure = self.calculator.relax(final_structure)["final_structure"]
 
         images = initial_structure.interpolate(
-                end_structure=final_structure,
-                nimages=self.n_images,
-                interpolate_lattices=self.interpolate_lattices,
-                pbc=self.pbc,
-                autosort_tol=self.autosort_tol,
-                end_amplitude=self.end_amplitude,
+            end_structure=final_structure,
+            nimages=self.n_images,
+            interpolate_lattices=self.interpolate_lattices,
+            pbc=self.pbc,
+            autosort_tol=self.autosort_tol,
+            end_amplitude=self.end_amplitude,
         )
 
         images = [image.to_ase_atoms(msonable=False) for image in images]
@@ -115,12 +107,12 @@ class NEBAnalyzer:
             image.calc = self.calculator.calculator
 
         self.neb = NEB(
-                images=images,
-                k=self.k,
-                climb=self.climb,
-                remove_rotation_and_translation=self.remove_rotation_and_translation,
-                method=self.method,
-                allow_shared_calculator=True
+            images=images,
+            k=self.spring_constant,
+            climb=self.climb,
+            remove_rotation_and_translation=self.remove_rotation_and_translation,
+            method=self.method,
+            allow_shared_calculator=True,
         )
 
         optimizer = self.calculator.optimizer(self.neb, **kwargs)
@@ -128,8 +120,7 @@ class NEBAnalyzer:
 
     @property
     def calculator(self) -> BaseCalculator:
-        """
-        Returns the calculator instance used for energy, force, and stress calculations.
+        """Returns the calculator instance used for energy, force, and stress calculations.
 
         If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
 
@@ -138,5 +129,6 @@ class NEBAnalyzer:
         """
         if self._calculator is None:
             from materialsframework.calculators.m3gnet import M3GNetCalculator
+
             self._calculator = M3GNetCalculator()
         return self._calculator
