@@ -38,7 +38,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
             self,
-            model: str = "orb-v3-conservative-20-omat",
+            model: str = "orb-v3-conservative-inf-omat",
             device: Literal["cuda", "cpu", "mps"] = "cpu",
             precision: Literal["float32-high", "float32-highest", "float64"] = "float32-high",
             **kwargs

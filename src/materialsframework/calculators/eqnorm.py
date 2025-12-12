@@ -82,7 +82,7 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
         to the caller. If the Calculator object has already been created, it is returned directly.
 
         Returns:
-            Calculator: The ASE Calculator object configured with the AlphaNet potential.
+            Calculator: The ASE Calculator object configured with the Eqnorm potential.
         """
         if self._calculator is None:
             from eqnorm.calculator import EqnormCalculator
