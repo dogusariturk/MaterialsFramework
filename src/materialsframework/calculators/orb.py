@@ -70,6 +70,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         self.precision = precision
 
         self._potential = None
+        self._atoms_adapter = None
         self._calculator = None
 
     @property
@@ -81,14 +82,14 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         calculations.
 
         Returns:
-            GraphRegressor: The ORB potential associated with this instance.
+            dict: A dictionary containing the loaded ORB potential and the corresponding atoms adapter.
         """
         if self._potential is None:
             from orb_models.forcefield import pretrained
 
             model = pretrained.ORB_PRETRAINED_MODELS[self.model]
-            self._potential = model(device=self.device, precision=self.precision)
-        return self._potential
+            self._potential, self._atoms_adapter = model(device=self.device, precision=self.precision)
+        return {"model": self._potential, "atoms_adapter": self._atoms_adapter}
 
     @property
     def calculator(self) -> Calculator:
@@ -101,12 +102,12 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
             Calculator: The ASE Calculator object configured with the ORB potential.
         """
         if self._calculator is None:
-            from orb_models.forcefield.calculator import (
+            from orb_models.forcefield.inference.calculator import (
                 ORBCalculator as ORBASECalculator,
             )
 
             self._calculator = ORBASECalculator(
-                model=self.potential,
+                **self.potential,
                 device=self.device,
             )
         return self._calculator
