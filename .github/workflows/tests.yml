@@ -9,8 +9,12 @@ on:
 
 jobs:
   test-core:
-    name: Core Tests
-    runs-on: ubuntu-latest
+    name: "Core Tests (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
 
     steps:
       - name: Checkout code
