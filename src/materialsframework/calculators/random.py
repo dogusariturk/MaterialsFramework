@@ -9,7 +9,8 @@ from materialsframework.tools.calculator import BaseCalculator
 
 if TYPE_CHECKING:
     from ase import Atoms
-    from pymatgen.core import Structure
+    from ase.calculators.calculator import Calculator
+    from pymatgen.core import Molecule, Structure
 
 
 class RandomCalculator(BaseCalculator):
@@ -17,7 +18,21 @@ class RandomCalculator(BaseCalculator):
 
     AVAILABLE_PROPERTIES = ["energy", "forces"]
 
-    def calculate(self, structure=None, **kwargs) -> dict[str, Any]:
+    @property
+    def calculator(self) -> Calculator:
+        """Returns a bare ASE Calculator instance.
+
+        Unused by this class since `calculate()` and `relax()` are both overridden
+        directly, but still required to satisfy `BaseCalculator`'s abstract property.
+
+        Returns:
+            Calculator: A plain ASE Calculator instance.
+        """
+        from ase.calculators.calculator import Calculator
+
+        return Calculator()
+
+    def calculate(self, structure: Atoms | Structure | Molecule, **kwargs) -> dict[str, Any]:
         """Pretend to calculate: return a random energy and random forces.
 
         Args:
@@ -28,7 +43,7 @@ class RandomCalculator(BaseCalculator):
         forces = [[random.uniform(-10, 10) for _ in range(3)] for _ in range(len(structure))]
         return {"energy": energy, "forces": forces}
 
-    def relax(self, structure: Atoms | Structure, **kwargs) -> dict[str, Any]:
+    def relax(self, structure: Atoms | Structure | Molecule, **kwargs) -> dict[str, Any]:
         """Pretend to relax: return the same structure, a random energy, and random forces.
 
         Args:
