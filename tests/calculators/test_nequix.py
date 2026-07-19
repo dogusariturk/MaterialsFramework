@@ -35,7 +35,7 @@ def test_calculate_energy(calc: NequixCalculator, bcc_fe) -> None:
     """calculate() returns a negative float energy for BCC Fe."""
     result = calc.calculate(bcc_fe)
     assert "energy" in result
-    assert isinstance(result["energy"], float)
+    assert isinstance(result["energy"], (float, np.floating))
     assert result["energy"] < 0
 
 

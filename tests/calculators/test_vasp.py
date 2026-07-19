@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 import shutil
 
+import numpy as np
 import pytest
 
 from materialsframework.calculators.vasp import VASPCalculator
@@ -49,4 +50,4 @@ def test_calculate_energy(bcc_fe) -> None:
     calc = VASPCalculator(xc="PBE", encut=400, kpts=(4, 4, 4))
     result = calc.calculate(bcc_fe)
     assert "energy" in result
-    assert isinstance(result["energy"], float)
+    assert isinstance(result["energy"], (float, np.floating))

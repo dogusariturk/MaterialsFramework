@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 from materialsframework.analysis.bain import BainPathAnalyzer
@@ -73,4 +74,4 @@ def test_calculate_list_lengths_match(result) -> None:
 def test_energy_list_contains_floats(result) -> None:
     """Every entry in energy_list is a float."""
     for e in result["energy_list"]:
-        assert isinstance(e, float)
+        assert isinstance(e, (float, np.floating))

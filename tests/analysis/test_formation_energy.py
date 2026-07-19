@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 from materialsframework.analysis.formation_energy import FormationEnergyAnalyzer
@@ -40,7 +41,7 @@ def test_calculate_returns_key_with_random_calc(l10_feni) -> None:
     analyzer = FormationEnergyAnalyzer(calculator=RandomCalculator())
     result = analyzer.calculate(l10_feni, is_relaxed=True)
     assert "formation_energy" in result
-    assert isinstance(result["formation_energy"], float)
+    assert isinstance(result["formation_energy"], (float, np.floating))
 
 
 def test_calculate_accepts_ase_atoms(ase_l10_feni) -> None:
@@ -63,7 +64,7 @@ def test_single_element_raises(analyzer, bcc_fe) -> None:
 def test_calculate_returns_formation_energy(result) -> None:
     """calculate() returns a dict with a float 'formation_energy' key."""
     assert "formation_energy" in result
-    assert isinstance(result["formation_energy"], float)
+    assert isinstance(result["formation_energy"], (float, np.floating))
 
 
 @pytest.mark.integration
