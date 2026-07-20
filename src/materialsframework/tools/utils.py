@@ -22,9 +22,7 @@ def generate_compositions(num_elements=5, step=12.5):
 
     results = [
         combo
-        for combo in combinations_with_replacement(
-            np.arange(0, 100 + step, step), num_elements
-        )
+        for combo in combinations_with_replacement(np.arange(0, 100 + step, step), num_elements)
         if round(sum(combo), 10) == 100
     ]
 
