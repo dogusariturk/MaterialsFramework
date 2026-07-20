@@ -6,8 +6,7 @@ Use ``get_analyzer(name)`` for name-based lookup without triggering imports.
 
 from __future__ import annotations
 
-import importlib
-
+from materialsframework._registry import lazy_getattr
 from materialsframework.analysis.registry import get_analyzer, list_analyzers
 
 __author__ = "Doguhan Sariturk"
@@ -45,8 +44,4 @@ def __getattr__(name: str) -> type:
     Raises:
         AttributeError: If ``name`` is not found in the analyzer map.
     """
-    if name in _ANALYZER_MAP:
-        module_path, class_name = _ANALYZER_MAP[name]
-        module = importlib.import_module(module_path)
-        return getattr(module, class_name)
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return lazy_getattr(name, __name__, _ANALYZER_MAP)

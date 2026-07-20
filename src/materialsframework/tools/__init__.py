@@ -6,8 +6,7 @@ Use ``get_tool(name)`` for name-based lookup without triggering imports.
 
 from __future__ import annotations
 
-import importlib
-
+from materialsframework._registry import lazy_getattr
 from materialsframework.tools.registry import get_tool, list_tools
 
 __author__ = "Doguhan Sariturk"
@@ -43,8 +42,4 @@ def __getattr__(name: str) -> type:
     Raises:
         AttributeError: If ``name`` is not found in the tools map.
     """
-    if name in _TOOLS_MAP:
-        module_path, class_name = _TOOLS_MAP[name]
-        module = importlib.import_module(module_path)
-        return getattr(module, class_name)
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return lazy_getattr(name, __name__, _TOOLS_MAP)
