@@ -1,13 +1,12 @@
-"""This module provides a class to generate distorted structures for Phono3py calculations.
+"""Generates distorted structures for Phono3py calculations.
 
-The `Phono3pyDisplacementTransformation` class facilitates the generation of supercells with atomic displacements,
-which are necessary for calculating second- and third-order force constants using Phono3py. These displaced structures
-are critical in studying anharmonic phonon properties and thermal conductivity in materials.
+Produces supercells with atomic displacements needed to compute second- and third-order
+force constants for anharmonic phonon and thermal-conductivity calculations.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -20,25 +19,14 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class Phono3pyDisplacementTransformation:
-    """A class used to generate displaced structures for Phono3py calculations.
+    """Generates displaced structures for Phono3py calculations.
 
-    The `Phono3pyDisplacementTransformation` class provides methods to create supercells with atomic
-    displacements needed for Phono3py calculations. It supports the generation of structures for both
-    second- and third-order force constants, which are crucial for phonon calculations, including the
-    study of lattice thermal conductivity and phonon interactions.
+    Creates supercells with atomic displacements for both second- and third-order force
+    constants.
     """
 
     def __init__(self) -> None:
         """Initializes the `Phono3pyDisplacementTransformation` object."""
-        self.phonon: Phono3py | None = None
-
-        # For second-order force-constant results
-        self.phonon_displacements = None
-        self.phonon_supercells_with_displacements = None
-
-        # For third-order force-constant results
-        self.supercell_displacements = None
-        self.supercells_with_displacements = None
 
     def apply_transformation(
         self,
@@ -49,12 +37,8 @@ class Phono3pyDisplacementTransformation:
         phonon_supercell_matrix: list | None = None,
         log_level: int = 0,
         **kwargs,
-    ) -> None:
-        """Applies the transformation to generate displaced supercells for Phono3py calculations.
-
-        This method generates supercells with atomic displacements for both second-order (phonon) and
-        third-order force constant calculations. These supercells are necessary for calculating phonon
-        properties and investigating lattice dynamics.
+    ) -> dict[str, Any]:
+        """Generate displaced supercells for Phono3py calculations.
 
         Args:
             structure (Structure): The input structure to be used for generating displacements.
@@ -67,9 +51,14 @@ class Phono3pyDisplacementTransformation:
             log_level (int, optional): The log level for Phono3py. Defaults to 0.
             **kwargs: Additional keyword arguments for the `Phono3py.generate_displacement` method.
 
-        Note:
-            The generated displaced supercells are stored in `phonon_supercells_with_displacements` (for phonon calculations)
-            and `supercells_with_displacements` (for third-order force constants).
+        Returns:
+            dict[str, Phono3py | list[Structure]]: Dictionary with keys:
+                - ``phonon``: The `Phono3py` object used to generate the displacements.
+                - ``phonon_supercells_with_displacements``: Displaced supercells for phonon (second-order)
+                  force constant calculations.
+                - ``supercells_with_displacements``: Displaced supercells for third-order force constant calculations.
+                - ``phonon_displacements``: The atomic displacements for the phonon supercells.
+                - ``supercell_displacements``: The atomic displacements for the third-order force-constant supercells.
         """
         try:
             from phono3py import Phono3py
@@ -82,7 +71,7 @@ class Phono3pyDisplacementTransformation:
 
         phonopy_structure = get_phonopy_structure(structure)
 
-        self.phonon = Phono3py(
+        phonon = Phono3py(
             unitcell=phonopy_structure,
             supercell_matrix=supercell_matrix,
             primitive_matrix=primitive_matrix,
@@ -91,25 +80,32 @@ class Phono3pyDisplacementTransformation:
         )
 
         (
-            self.phonon_supercells_with_displacements,
-            self.supercells_with_displacements,
-        ) = self._get_displaced_structures(distance=distance, **kwargs)
+            phonon_supercells_with_displacements,
+            supercells_with_displacements,
+        ) = self._get_displaced_structures(phonon, distance=distance, **kwargs)
 
-        self.phonon_displacements = self.phonon.phonon_displacements
-        self.supercell_displacements = self.phonon.displacements
+        phonon_displacements = phonon.phonon_displacements
+        supercell_displacements = phonon.displacements
+
+        return {
+            "phonon": phonon,
+            "phonon_supercells_with_displacements": phonon_supercells_with_displacements,
+            "supercells_with_displacements": supercells_with_displacements,
+            "phonon_displacements": phonon_displacements,
+            "supercell_displacements": supercell_displacements,
+        }
 
     def _get_displaced_structures(
         self,
+        phonon: Phono3py,
         distance: float = 0.03,
         is_plusminus: bool | str = "auto",
         is_diagonal: bool = True,
     ) -> tuple[list[Structure], list[Structure]]:
-        """Generates displaced structures using Phono3py.
-
-        This method generates the necessary supercells with atomic displacements for Phono3py calculations
-        by applying specified displacement distances.
+        """Generate displaced structures using Phono3py.
 
         Args:
+            phonon (Phono3py): The `Phono3py` object to generate the displacements for.
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
             is_plusminus (bool | str, optional): Whether to generate both positive and negative displacements.
                                                  Defaults to "auto".
@@ -124,14 +120,14 @@ class Phono3pyDisplacementTransformation:
         except ImportError as e:
             raise ImportError("phono3py is required. Install it with: pip install materialsframework[phono3py]") from e
 
-        self.phonon.generate_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
+        phonon.generate_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
 
-        displaced_supercells = self.phonon.supercells_with_displacements
+        displaced_supercells = phonon.supercells_with_displacements
         displaced_structures = [get_pmg_structure(cell) for cell in displaced_supercells if cell is not None]
 
-        self.phonon.generate_fc2_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
+        phonon.generate_fc2_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
 
-        displaced_phonon_supercells = self.phonon.phonon_supercells_with_displacements
+        displaced_phonon_supercells = phonon.phonon_supercells_with_displacements
         displaced_phonon_structures = [get_pmg_structure(cell) for cell in displaced_phonon_supercells if cell is not None]
 
         return displaced_phonon_structures, displaced_structures

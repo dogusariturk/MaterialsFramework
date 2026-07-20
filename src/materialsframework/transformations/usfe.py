@@ -1,13 +1,13 @@
 """This module provides a class to generate structures for USFE calculations.
 
-The `USFETransformation` class creates rigidly displaced structures along a selected
-BCC slip system. These structures are intended for generalized stacking fault energy
-(GSFE) / unstable stacking fault energy (USFE) analyses.
+The `USFETransformation` class creates rigidly displaced structures along a selected BCC slip
+system, for generalized stacking fault energy (GSFE) and unstable stacking fault energy (USFE)
+analyses.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -19,11 +19,11 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class USFETransformation:
-    """A class used to generate rigidly displaced structures for USFE calculations.
+    """Generates rigidly displaced structures for USFE calculations.
 
-    The transformation supports BCC-like slip planes ``110`` and ``112``. For each
-    displacement fraction, atoms in the upper half-space with respect to the selected
-    plane are shifted along the corresponding in-plane slip direction.
+    Supports BCC-like slip planes ``110`` and ``112``. For each displacement fraction, atoms in
+    the upper half-space relative to the selected plane are shifted along the corresponding
+    in-plane slip direction.
     """
 
     _SLIP_SYSTEMS = {
@@ -61,21 +61,24 @@ class USFETransformation:
 
         self.slip_plane = slip_plane
         self.displacement_fractions = np.linspace(start, stop, num_steps)
-        self.displaced_structures: dict[float, Structure] = {}
-        self.fault_area: float | None = None
 
-    def apply_transformation(self, structure: Structure) -> None:
+    def apply_transformation(self, structure: Structure) -> dict[str, Any]:
         """Applies rigid displacements to create GSFE/USFE structures.
 
         Args:
             structure (Structure): Input structure used as the reference state.
+
+        Returns:
+            dict[str, dict[float, Structure] | float]: A dictionary with keys ``"displaced_structures"``,
+                mapping displacement fractions to the corresponding displaced `Structure`, and
+                ``"fault_area"``, the fault-plane area in Angstrom squared.
         """
-        self.displaced_structures = {}
+        displaced_structures: dict[float, Structure] = {}
 
         normal_cart = self._plane_normal_cart(structure)
         slip_dir_cart = self._slip_direction_cart(structure, normal_cart)
         burgers_vector = 0.5 * slip_dir_cart
-        self.fault_area = self._fault_area(structure, normal_cart)
+        fault_area = self._fault_area(structure, normal_cart)
 
         cart_coords = structure.cart_coords
         plane_projection = cart_coords @ normal_cart
@@ -90,7 +93,9 @@ class USFETransformation:
                 frac_coords=False,
                 to_unit_cell=False,
             )
-            self.displaced_structures[float(frac)] = displaced
+            displaced_structures[float(frac)] = displaced
+
+        return {"displaced_structures": displaced_structures, "fault_area": fault_area}
 
     def _plane_normal_cart(self, structure: Structure) -> np.ndarray:
         """Return a normalized Cartesian plane normal.

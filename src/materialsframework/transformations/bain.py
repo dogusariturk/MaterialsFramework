@@ -1,8 +1,8 @@
-"""This module provides a class to generate displaced structures along the Bain Path.
+"""Generates displaced structures along the Bain path.
 
-The `BainDisplacementTransformation` class allows users to generate structures that are deformed
-along the Bain path through a continuous deformation of the lattice.
-This transformation is useful in studying martensitic transformations and phase transitions in materials.
+Produces structures deformed along the Bain path through a continuous change in the
+c/a ratio, useful for studying martensitic transformations between cubic and tetragonal
+phases.
 """
 
 from __future__ import annotations
@@ -22,12 +22,10 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class BainDisplacementTransformation:
-    """A class used to generate displaced structures along the Bain Path.
+    """Generates a series of deformed structures along the Bain path.
 
-    The `BainDisplacementTransformation` class provides methods to generate a series of deformed structures
-    by varying the c/a ratio in small steps, following the Bain transformation pathway. This pathway is significant
-    for studying phase transformations between cubic and tetragonal structures, especially in materials that undergo
-    martensitic transformations.
+    Varies the c/a ratio in small steps to produce structures along the Bain transformation
+    pathway between cubic and tetragonal phases.
     """
 
     def __init__(
@@ -44,34 +42,28 @@ class BainDisplacementTransformation:
             step (float, optional): The step size for incrementing the c/a ratio. Defaults to 0.01.
         """
         self.c_a_ratios: np.ndarray = np.arange(start=start, stop=stop, step=step)
-        self.displaced_structures: dict[float, Structure] = {}
 
     def apply_transformation(
         self,
         structure: Structure,
-    ) -> None:
-        """Applies the Bain displacement transformation to generate structures along the Bain path.
-
-        This method generates displaced structures for each value of the c/a ratio in the specified range.
-        If the `is_relaxed` flag is set to False, the method relaxes the input structure before applying
-        the Bain path displacement. The resulting structures are stored in the `displaced_structures` dictionary.
+    ) -> dict[float, Structure]:
+        """Generate displaced structures along the Bain path.
 
         Args:
             structure (Structure): The input structure to be displaced along the Bain path.
 
-        Note:
-            The generated structures are stored in the `displaced_structures` attribute, keyed by the corresponding c/a ratio.
+        Returns:
+            dict[float, Structure]: The displaced structures, keyed by the corresponding c/a ratio.
         """
+        displaced_structures: dict[float, Structure] = {}
         for c_a in self.c_a_ratios:
             delta = np.cbrt(1 / c_a) - 1
-            self.displaced_structures[c_a] = self._get_displaced_structures(delta, structure)
+            displaced_structures[c_a] = self._get_displaced_structures(delta, structure)
+        return displaced_structures
 
     @staticmethod
     def _get_displaced_structures(delta: float, structure: Structure) -> Structure:
-        """Generates a displaced structure by applying a deformation along the Bain path.
-
-        The deformation is applied based on the given `delta` value, which modifies the lattice parameters
-        in accordance with the Bain transformation. A new structure is returned with the deformation applied.
+        """Apply a Bain-path deformation to the structure for a given delta.
 
         Args:
             delta (float): The displacement value for the Bain transformation.

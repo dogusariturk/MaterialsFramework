@@ -10,10 +10,11 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from ase import Atoms
-from pymatgen.io.ase import AseAtomsAdaptor
+
+from materialsframework.utils import to_structure
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from pymatgen.core import Structure
 
 __author__ = "Doguhan Sariturk"
@@ -36,17 +37,13 @@ class CTETransformation:
         """
         self.ensemble = ensemble
         self.pressure = pressure
-        self.ase_adaptor = AseAtomsAdaptor()
-
-        self.structures: dict[float, Structure] = {}
-        self.tasks: list[dict[str, Any]] = []
 
     def apply_transformation(
         self,
         structure: Structure | Atoms,
         temperatures: Sequence[float],
         steps: int = 10000,
-    ) -> None:
+    ) -> dict[str, Any]:
         """Prepare structures and task metadata for each target temperature.
 
         Args:
@@ -56,21 +53,25 @@ class CTETransformation:
 
         Raises:
             ValueError: If temperatures are invalid or steps is non-positive.
+
+        Returns:
+            Dictionary with keys:
+                - ``structures``: Mapping of temperature (K) to a copy of the input structure.
+                - ``tasks``: Per-temperature MD task metadata (temperature, steps, ensemble, pressure).
         """
         validated_temperatures = self._validate_temperatures(temperatures)
         if steps <= 0:
             raise ValueError("steps must be a positive integer.")
 
-        if isinstance(structure, Atoms):
-            structure = self.ase_adaptor.get_structure(structure)
+        structure = to_structure(structure)
 
-        self.structures = {}
-        self.tasks = []
+        structures: dict[float, Structure] = {}
+        tasks: list[dict[str, Any]] = []
 
         for temperature in validated_temperatures:
             temperature_value = float(temperature)
-            self.structures[temperature_value] = structure.copy()
-            self.tasks.append(
+            structures[temperature_value] = structure.copy()
+            tasks.append(
                 {
                     "temperature": temperature_value,
                     "steps": int(steps),
@@ -78,6 +79,8 @@ class CTETransformation:
                     "pressure": float(self.pressure),
                 }
             )
+
+        return {"structures": structures, "tasks": tasks}
 
     @staticmethod
     def _validate_temperatures(temperatures: Sequence[float]) -> list[float]:

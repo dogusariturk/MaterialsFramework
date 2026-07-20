@@ -1,26 +1,26 @@
 """This module provides a class to generate BCC interstitial structures for hydrogen solubility calculations.
 
-The `HSolubilityTransformation` class generates host and H-inserted structures at
-octahedral/tetrahedral sites for composition-driven or structure-driven H-solubility
-workflows.
+The `HSolubilityTransformation` class builds host and H-inserted structures at octahedral and
+tetrahedral sites, for composition-driven or structure-driven H-solubility workflows.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from ase import Atoms
 from pymatgen.core import Composition
-from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.tools.sqsgen import SqsGenerator
+from materialsframework.utils import lazy_property, to_structure
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from pymatgen.core import Structure
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
+
 
 _VALID_SITE_TYPES = {"octahedral", "tetrahedral"}
 _SITE_FRACTIONS = {
@@ -50,10 +50,10 @@ _SITE_FRACTIONS = {
 
 
 class HSolubilityTransformation:
-    """A transformation that generates H-interstitial BCC structures.
+    """Generates H-interstitial BCC structures.
 
-    The transformation can start from an explicit host structure or generate a BCC
-    host through ``SqsGenerator`` for composition-driven workflows.
+    The transformation can start from an explicit host structure or generate a BCC host through
+    ``SqsGenerator`` for composition-driven workflows.
     """
 
     def __init__(self, sqs_gen: SqsGenerator | None = None) -> None:
@@ -62,11 +62,7 @@ class HSolubilityTransformation:
         Args:
             sqs_gen (SqsGenerator | None): Optional SQS generator for composition-driven host generation.
         """
-        self.ase_adaptor = AseAtomsAdaptor()
         self._sqs_gen = sqs_gen
-
-        self.host_structure: Structure | None = None
-        self.structures: dict[str, list[Structure]] = {}
 
     def apply_transformation(
         self,
@@ -75,7 +71,7 @@ class HSolubilityTransformation:
         supercell_size: tuple[int, int, int] = (1, 1, 1),
         site_types: tuple[str, ...] = ("octahedral", "tetrahedral"),
         max_sites_per_type: int | None = 1,
-    ) -> None:
+    ) -> dict[str, Any]:
         """Generates structures with H inserted into BCC octahedral/tetrahedral sites.
 
         Args:
@@ -85,6 +81,11 @@ class HSolubilityTransformation:
             site_types (tuple[str, ...], optional): Site families to generate.
             max_sites_per_type (int | None, optional): Maximum generated structures per site type.
                 Use ``None`` to keep all generated candidates.
+
+        Returns:
+            dict[str, Structure | dict[str, list[Structure]]]: Dictionary with keys:
+                - ``host_structure``: The host structure used for interstitial insertion.
+                - ``structures``: Mapping of site type to generated host-plus-hydrogen structures.
 
         Raises:
             ValueError: If core inputs are invalid.
@@ -98,14 +99,15 @@ class HSolubilityTransformation:
             raise ValueError("`max_sites_per_type` must be >= 1 when provided.")
 
         host_structure = self._build_host_structure(structure, composition, supercell_size)
-        self.host_structure = host_structure
-        self.structures = {}
+        structures: dict[str, list[Structure]] = {}
 
         for site_type in site_types:
             generated = self._insert_hydrogen(host_structure, site_type, max_sites_per_type)
             if not generated:
                 raise ValueError(f"No valid `{site_type}` interstitial sites were generated.")
-            self.structures[site_type] = generated
+            structures[site_type] = generated
+
+        return {"host_structure": host_structure, "structures": structures}
 
     def _build_host_structure(
         self,
@@ -127,8 +129,7 @@ class HSolubilityTransformation:
             Host structure for interstitial insertion.
         """
         if structure is not None:
-            if isinstance(structure, Atoms):
-                structure = self.ase_adaptor.get_structure(structure)
+            structure = to_structure(structure)
 
             host = structure.copy()
             if supercell_size != (1, 1, 1):
@@ -203,13 +204,13 @@ class HSolubilityTransformation:
 
         return generated
 
-    @property
+    @lazy_property("_sqs_gen")
     def sqs_gen(self) -> SqsGenerator:
-        """Return the SQS generator used in composition-driven workflows.
+        """The SqsGenerator used to generate SQS structures.
+
+        Lazily creates a `SqsGenerator` instance on first access.
 
         Returns:
-            SQS generator instance.
+            SqsGenerator: The SqsGenerator instance.
         """
-        if self._sqs_gen is None:
-            self._sqs_gen = SqsGenerator()
-        return self._sqs_gen
+        return SqsGenerator()

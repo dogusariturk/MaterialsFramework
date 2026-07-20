@@ -1,8 +1,4 @@
-"""This module provides a class to generate distorted structures for elastic constant calculations.
-
-The `ElasticConstantsDeformationTransformation` class facilitates the generation of distorted
-structures required for the calculation of elastic constants.
-"""
+"""Generates distorted structures for elastic constant calculations."""
 
 from __future__ import annotations
 
@@ -20,11 +16,7 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class ElasticConstantsDeformationTransformation:
-    """A class used to generate deformed structures for elastic constant calculations.
-
-    The `ElasticConstantsDeformationTransformation` class provides methods to generate distorted
-    structures for the calculation of elastic constants.
-    """
+    """Generates deformed structures for elastic constant calculations."""
 
     def __init__(self, num_deform: int = 5, max_deform: float = 2) -> None:
         """Initializes the `ElasticConstantsDeformationTransformation` object.
@@ -36,20 +28,19 @@ class ElasticConstantsDeformationTransformation:
         self.num_deform = num_deform
         self.max_deform = max_deform
 
-        self.distorted_structures: list[Atoms] = []
-
     def apply_transformation(
         self,
         structure: Structure | Atoms,
-    ) -> None:
+    ) -> list[Atoms]:
         """Applies the deformation transformation to the given structure and generates distorted structures.
 
         Args:
             structure (Structure | Atoms): The structure to apply the deformation transformation.
+
+        Returns:
+            list[Atoms]: The distorted structures generated from the deformation transformation.
         """
         if isinstance(structure, Structure):
             structure = structure.to_ase_atoms()
 
-        self.distorted_structures = elastic.get_elementary_deformations(
-            cryst=structure, n=self.num_deform, d=self.max_deform
-        )
+        return elastic.get_elementary_deformations(cryst=structure, n=self.num_deform, d=self.max_deform)

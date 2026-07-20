@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
 
+from materialsframework._registry import make_registry
+
 if TYPE_CHECKING:
-    from materialsframework.transformations.base import BaseTransformation
+    from typing import Any
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
+
+_list_transformations, _get_transformation = make_registry("materialsframework.transformations", "transformation")
 
 
 def list_transformations() -> list[str]:
@@ -18,10 +21,10 @@ def list_transformations() -> list[str]:
     Returns:
         Sorted list of registered transformation names.
     """
-    return sorted(ep.name for ep in entry_points(group="materialsframework.transformations"))
+    return _list_transformations()
 
 
-def get_transformation(name: str, **kwargs) -> BaseTransformation:
+def get_transformation(name: str, **kwargs) -> Any:
     """Instantiate a transformation by its registered name.
 
     Args:
@@ -34,7 +37,4 @@ def get_transformation(name: str, **kwargs) -> BaseTransformation:
     Raises:
         ValueError: If no transformation is registered under the given name.
     """
-    eps = {ep.name: ep for ep in entry_points(group="materialsframework.transformations")}
-    if name not in eps:
-        raise ValueError(f"Unknown transformation {name!r}. Available: {', '.join(sorted(eps))}")
-    return eps[name].load()(**kwargs)
+    return _get_transformation(name, **kwargs)
