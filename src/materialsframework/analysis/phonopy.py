@@ -1,20 +1,20 @@
 """This module provides a class to calculate phonon properties of a structure using Phonopy.
 
-The `PhonopyAnalyzer` class facilitates phonon property calculations, including the total density of states (DOS),
-projected DOS (PDOS), and thermal properties of a structure. It leverages Phonopy for calculating these properties
-and utilizes transformations to generate displaced structures and force constants.
+The `PhonopyAnalyzer` class computes the total density of states (DOS), projected DOS (PDOS), and
+thermal properties from displaced structures and force constants generated with Phonopy.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ase import Atoms
-from pymatgen.io.ase import AseAtomsAdaptor
-
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
 from materialsframework.transformations.phonopy import PhonopyDisplacementTransformation
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from numpy.typing import ArrayLike
     from pymatgen.core import Structure
 
@@ -24,13 +24,11 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class PhonopyAnalyzer:
+class PhonopyAnalyzer(BaseAnalyzer):
     """A class used to calculate phonon properties using Phonopy.
 
-    The `PhonopyAnalyzer` class provides methods to compute phonon properties such as the total
-    density of states (DOS), projected DOS (PDOS), and thermal properties of a given structure.
-    It generates displaced supercells, calculates forces using a specified calculator, and computes
-    the required phonon properties.
+    Generates displaced supercells, calculates forces with a specified calculator, and computes the
+    total density of states (DOS), projected DOS (PDOS), and thermal properties of a given structure.
     """
 
     def __init__(
@@ -42,19 +40,13 @@ class PhonopyAnalyzer:
 
         Args:
             calculator (BaseCalculator, optional): The calculator used to compute forces and energies.
-                                                   Defaults to `M3GNetCalculator`.
             phonopy_transformation (PhonopyDisplacementTransformation, optional): The transformation object used
                                                                                   to generate displaced supercells.
         """
-        self.ase_adaptor = AseAtomsAdaptor()
-        self._calculator = calculator
+        super().__init__(calculator)
         self._phonopy_transformation = phonopy_transformation
 
-        self.phonon = None
-        self.total_dos = None
-        self.projected_dos = None
-        self.thermal_properties = None
-
+    @require_properties("forces")
     def calculate(
         self,
         structure: Structure | Atoms,
@@ -104,42 +96,36 @@ class PhonopyAnalyzer:
         Raises:
             ValueError: If the calculator object does not have the 'forces' property implemented.
         """
-        if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'forces' property implemented.")
-
-        if isinstance(structure, Atoms):
-            structure = self.ase_adaptor.get_structure(structure)
-
-        if not is_relaxed:
-            structure: Structure = self.calculator.relax(structure)["final_structure"]
+        structure = self._ensure_relaxed(structure, is_relaxed)
 
         mesh = mesh or [20, 20, 20]
         pdos_mesh = pdos_mesh or [10, 10, 10]
 
-        self.phonopy_transformation.apply_transformation(
+        phonopy_result = self.phonopy_transformation.apply_transformation(
             structure=structure,
             distance=distance,
             supercell_matrix=supercell_matrix,
             primitive_matrix=primitive_matrix,
             log_level=log_level,
         )
-        self.phonon = self.phonopy_transformation.phonon
-        self._produce_force_constants()
+        phonon = phonopy_result["phonon"]
+        displaced_structures = phonopy_result["displaced_structures"]
+        self._produce_force_constants(phonon, displaced_structures)
 
-        self.phonon.run_mesh(mesh=mesh)
+        phonon.run_mesh(mesh=mesh)
 
         # DOS
-        self.phonon.run_total_dos(sigma=sigma, freq_min=freq_min, freq_max=freq_max, freq_pitch=freq_pitch)
-        total_dos = self.phonon.get_total_dos_dict()
+        phonon.run_total_dos(sigma=sigma, freq_min=freq_min, freq_max=freq_max, freq_pitch=freq_pitch)
+        total_dos = phonon.get_total_dos_dict()
 
         # Thermal Properties
-        self.phonon.run_thermal_properties(t_min=t_min, t_max=t_max, t_step=t_step)
-        thermal_properties = self.phonon.get_thermal_properties_dict()
+        phonon.run_thermal_properties(t_min=t_min, t_max=t_max, t_step=t_step)
+        thermal_properties = phonon.get_thermal_properties_dict()
 
         # PDOS
-        self.phonon.run_mesh(mesh=pdos_mesh, is_mesh_symmetry=False, with_eigenvectors=True)
-        self.phonon.run_projected_dos()
-        projected_dos = self.phonon.get_projected_dos_dict()
+        phonon.run_mesh(mesh=pdos_mesh, is_mesh_symmetry=False, with_eigenvectors=True)
+        phonon.run_projected_dos()
+        projected_dos = phonon.get_projected_dos_dict()
 
         return {
             "total_dos": total_dos,
@@ -147,46 +133,25 @@ class PhonopyAnalyzer:
             "projected_dos": projected_dos,
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Returns the calculator used for energy and force calculations.
-
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
-
-        Returns:
-            BaseCalculator: The calculator object used for force and energy calculations.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    @property
+    @lazy_property("_phonopy_transformation")
     def phonopy_transformation(self) -> PhonopyDisplacementTransformation:
         """Returns the Phonopy transformation object used to generate displaced structures.
-
-        If the transformation instance is not already initialized, this method creates a new `PhonopyDisplacementTransformation` instance.
 
         Returns:
             PhonopyDisplacementTransformation: The transformation object used for phonon property calculations.
         """
-        if self._phonopy_transformation is None:
-            self._phonopy_transformation = PhonopyDisplacementTransformation()
-        return self._phonopy_transformation
+        return PhonopyDisplacementTransformation()
 
-    def _produce_force_constants(self) -> None:
+    def _produce_force_constants(self, phonon, displaced_structures) -> None:
         """Produces the force constants using the forces calculated from the calculator.
 
         This method calculates the forces on the displaced atoms using the provided calculator and generates
         the force constants required for phonon calculations.
-        """
-        if self.phonon is None:
-            raise RuntimeError("phonopy_transformation has to be called before trying to produce force constants.")
 
-        forces = [
-            self.calculator.calculate(displaced_structure)["forces"]
-            for displaced_structure in self.phonopy_transformation.displaced_structures
-        ]
-        self.phonon.forces = forces
-        self.phonon.produce_force_constants()
+        Args:
+            phonon (Phonopy): The `Phonopy` object to produce force constants for.
+            displaced_structures (list[Structure]): The displaced structures used to calculate forces.
+        """
+        forces = [self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in displaced_structures]
+        phonon.forces = forces
+        phonon.produce_force_constants()

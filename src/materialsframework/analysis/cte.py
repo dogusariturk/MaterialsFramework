@@ -10,14 +10,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from ase import Atoms
-from pymatgen.io.ase import AseAtomsAdaptor
 
+from materialsframework.analysis.base import BaseAnalyzer
 from materialsframework.transformations.cte import CTETransformation
+from materialsframework.utils import lazy_property, to_structure
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from ase import Atoms
     from pymatgen.core import Structure
 
     from materialsframework.tools.calculator import BaseCalculator
@@ -26,10 +27,8 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class CTEAnalyzer:
+class CTEAnalyzer(BaseAnalyzer):
     """A class used to estimate volumetric CTE from NPT-MD volume-temperature data."""
-
-    _MIN_DISTINCT_TEMPERATURES = 2
 
     def __init__(
         self,
@@ -40,12 +39,10 @@ class CTEAnalyzer:
 
         Args:
             calculator (BaseCalculator | None, optional): MD-capable calculator.
-                Defaults to lazy `M3GNetCalculator`.
             cte_transformation (CTETransformation | None, optional): Transformation object
                 for running the temperature sweep workflow.
         """
-        self.ase_adaptor = AseAtomsAdaptor()
-        self._calculator = calculator
+        super().__init__(calculator)
         self._cte_transformation = cte_transformation
 
     def calculate(
@@ -72,25 +69,26 @@ class CTEAnalyzer:
                 - ``per_temperature``: Per-temperature metrics from MD.
                 - ``cte``: Volumetric CTE summary in K⁻¹ and ppm/K.
         """
-        if isinstance(structure, Atoms):
-            structure = self.ase_adaptor.get_structure(structure)
+        structure = to_structure(structure)
 
         validated_temperatures = self.cte_transformation._validate_temperatures(temperatures)
         unique_temperatures = {float(t) for t in validated_temperatures}
-        if len(unique_temperatures) < self._MIN_DISTINCT_TEMPERATURES:
+        if len(unique_temperatures) < 2:
             raise ValueError("At least two distinct temperatures are required to compute CTE.")
 
-        self.cte_transformation.apply_transformation(
+        transformation_result = self.cte_transformation.apply_transformation(
             structure=structure,
             temperatures=validated_temperatures,
             steps=steps,
         )
+        cte_structures = transformation_result["structures"]
+        cte_tasks = transformation_result["tasks"]
 
         if not hasattr(self.calculator, "run") or not callable(self.calculator.run):
             raise ValueError("The calculator object must have a callable 'run' method for MD.")
 
         per_temperature: list[dict[str, float]] = []
-        for task in self.cte_transformation.tasks:
+        for task in cte_tasks:
             if hasattr(self.calculator, "ensemble"):
                 self.calculator.ensemble = task["ensemble"]
             if hasattr(self.calculator, "pressure"):
@@ -99,15 +97,14 @@ class CTEAnalyzer:
                 self.calculator.temperature = task["temperature"]
 
             md_result = self.calculator.run(
-                structure=self.cte_transformation.structures[task["temperature"]],
+                structure=cte_structures[task["temperature"]],
                 steps=task["steps"],
             )
 
             final_structure = md_result.get("final_structure")
             if final_structure is None:
                 raise ValueError("MD calculator 'run' output must include a 'final_structure'.")
-            if isinstance(final_structure, Atoms):
-                final_structure = self.ase_adaptor.get_structure(final_structure)
+            final_structure = to_structure(final_structure)
 
             sampled_temperatures = md_result.get("temperature", [])
             sampled_potential_energies = md_result.get("potential_energy", [])
@@ -149,26 +146,11 @@ class CTEAnalyzer:
             },
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Return calculator instance used for the CTE workflow.
-
-        Returns:
-            Calculator instance.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    @property
+    @lazy_property("_cte_transformation")
     def cte_transformation(self) -> CTETransformation:
         """Return CTE transformation object used by this analyzer.
 
         Returns:
             CTE transformation instance.
         """
-        if self._cte_transformation is None:
-            self._cte_transformation = CTETransformation()
-        return self._cte_transformation
+        return CTETransformation()

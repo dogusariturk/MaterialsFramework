@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
+
+from materialsframework._registry import make_registry
 
 if TYPE_CHECKING:
     from materialsframework.analysis.base import BaseAnalyzer
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
+
+_list_analyzers, _get_analyzer = make_registry("materialsframework.analyzers", "analyzer")
 
 
 def list_analyzers() -> list[str]:
@@ -18,7 +21,7 @@ def list_analyzers() -> list[str]:
     Returns:
         Sorted list of registered analyzer names.
     """
-    return sorted(ep.name for ep in entry_points(group="materialsframework.analyzers"))
+    return _list_analyzers()
 
 
 def get_analyzer(name: str, **kwargs) -> BaseAnalyzer:
@@ -34,7 +37,4 @@ def get_analyzer(name: str, **kwargs) -> BaseAnalyzer:
     Raises:
         ValueError: If no analyzer is registered under the given name.
     """
-    eps = {ep.name: ep for ep in entry_points(group="materialsframework.analyzers")}
-    if name not in eps:
-        raise ValueError(f"Unknown analyzer {name!r}. Available: {', '.join(sorted(eps))}")
-    return eps[name].load()(**kwargs)
+    return _get_analyzer(name, **kwargs)

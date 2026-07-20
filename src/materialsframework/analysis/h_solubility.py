@@ -9,7 +9,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
 from materialsframework.transformations.h_solubility import HSolubilityTransformation
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase import Atoms
@@ -21,7 +24,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class HSolubilityAnalyzer:
+class HSolubilityAnalyzer(BaseAnalyzer):
     """A class to evaluate H insertion energetics in BCC octahedral/tetrahedral sites."""
 
     def __init__(
@@ -38,10 +41,11 @@ class HSolubilityAnalyzer:
             hydrogen_reference_energy (float, optional): Reference energy per inserted hydrogen atom,
                 e.g., 1/2 E(H2).
         """
-        self._calculator = calculator
+        super().__init__(calculator)
         self._h_solubility_transformation = h_solubility_transformation
         self.hydrogen_reference_energy = float(hydrogen_reference_energy)
 
+    @require_properties("energy")
     def calculate(
         self,
         structure: Atoms | Structure | None = None,
@@ -75,10 +79,7 @@ class HSolubilityAnalyzer:
         Raises:
             ValueError: If required calculator capabilities are missing or no insertion energies are produced.
         """
-        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'energy' property implemented.")
-
-        self.h_solubility_transformation.apply_transformation(
+        initial_result = self.h_solubility_transformation.apply_transformation(
             structure=structure,
             composition=composition,
             supercell_size=supercell_size,
@@ -86,9 +87,8 @@ class HSolubilityAnalyzer:
             max_sites_per_type=max_sites_per_type,
         )
 
-        host_structure = self.h_solubility_transformation.host_structure
-        if host_structure is None:
-            raise ValueError("Host structure generation failed.")
+        host_structure = initial_result["host_structure"]
+        insertion_structures = initial_result["structures"]
 
         if is_relaxed:
             host_energy = float(self.calculator.calculate(host_structure)["energy"])
@@ -97,20 +97,21 @@ class HSolubilityAnalyzer:
             host_structure = relaxed_host["final_structure"]
             host_energy = float(relaxed_host["energy"])
 
-            self.h_solubility_transformation.apply_transformation(
+            relaxed_result = self.h_solubility_transformation.apply_transformation(
                 structure=host_structure,
                 site_types=site_types,
                 max_sites_per_type=max_sites_per_type,
             )
+            insertion_structures = relaxed_result["structures"]
 
         octahedral_energies = self._calculate_site_energies(
             host_energy,
-            self.h_solubility_transformation.structures.get("octahedral", []),
+            insertion_structures.get("octahedral", []),
             is_relaxed,
         )
         tetrahedral_energies = self._calculate_site_energies(
             host_energy,
-            self.h_solubility_transformation.structures.get("tetrahedral", []),
+            insertion_structures.get("tetrahedral", []),
             is_relaxed,
         )
 
@@ -165,26 +166,11 @@ class HSolubilityAnalyzer:
 
         return energies
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Return the calculator used for energy evaluations.
-
-        Returns:
-            Calculator instance.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    @property
+    @lazy_property("_h_solubility_transformation")
     def h_solubility_transformation(self) -> HSolubilityTransformation:
         """Return transformation used for interstitial-structure generation.
 
         Returns:
             H-solubility transformation instance.
         """
-        if self._h_solubility_transformation is None:
-            self._h_solubility_transformation = HSolubilityTransformation()
-        return self._h_solubility_transformation
+        return HSolubilityTransformation()

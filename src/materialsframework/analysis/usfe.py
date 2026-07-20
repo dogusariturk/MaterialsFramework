@@ -9,12 +9,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ase import Atoms
-from pymatgen.io.ase import AseAtomsAdaptor
-
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
 from materialsframework.transformations.usfe import USFETransformation
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from pymatgen.core import Structure
 
     from materialsframework.tools.calculator import BaseCalculator
@@ -23,7 +24,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class USFEAnalyzer:
+class USFEAnalyzer(BaseAnalyzer):
     """A class used to compute GSFE curves and USFE values for BCC-like slip systems."""
 
     _EV_A2_TO_MJ_M2 = 16021.76634
@@ -46,7 +47,6 @@ class USFEAnalyzer:
             stop (float, optional): Ending displacement fraction. Defaults to 1.0.
             num_steps (int, optional): Number of displacement points. Defaults to 11.
             calculator (BaseCalculator | None, optional): Calculator for energy evaluations.
-                Defaults to lazy `M3GNetCalculator`.
             usfe_transformation (USFETransformation | None, optional): Custom transformation
                 object. If not provided, a default one is created lazily.
 
@@ -56,15 +56,15 @@ class USFEAnalyzer:
         if slip_plane not in {"110", "112"}:
             raise ValueError(f"Unsupported slip_plane '{slip_plane}'. Supported values are: 110, 112.")
 
+        super().__init__(calculator)
         self.slip_plane = slip_plane
         self.start = start
         self.stop = stop
         self.num_steps = num_steps
 
-        self.ase_adaptor = AseAtomsAdaptor()
-        self._calculator = calculator
         self._usfe_transformation = usfe_transformation
 
+    @require_properties("energy")
     def calculate(
         self, structure: Structure | Atoms, is_relaxed: bool = False
     ) -> dict[str, str | int | float | list[dict[str, float]]]:
@@ -85,27 +85,21 @@ class USFEAnalyzer:
         Raises:
             ValueError: If the calculator does not provide ``energy``.
         """
-        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'energy' property implemented.")
+        structure = self._ensure_relaxed(structure, is_relaxed)
 
-        if isinstance(structure, Atoms):
-            structure = self.ase_adaptor.get_structure(structure)
-
-        if not is_relaxed:
-            structure = self.calculator.relax(structure)["final_structure"]
-
-        self.usfe_transformation.apply_transformation(structure)
+        transformation_result = self.usfe_transformation.apply_transformation(structure)
+        displaced_structures = transformation_result["displaced_structures"]
+        fault_area = transformation_result["fault_area"]
 
         energy_points = [
             (
                 frac,
                 self.calculator.calculate(displaced_structure)["energy"],
             )
-            for frac, displaced_structure in self.usfe_transformation.displaced_structures.items()
+            for frac, displaced_structure in displaced_structures.items()
         ]
 
         reference_energy = energy_points[0][1]
-        fault_area = self.usfe_transformation.fault_area
         if fault_area is None or fault_area <= 0:
             raise ValueError("Fault area must be a positive value after transformation.")
 
@@ -127,31 +121,16 @@ class USFEAnalyzer:
             "num_steps": len(gsfe_curve),
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Return the calculator instance used for energy calculations.
-
-        Returns:
-            Calculator instance.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    @property
+    @lazy_property("_usfe_transformation")
     def usfe_transformation(self) -> USFETransformation:
         """Return USFE transformation object for displaced structures.
 
         Returns:
             USFE transformation instance.
         """
-        if self._usfe_transformation is None:
-            self._usfe_transformation = USFETransformation(
-                slip_plane=self.slip_plane,
-                start=self.start,
-                stop=self.stop,
-                num_steps=self.num_steps,
-            )
-        return self._usfe_transformation
+        return USFETransformation(
+            slip_plane=self.slip_plane,
+            start=self.start,
+            stop=self.stop,
+            num_steps=self.num_steps,
+        )

@@ -1,22 +1,22 @@
 """This module contains a class to calculate the formation energy of materials.
 
 The `FormationEnergyAnalyzer` class computes the formation energy of a material based on its
-composition and structure. The class can be used to analyze the stability of materials and
-determine their suitability for various applications.
+composition and structure.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ase import Atoms
-from pymatgen.io.ase import AseAtomsAdaptor
-
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import default_calculator, require_properties
 from materialsframework.transformations.formation_energy import (
     FormationEnergyTransformation,
 )
+from materialsframework.utils import lazy_property, to_structure
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from pymatgen.core import Structure
 
     from materialsframework.tools.calculator import BaseCalculator
@@ -25,12 +25,11 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class FormationEnergyAnalyzer:
+class FormationEnergyAnalyzer(BaseAnalyzer):
     """A class used to calculate the formation energy of materials.
 
-    The `FormationEnergyAnalyzer` class provides methods to compute the formation energy of a
-    material based on its composition and structure. The class can be used to analyze the stability
-    of materials and determine their suitability for various applications.
+    The `FormationEnergyAnalyzer` class computes the formation energy of a material from its
+    composition and structure.
     """
 
     def __init__(
@@ -42,14 +41,13 @@ class FormationEnergyAnalyzer:
 
         Args:
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
-                                                             Defaults to `M3GNetCalculator`.
             formation_energy_transformation (FormationEnergyTransformation, optional): The transformation
                 object used to generate structures required for the calculation of formation energies.
         """
-        self.ase_adaptor = AseAtomsAdaptor()
-        self._calculator = calculator
+        super().__init__(calculator)
         self._formation_energy_transformation = formation_energy_transformation
 
+    @require_properties("energy")
     def calculate(self, structure: Atoms | Structure, is_relaxed: bool = False) -> dict[str, float]:
         """Calculates the formation energy of the given structure.
 
@@ -66,14 +64,9 @@ class FormationEnergyAnalyzer:
             dict[str, float]: Dictionary with keys:
                 - ``formation_energy``: Formation energy per atom (eV/atom).
         """
-        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'energy' property implemented.")
+        structure = to_structure(structure)
 
-        if isinstance(structure, Atoms):
-            structure = self.ase_adaptor.get_structure(structure)
-
-        min_elements = 2
-        if len(structure.elements) < min_elements:
+        if len(structure.elements) < 2:
             raise ValueError("The structure must contain at least two different elements to calculate formation energy.")
 
         if is_relaxed:
@@ -83,42 +76,22 @@ class FormationEnergyAnalyzer:
             compound_energy = result["energy"]
             structure = result["final_structure"]
 
-        self.formation_energy_transformation.apply_transformation(structure)
+        pure_structures = self.formation_energy_transformation.apply_transformation(structure)
 
         pure_energies = sum(
             num * min(self.calculator.relax(candidate)["energy"] / candidate.num_sites for candidate in candidates)
-            for candidates, num in self.formation_energy_transformation.pure_structures
+            for candidates, num in pure_structures
         )
 
         return {
             "formation_energy": (compound_energy - pure_energies) / structure.num_sites,
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Returns the calculator instance used for energy calculations.
-
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
-
-        Returns:
-            BaseCalculator: The calculator object used for energy calculations.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator(fmax=0.01)
-        return self._calculator
-
-    @property
+    @lazy_property("_formation_energy_transformation")
     def formation_energy_transformation(self) -> FormationEnergyTransformation:
         """Returns the transformation object used to apply distortions.
-
-        If the transformation object is not already initialized, this method creates a new
-        `FormationEnergyTransformation` instance.
 
         Returns:
             FormationEnergyTransformation: The transformation object used to generate structures.
         """
-        if self._formation_energy_transformation is None:
-            self._formation_energy_transformation = FormationEnergyTransformation()
-        return self._formation_energy_transformation
+        return FormationEnergyTransformation()

@@ -1,8 +1,7 @@
 """This module provides a class to calculate phonon properties of a structure using Phono3py.
 
-The `Phono3pyAnalyzer` class facilitates phonon property calculations, including thermal
-conductivity, using Phono3py. It generates displaced structures, computes forces using
-the provided calculator, and calculates the thermal conductivity using the RTA or LBTE methods.
+The `Phono3pyAnalyzer` class generates displaced structures, computes forces with the provided
+calculator, and calculates thermal conductivity using the RTA or LBTE methods.
 """
 
 from __future__ import annotations
@@ -10,16 +9,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from ase import Atoms
-from pymatgen.io.ase import AseAtomsAdaptor
 
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
 from materialsframework.transformations.phono3py import (
     Phono3pyDisplacementTransformation,
 )
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from typing import Literal
 
+    from ase import Atoms
     from numpy.typing import ArrayLike
     from phono3py.conductivity.direct_solution import ConductivityLBTE
     from phono3py.conductivity.rta import ConductivityRTA
@@ -31,13 +32,12 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class Phono3pyAnalyzer:
+class Phono3pyAnalyzer(BaseAnalyzer):
     """A class used to calculate phonon properties using Phono3py.
 
-    The `Phono3pyAnalyzer` class provides methods to compute phonon properties of a given structure,
-    including thermal conductivity using the Relaxation Time Approximation (RTA) or the Linearized
-    Boltzmann Transport Equation (LBTE) methods. This is achieved by generating displaced supercells,
-    calculating forces using the provided calculator, and performing phonon property calculations.
+    Generates displaced supercells, calculates forces with the provided calculator, and computes thermal
+    conductivity using the Relaxation Time Approximation (RTA) or the Linearized Boltzmann Transport
+    Equation (LBTE) method.
     """
 
     def __init__(
@@ -49,17 +49,13 @@ class Phono3pyAnalyzer:
 
         Args:
             calculator (BaseCalculator, optional): The calculator used to compute forces and energies.
-                                                   Defaults to `M3GNetCalculator` if not provided.
             phono3py_transformation (Phono3pyDisplacementTransformation, optional): The transformation object used
                                                                                    to generate displaced structures.
         """
-        self.ase_adaptor = AseAtomsAdaptor()
-        self._calculator = calculator
+        super().__init__(calculator)
         self._phono3py_transformation = phono3py_transformation
 
-        self.phonon = None
-        self.thermal_conductivity = None
-
+    @require_properties("forces")
     def calculate(
         self,
         structure: Structure | Atoms,
@@ -107,18 +103,11 @@ class Phono3pyAnalyzer:
         Raises:
             ValueError: If the calculator object does not have the 'forces' property implemented.
         """
-        if "forces" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'forces' property implemented.")
-
-        if isinstance(structure, Atoms):
-            structure = self.ase_adaptor.get_structure(structure)
-
-        if not is_relaxed:
-            structure: Structure = self.calculator.relax(structure)["final_structure"]
+        structure = self._ensure_relaxed(structure, is_relaxed)
 
         mesh = mesh or [20, 20, 20]
 
-        self.phono3py_transformation.apply_transformation(
+        phono3py_result = self.phono3py_transformation.apply_transformation(
             structure=structure,
             distance=distance,
             supercell_matrix=supercell_matrix,
@@ -127,73 +116,58 @@ class Phono3pyAnalyzer:
             log_level=log_level,
         )
 
-        self.phonon = self.phono3py_transformation.phonon
-        self._produce_force_constants()
+        phonon = phono3py_result["phonon"]
+        supercells_with_displacements = phono3py_result["supercells_with_displacements"]
+        phonon_supercells_with_displacements = phono3py_result["phonon_supercells_with_displacements"]
+        self._produce_force_constants(phonon, supercells_with_displacements, phonon_supercells_with_displacements)
 
-        self.phonon.mesh_numbers = mesh
-        self.phonon.init_phph_interaction()
-        self.phonon.run_phonon_solver()
+        phonon.mesh_numbers = mesh
+        phonon.init_phph_interaction()
+        phonon.run_phonon_solver()
 
         # Thermal Conductivity
-        self.phonon.run_thermal_conductivity(
+        phonon.run_thermal_conductivity(
             is_LBTE=is_lbte,
             is_isotope=is_isotope,
             conductivity_type=conductivity_type,
             boundary_mfp=boundary_mfp,
             temperatures=np.arange(t_min, t_max + t_step, t_step),
         )
-        self.thermal_conductivity: ConductivityRTA | ConductivityLBTE = self.phonon.thermal_conductivity
+        thermal_conductivity: ConductivityRTA | ConductivityLBTE = phonon.thermal_conductivity
 
-        return {"thermal_conductivity": self.thermal_conductivity}
+        return {"thermal_conductivity": thermal_conductivity}
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Returns the calculator used for energy and force calculations.
-
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
-
-        Returns:
-            BaseCalculator: The calculator object used for force and energy calculations.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    @property
+    @lazy_property("_phono3py_transformation")
     def phono3py_transformation(self) -> Phono3pyDisplacementTransformation:
         """Returns the Phono3py transformation object used to generate displaced structures.
-
-        If the transformation instance is not already initialized, this method creates a new `Phono3pyDisplacementTransformation` instance.
 
         Returns:
             Phono3pyDisplacementTransformation: The transformation object used for phonon property calculations.
         """
-        if self._phono3py_transformation is None:
-            self._phono3py_transformation = Phono3pyDisplacementTransformation()
-        return self._phono3py_transformation
+        return Phono3pyDisplacementTransformation()
 
-    def _produce_force_constants(self) -> None:
+    def _produce_force_constants(self, phonon, supercells_with_displacements, phonon_supercells_with_displacements) -> None:
         """Produces the force constants using the forces calculated from the calculator.
 
         This method calculates the forces on the displaced atoms using the provided calculator and then
         generates the second- and third-order force constants required for phonon calculations.
-        """
-        if self.phonon is None:
-            raise RuntimeError("phono3py_transformation has to be called before trying to produce force constants.")
 
+        Args:
+            phonon (Phono3py): The `Phono3py` object to produce force constants for.
+            supercells_with_displacements (list[Structure]): Displaced supercells for third-order force constants.
+            phonon_supercells_with_displacements (list[Structure]): Displaced supercells for phonon (second-order)
+                force constants.
+        """
         forces = [
-            self.calculator.calculate(displaced_structure)["forces"]
-            for displaced_structure in self.phono3py_transformation.supercells_with_displacements
+            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements
         ]
-        self.phonon.forces = np.array(forces)
+        phonon.forces = np.array(forces)
 
         phonon_forces = [
             self.calculator.calculate(displaced_structure)["forces"]
-            for displaced_structure in self.phono3py_transformation.phonon_supercells_with_displacements
+            for displaced_structure in phonon_supercells_with_displacements
         ]
-        self.phonon.phonon_forces = np.array(phonon_forces)
+        phonon.phonon_forces = np.array(phonon_forces)
 
-        self.phonon.produce_fc3()
-        self.phonon.produce_fc2()
+        phonon.produce_fc3()
+        phonon.produce_fc2()

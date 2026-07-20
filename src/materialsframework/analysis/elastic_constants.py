@@ -12,29 +12,34 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
-from pymatgen.core import Structure
 
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
 from materialsframework.tools import elastic
 from materialsframework.transformations.elastic_constants import (
     ElasticConstantsDeformationTransformation,
 )
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ase import Atoms
+    from pymatgen.core import Structure
 
     from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
+EV_A3_TO_GPA: float = 160.21766208
 
-class ElasticConstantsAnalyzer:
+
+class ElasticConstantsAnalyzer(BaseAnalyzer):
     """A class used to calculate the elastic constant tensor for a given structure.
 
-    The `ElasticConstantsAnalyzer` class provides methods to compute the elastic constant tensor
-    of a structure using deformation and energy-volume data. In addition to the elastic constants,
-    this class computes mechanical properties such as bulk modulus, shear modulus, Young's modulus,
-    and Poisson's ratio.
+    Computes the elastic constant tensor from deformation and energy-volume data, along with derived
+    mechanical properties such as bulk modulus, shear modulus, Young's modulus, and Poisson's ratio.
     """
 
     EQUIV = {
@@ -57,7 +62,6 @@ class ElasticConstantsAnalyzer:
         self,
         num_deform: int = 5,
         max_deform: float = 2,
-        fmax: float = 0.01,
         calculator: BaseCalculator | None = None,
         elastic_constant_transformation: ElasticConstantsDeformationTransformation | None = None,
     ) -> None:
@@ -66,26 +70,22 @@ class ElasticConstantsAnalyzer:
         Args:
             num_deform (int, optional): The number of deformations to apply. Defaults to 5.
             max_deform (float, optional): The maximum deformation size in percent and degrees. Defaults to 2%.
-            fmax (float, optional): The maximum force for the calculator. Defaults to 0.01.
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
-                                                          Defaults to `M3GNetCalculator`.
             elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The transformation
                                                                                                     object used to apply
                                                                                                     cubic distortions.
         """
+        super().__init__(calculator)
         self.num_deform = num_deform
         self.max_deform = max_deform
-        self.fmax = fmax
 
-        self._calculator = calculator
         self._elastic_constant_transformation = elastic_constant_transformation
 
+    @require_properties("energy", "stress")
     def calculate(self, structure: Structure | Atoms, is_relaxed: bool = False) -> dict[str, float]:
         """Calculates the elastic constants of a given structure.
 
-        The method calculates the elastic constants of a structure using stress-strain data and various
-        deformation modes. The resulting elastic constants are returned as a dictionary with the elastic
-        constant names as keys and the corresponding values in GPa.
+        Uses stress-strain data from a series of deformation modes to fit the elastic constants.
 
         Args:
             structure (Structure | Atoms): The input structure to calculate the elastic constants.
@@ -107,30 +107,30 @@ class ElasticConstantsAnalyzer:
                 - ``pugh_ratio``: Pugh ratio.
 
         Raises:
-            ValueError: If the calculator object does not have the 'energy' property implemented.
+            ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
         """
-        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'energy' property implemented.")
+        structure = self._ensure_relaxed(structure, is_relaxed)
+        structure = structure.to_ase_atoms(msonable=False)
 
-        if not is_relaxed:
-            structure = self.calculator.relax(structure)["final_structure"]
-
-        if isinstance(structure, Structure):
-            structure = structure.to_ase_atoms(msonable=False)
-
+        prev_relax_cell = self.calculator.relax_cell
         self.calculator.relax_cell = False
-        structure.calc = self.calculator.calculator
+        try:
+            structure.calc = self.calculator.calculator
 
-        self.elastic_constants_transformation.apply_transformation(structure)
+            distorted_structures = self.elastic_constants_transformation.apply_transformation(structure)
 
-        for distorted_structure in self.elastic_constants_transformation.distorted_structures:
-            distorted_structure.calc = self.calculator.calculator
+            for distorted_structure in distorted_structures:
+                distorted_structure.calc = self.calculator.calculator
 
-        cij_order = elastic.get_cij_order(structure)
-        cij, bij = elastic.get_elastic_tensor(
-            cryst=structure,
-            systems=self.elastic_constants_transformation.distorted_structures,
-        )
+            cij_order = elastic.get_cij_order(structure)
+            cij, bij = elastic.get_elastic_tensor(
+                cryst=structure,
+                systems=distorted_structures,
+            )
+        finally:
+            self.calculator.relax_cell = prev_relax_cell
+
+        cij = np.asarray(cij, dtype=float) * EV_A3_TO_GPA
 
         elastic_tensor = self._build_elastic_tensor(cij, cij_order, structure)
 
@@ -147,44 +147,23 @@ class ElasticConstantsAnalyzer:
             "pugh_ratio": elastic_tensor.g_vrh / elastic_tensor.k_vrh,
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """Returns the calculator instance used for energy calculations.
-
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
-
-        Returns:
-            BaseCalculator: The calculator object used for energy calculations.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator(fmax=self.fmax)
-        return self._calculator
-
-    @property
+    @lazy_property("_elastic_constant_transformation")
     def elastic_constants_transformation(
         self,
     ) -> ElasticConstantsDeformationTransformation:
         """Returns the transformation object used to apply distortions.
 
-        If the transformation object is not already initialized, this method creates a new `ElasticConstantsDeformationTransformation` instance.
-
         Returns:
             ElasticConstantsDeformationTransformation: The transformation object used to apply distortions.
         """
-        if self._elastic_constant_transformation is None:
-            self._elastic_constant_transformation = ElasticConstantsDeformationTransformation(
-                num_deform=self.num_deform, max_deform=self.max_deform
-            )
-        return self._elastic_constant_transformation
+        return ElasticConstantsDeformationTransformation(num_deform=self.num_deform, max_deform=self.max_deform)
 
-    def _build_elastic_tensor(self, cij: list, cij_order: list, structure: Atoms) -> ElasticTensor:
+    def _build_elastic_tensor(self, cij: Sequence[float], cij_order: Sequence[str], structure: Atoms) -> ElasticTensor:
         """Builds the elastic tensor from the given cij and cij_order.
 
         Args:
-            cij (list): The list of elastic constants.
-            cij_order (list): The order of the elastic constants.
+            cij (Sequence[float]): The list of elastic constants.
+            cij_order (Sequence[str]): The order of the elastic constants.
             structure (Atoms): The input structure.
 
         Returns:
