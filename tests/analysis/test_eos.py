@@ -23,8 +23,8 @@ def result(analyzer, bcc_fe):
 def test_eos_transformation_generates_structures(bcc_fe) -> None:
     """EOSTransformation produces the expected number of deformed structures."""
     t = EOSTransformation(start=-0.02, stop=0.02, num=3)
-    t.apply_transformation(bcc_fe)
-    assert len(t.structures) == 3
+    result = t.apply_transformation(bcc_fe)
+    assert len(result) == 3
 
 
 def test_eos_analyzer_default_params() -> None:

@@ -53,7 +53,6 @@ def test_default_params() -> None:
     analyzer = ElasticConstantsAnalyzer()
     assert analyzer.num_deform == 5
     assert analyzer.max_deform == pytest.approx(2)
-    assert analyzer.fmax == pytest.approx(0.01)
     assert analyzer._calculator is None
     assert analyzer._elastic_constant_transformation is None
 

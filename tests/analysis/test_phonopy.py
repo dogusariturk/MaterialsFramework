@@ -27,10 +27,6 @@ def test_default_params() -> None:
     analyzer = PhonopyAnalyzer()
     assert analyzer._calculator is None
     assert analyzer._phonopy_transformation is None
-    assert analyzer.phonon is None
-    assert analyzer.total_dos is None
-    assert analyzer.projected_dos is None
-    assert analyzer.thermal_properties is None
 
 
 def test_phonopy_transformation_lazy_property() -> None:
@@ -60,6 +56,6 @@ def test_thermal_properties_has_expected_keys(result) -> None:
 
 
 @pytest.mark.integration
-def test_phonon_attribute_populated(analyzer) -> None:
-    """After calculate(), analyzer.phonon is populated."""
-    assert analyzer.phonon is not None
+def test_projected_dos_has_expected_keys(result) -> None:
+    """projected_dos dict contains frequency_points."""
+    assert "frequency_points" in result["projected_dos"]

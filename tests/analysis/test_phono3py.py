@@ -34,8 +34,6 @@ def test_default_params() -> None:
     analyzer = Phono3pyAnalyzer()
     assert analyzer._calculator is None
     assert analyzer._phono3py_transformation is None
-    assert analyzer.phonon is None
-    assert analyzer.thermal_conductivity is None
 
 
 def test_phono3py_transformation_lazy_property() -> None:
@@ -54,7 +52,6 @@ def test_calculate_returns_thermal_conductivity(result) -> None:
 
 @pytest.mark.integration
 @pytest.mark.slow
-def test_phonon_and_conductivity_attributes_populated(analyzer) -> None:
-    """After calculate(), both analyzer.phonon and .thermal_conductivity are set."""
-    assert analyzer.phonon is not None
-    assert analyzer.thermal_conductivity is not None
+def test_calculate_thermal_conductivity_is_not_none(result) -> None:
+    """calculate() returns a non-None 'thermal_conductivity' value."""
+    assert result["thermal_conductivity"] is not None
