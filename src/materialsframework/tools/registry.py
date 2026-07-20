@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
-from importlib.metadata import entry_points
-from typing import Any
+from typing import TYPE_CHECKING
+
+from materialsframework._registry import make_registry
+
+if TYPE_CHECKING:
+    from typing import Any
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
+
+_list_tools, _get_tool = make_registry("materialsframework.tools", "tool")
 
 
 def list_tools() -> list[str]:
@@ -15,7 +21,7 @@ def list_tools() -> list[str]:
     Returns:
         Sorted list of registered tool names.
     """
-    return sorted(ep.name for ep in entry_points(group="materialsframework.tools"))
+    return _list_tools()
 
 
 def get_tool(name: str, **kwargs) -> Any:
@@ -31,7 +37,4 @@ def get_tool(name: str, **kwargs) -> Any:
     Raises:
         ValueError: If no tool is registered under the given name.
     """
-    eps = {ep.name: ep for ep in entry_points(group="materialsframework.tools")}
-    if name not in eps:
-        raise ValueError(f"Unknown tool {name!r}. Available: {', '.join(sorted(eps))}")
-    return eps[name].load()(**kwargs)
+    return _get_tool(name, **kwargs)
