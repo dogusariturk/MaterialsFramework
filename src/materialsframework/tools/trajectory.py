@@ -1,8 +1,8 @@
-"""This module provides a `TrajectoryObserver` class for observing and recording atomic states.
+"""This module provides the `TrajectoryObserver` class for observing and recording atomic states.
 
-Records states of atomic structures during relaxation processes in the Atomic Simulation Environment (ASE).
-The `TrajectoryObserver` class can save properties like energies, forces, stresses,
-magnetic moments, dipoles, and more for each step of the relaxation.
+`TrajectoryObserver` records the state of atomic structures at each step of a relaxation
+in the Atomic Simulation Environment (ASE), saving properties such as energies, forces,
+stresses, magnetic moments, and dipoles.
 """
 
 from __future__ import annotations
@@ -25,8 +25,7 @@ __email__ = "dogu.sariturk@gmail.com"
 class TrajectoryObserver(collections.abc.Sequence):
     """TrajectoryObserver is a class that observes and records the states of atomic structures.
 
-    Records states during the relaxation process in ASE.
-    This class acts as a hook during the relaxation process, saving intermediate structures and
+    Acts as a hook during the relaxation process in ASE, saving intermediate structures and
     their associated properties like energies, forces, stresses, and optionally, temperatures,
     magnetic moments, and dipoles.
 
@@ -51,8 +50,6 @@ class TrajectoryObserver(collections.abc.Sequence):
         include_velocities: bool = False,
     ) -> None:
         """Initializes the TrajectoryObserver with the ASE Atoms object and optional flags.
-
-        Sets up flags for recording additional properties.
 
         Args:
             atoms (Atoms): The ASE Atoms object representing the atomic structure to observe and record.
@@ -93,8 +90,6 @@ class TrajectoryObserver(collections.abc.Sequence):
         """Records the current state of the atoms, including energies, forces, and stresses.
 
         Optionally records temperatures, magnetic moments, dipoles, and velocities.
-        This method captures and stores various properties of the ASE Atoms object at the current
-        step of the relaxation process.
         """
         self.total_energies.append(float(self.atoms.get_total_energy()))
         self.potential_energies.append(float(self.atoms.get_potential_energy()))
@@ -147,11 +142,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         return item_properties
 
     def __len__(self):
-        """Returns the number of recorded steps in the observer.
-
-        This method provides the length of the recorded trajectory, corresponding to the
-        number of steps at which properties were saved.
-        """
+        """Returns the number of recorded steps in the observer."""
         return len(self.total_energies)
 
     def _out_dict(self) -> dict[str, Any]:
@@ -213,9 +204,6 @@ class TrajectoryObserver(collections.abc.Sequence):
 
         Args:
             filename (str): The name of the file where the trajectory will be saved.
-
-        The trajectory data, including all recorded properties, will be serialized
-        and saved to the specified file.
         """
         with Path(filename).open("wb") as file:
             pickle.dump(self._out_dict(), file)
