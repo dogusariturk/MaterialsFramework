@@ -11,35 +11,32 @@ from materialsframework.transformations.phonopy import PhonopyDisplacementTransf
 
 
 def test_init() -> None:
-    """Transformation initialises with all state attributes as None."""
-    t = PhonopyDisplacementTransformation()
-    assert t.phonon is None
-    assert t.displaced_structures is None
-    assert t.displacements is None
+    """Transformation initialises with no state attributes."""
+    PhonopyDisplacementTransformation()
 
 
 @pytest.mark.integration
-def test_apply_transformation_populates_phonon(bcc_fe) -> None:
-    """apply_transformation creates a Phonopy object."""
+def test_apply_transformation_returns_phonon(bcc_fe) -> None:
+    """apply_transformation returns a Phonopy object."""
     t = PhonopyDisplacementTransformation()
-    t.apply_transformation(bcc_fe)
-    assert t.phonon is not None
+    result = t.apply_transformation(bcc_fe)
+    assert result["phonon"] is not None
 
 
 @pytest.mark.integration
-def test_apply_transformation_populates_displaced_structures(bcc_fe) -> None:
-    """apply_transformation produces a non-empty list of displaced structures."""
+def test_apply_transformation_returns_displaced_structures(bcc_fe) -> None:
+    """apply_transformation returns a non-empty list of displaced structures."""
     t = PhonopyDisplacementTransformation()
-    t.apply_transformation(bcc_fe)
-    assert t.displaced_structures is not None
-    assert len(t.displaced_structures) > 0
-    for s in t.displaced_structures:
+    result = t.apply_transformation(bcc_fe)
+    assert result["displaced_structures"] is not None
+    assert len(result["displaced_structures"]) > 0
+    for s in result["displaced_structures"]:
         assert isinstance(s, Structure)
 
 
 @pytest.mark.integration
-def test_apply_transformation_stores_displacements(bcc_fe) -> None:
-    """apply_transformation stores the displacement vectors."""
+def test_apply_transformation_returns_displacements(bcc_fe) -> None:
+    """apply_transformation returns the displacement vectors."""
     t = PhonopyDisplacementTransformation()
-    t.apply_transformation(bcc_fe)
-    assert t.displacements is not None
+    result = t.apply_transformation(bcc_fe)
+    assert result["displacements"] is not None

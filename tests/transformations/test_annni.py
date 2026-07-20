@@ -11,9 +11,8 @@ from materialsframework.transformations.annni import ANNNIStackingFaultTransform
 
 
 def test_init() -> None:
-    """Transformation initialises with empty structures dict and no SQS transformation."""
+    """Transformation initialises with no SQS transformation."""
     t = ANNNIStackingFaultTransformation()
-    assert t.structures == {}
     assert t._sqs_gen is None
 
 
@@ -27,28 +26,28 @@ def test_sqs_gen_lazy_property() -> None:
 
 
 @pytest.mark.integration
-def test_apply_transformation_populates_all_phases() -> None:
-    """apply_transformation fills structures dict with fcc, hcp, and dhcp entries."""
+def test_apply_transformation_returns_correct_structures() -> None:
+    """apply_transformation returns a dict with fcc, hcp, and dhcp entries."""
     t = ANNNIStackingFaultTransformation()
-    t.apply_transformation(
+    result = t.apply_transformation(
         "Fe0.5Co0.5",
         fcc_supercell_size=(2, 1, 1),
         hcp_supercell_size=(1, 1, 1),
         dhcp_supercell_size=(1, 1, 1),
     )
     for key in ("fcc", "hcp", "dhcp"):
-        assert key in t.structures
-        assert isinstance(t.structures[key], Structure)
+        assert key in result
+        assert isinstance(result[key], Structure)
 
 
 @pytest.mark.integration
 def test_apply_transformation_accepts_string_composition() -> None:
     """apply_transformation accepts a plain string as composition."""
     t = ANNNIStackingFaultTransformation()
-    t.apply_transformation(
+    result = t.apply_transformation(
         "Fe0.5Co0.5",
         fcc_supercell_size=(2, 1, 1),
         hcp_supercell_size=(1, 1, 1),
         dhcp_supercell_size=(1, 1, 1),
     )
-    assert len(t.structures) == 3
+    assert len(result) == 3

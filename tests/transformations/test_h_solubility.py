@@ -12,20 +12,19 @@ def test_init() -> None:
     """Transformation initializes expected default state."""
     t = HSolubilityTransformation()
     assert t._sqs_gen is None
-    assert t.host_structure is None
-    assert t.structures == {}
 
 
-def test_apply_transformation_generates_octahedral_and_tetrahedral(bcc_fe) -> None:
-    """apply_transformation creates one structure per default site type."""
+def test_apply_transformation_returns_octahedral_and_tetrahedral(bcc_fe) -> None:
+    """apply_transformation returns one structure per default site type."""
     t = HSolubilityTransformation()
-    t.apply_transformation(bcc_fe)
+    result = t.apply_transformation(bcc_fe)
+    structures = result["structures"]
 
-    assert set(t.structures) == {"octahedral", "tetrahedral"}
-    assert len(t.structures["octahedral"]) == 1
-    assert len(t.structures["tetrahedral"]) == 1
+    assert set(structures) == {"octahedral", "tetrahedral"}
+    assert len(structures["octahedral"]) == 1
+    assert len(structures["tetrahedral"]) == 1
 
-    for generated in t.structures["octahedral"] + t.structures["tetrahedral"]:
+    for generated in structures["octahedral"] + structures["tetrahedral"]:
         assert generated.num_sites == bcc_fe.num_sites + 1
         assert generated.composition["H"] == 1
 
@@ -34,9 +33,9 @@ def test_apply_transformation_accepts_ase_atoms(bcc_fe) -> None:
     """apply_transformation accepts ASE Atoms inputs."""
     ase_bcc_fe = AseAtomsAdaptor.get_atoms(bcc_fe)
     t = HSolubilityTransformation()
-    t.apply_transformation(ase_bcc_fe, site_types=("octahedral",))
+    result = t.apply_transformation(ase_bcc_fe, site_types=("octahedral",))
 
-    assert len(t.structures["octahedral"]) == 1
+    assert len(result["structures"]["octahedral"]) == 1
 
 
 def test_apply_transformation_validates_site_types(bcc_fe) -> None:

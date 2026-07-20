@@ -14,7 +14,6 @@ def test_default_params() -> None:
     t = ElasticConstantsDeformationTransformation()
     assert t.num_deform == 5
     assert t.max_deform == 2
-    assert t.distorted_structures == []
 
 
 def test_custom_params() -> None:
@@ -24,12 +23,12 @@ def test_custom_params() -> None:
     assert t.max_deform == 1.0
 
 
-def test_apply_transformation_produces_ase_atoms(bcc_fe) -> None:
-    """apply_transformation populates distorted_structures with ASE Atoms objects."""
+def test_apply_transformation_returns_ase_atoms(bcc_fe) -> None:
+    """apply_transformation returns a list of ASE Atoms objects."""
     t = ElasticConstantsDeformationTransformation(num_deform=3, max_deform=1.0)
-    t.apply_transformation(bcc_fe)
-    assert len(t.distorted_structures) > 0
-    for atoms in t.distorted_structures:
+    result = t.apply_transformation(bcc_fe)
+    assert len(result) > 0
+    for atoms in result:
         assert isinstance(atoms, Atoms)
 
 
@@ -40,5 +39,5 @@ def test_apply_transformation_cubic_deformation_count(bcc_fe) -> None:
     With n=3: 3 + 3 = 6 deformations total.
     """
     t = ElasticConstantsDeformationTransformation(num_deform=3, max_deform=1.0)
-    t.apply_transformation(bcc_fe)
-    assert len(t.distorted_structures) == 6
+    result = t.apply_transformation(bcc_fe)
+    assert len(result) == 6

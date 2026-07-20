@@ -10,20 +10,6 @@ pytest.importorskip("sqsgenerator")
 from materialsframework.tools.sqsgen import SqsGenerator
 
 
-def test_sqs_property_raises_before_generate() -> None:
-    """Accessing .sqs before generate() raises ValueError."""
-    t = SqsGenerator()
-    with pytest.raises(ValueError, match="SQS has not been generated yet"):
-        _ = t.sqs
-
-
-def test_objective_property_raises_before_generate() -> None:
-    """Accessing .objective before generate() raises ValueError."""
-    t = SqsGenerator()
-    with pytest.raises(ValueError, match="SQS has not been generated yet"):
-        _ = t.objective
-
-
 def test_default_params() -> None:
     """Default iteration count and mode are stored correctly."""
     t = SqsGenerator()
@@ -44,12 +30,14 @@ def test_generate_returns_structure_and_objective() -> None:
 
 
 @pytest.mark.integration
-def test_generate_populates_properties() -> None:
-    """After generate(), .sqs and .objective properties are accessible."""
+def test_generate_independent_calls() -> None:
+    """Two calls to generate() with different compositions return independent results."""
     t = SqsGenerator(iterations=50)
-    t.generate("Fe0.5Co0.5", crystal_structure="bcc", supercell_size=(2, 2, 2))
-    assert isinstance(t.sqs, Structure)
-    assert isinstance(t.objective, float)
+    result1 = t.generate("Fe0.5Co0.5", crystal_structure="bcc", supercell_size=(2, 2, 2))
+    result2 = t.generate("Fe0.25Co0.75", crystal_structure="bcc", supercell_size=(2, 2, 2))
+    assert isinstance(result1["structure"], Structure)
+    assert isinstance(result2["structure"], Structure)
+    assert result1 is not result2
 
 
 @pytest.mark.integration

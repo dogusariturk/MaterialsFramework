@@ -11,31 +11,29 @@ _TEST_STEPS = 50
 
 
 def test_default_params() -> None:
-    """CTETransformation stores defaults and initializes output containers."""
+    """CTETransformation stores defaults."""
     transformation = CTETransformation()
     assert transformation.ensemble == "npt_berendsen"
     assert transformation.pressure == pytest.approx(1.0)
-    assert transformation.tasks == []
-    assert transformation.structures == {}
 
 
-def test_apply_transformation_creates_tasks_and_structures(bcc_fe) -> None:
-    """apply_transformation() prepares one task and one structure per temperature."""
+def test_apply_transformation_returns_tasks_and_structures(bcc_fe) -> None:
+    """apply_transformation() returns one task and one structure per temperature."""
     transformation = CTETransformation()
-    transformation.apply_transformation(bcc_fe, temperatures=[300.0, 400.0], steps=_TEST_STEPS)
+    result = transformation.apply_transformation(bcc_fe, temperatures=[300.0, 400.0], steps=_TEST_STEPS)
 
-    assert len(transformation.tasks) == _PAIR_COUNT
-    assert len(transformation.structures) == _PAIR_COUNT
-    assert transformation.tasks[0]["temperature"] == pytest.approx(300.0)
-    assert transformation.tasks[1]["temperature"] == pytest.approx(400.0)
-    assert transformation.tasks[0]["steps"] == _TEST_STEPS
+    assert len(result["tasks"]) == _PAIR_COUNT
+    assert len(result["structures"]) == _PAIR_COUNT
+    assert result["tasks"][0]["temperature"] == pytest.approx(300.0)
+    assert result["tasks"][1]["temperature"] == pytest.approx(400.0)
+    assert result["tasks"][0]["steps"] == _TEST_STEPS
 
 
 def test_apply_transformation_accepts_ase_atoms(ase_bcc_fe) -> None:
     """apply_transformation() accepts ase.Atoms input."""
     transformation = CTETransformation()
-    transformation.apply_transformation(ase_bcc_fe, temperatures=[300.0, 350.0], steps=3)
-    assert len(transformation.tasks) == _PAIR_COUNT
+    result = transformation.apply_transformation(ase_bcc_fe, temperatures=[300.0, 350.0], steps=3)
+    assert len(result["tasks"]) == _PAIR_COUNT
 
 
 @pytest.mark.parametrize(
