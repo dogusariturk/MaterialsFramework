@@ -1,8 +1,4 @@
-"""This module provides a class for performing calculations and structure relaxation using the GPTFF potential.
-
-The `GPTFFCalculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and to perform structure relaxation using a specified GPTFF model.
-"""
+"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the GPTFF potential."""
 
 from __future__ import annotations
 
@@ -10,6 +6,7 @@ from typing import TYPE_CHECKING, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -19,14 +16,11 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
-    """A calculator class for performing material property calculations and structure relaxation using the GPTFF potential.
-
-    The `GPTFFCalculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified GPTFF model.
+    """Calculator for material property calculations and structure relaxation using the GPTFF potential.
 
     Attributes:
-        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "energy", "forces", and "stresses".
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
+            "forces", and "stresses".
 
     References:
         - GPTFF: https://doi.org/10.1016/j.scib.2024.08.039
@@ -35,33 +29,19 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]
 
     def __init__(
-        self, model: str, device: Literal["cpu", "cuda"] = "cpu", **kwargs
+            self,
+            model: str = "GPTFF-MatPES_PBE_2025.2",
+            device: Literal["cpu", "cuda"] = "cpu",
+            **kwargs
     ) -> None:
         """Initializes the GPTFFCalculator with the specified model and calculation settings.
 
-        This method sets up the calculator with a predefined GPTFF model, which will be used
-        to calculate properties and perform structure relaxation. Additional parameters
-        for the relaxation process can be passed via `basecalculator_kwargs`.
-
         Args:
-            model (str): Path to the GPTFF model file.
+            model (str): Path to the GPTFF model file. Defaults to "GPTFF-MatPES_PBE_2025.2".
             device (Literal["cpu", "cuda"]): Device to use for calculations ("cpu" or "cuda").
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        basecalculator_kwargs = {
-            key: kwargs.pop(key)
-            for key in BaseCalculator.__init__.__annotations__
-            if key in kwargs
-        }
-        basemd_kwargs = {
-            key: kwargs.pop(key)
-            for key in BaseMDCalculator.__init__.__annotations__
-            if key in kwargs
-        }
-
-        # BaseCalculator and BaseMDCalculator specific attributes
-        BaseCalculator.__init__(self, **basecalculator_kwargs)
-        BaseMDCalculator.__init__(self, **basemd_kwargs)
+        super().__init__(**kwargs)
 
         # GPTFF-specific attributes
         self.model = model
@@ -69,21 +49,13 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
 
         self._calculator = None
 
-    @property
+    @lazy_property("_calculator")
     def calculator(self) -> Calculator:
-        """Creates and returns the ASE Calculator object associated with this calculator instance.
-
-        This property initializes the Calculator object using the GPTFF potential and other settings
-        specified during the initialization of this calculator. The Calculator object is then returned
-        to the caller. If the Calculator object has already been created, it is returned directly.
+        """Lazily builds the ASE Calculator object for the GPTFF potential, using the settings from initialization.
 
         Returns:
             Calculator: The ASE Calculator object configured with the GPTFF potential.
         """
-        if self._calculator is None:
-            from gptff.model.mpredict import ASECalculator as GPTFFASECalculator
+        from gptff.interfaces import ASECalculator as GPTFFASECalculator
 
-            self._calculator = GPTFFASECalculator(
-                model_path=self.model, device=self.device
-            )
-        return self._calculator
+        return GPTFFASECalculator(model_path=self.model, device=self.device)

@@ -1,8 +1,4 @@
-"""This module provides a class for performing calculations and structure relaxation using the Nequix potential.
-
-The `NequixCalculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and to perform structure relaxation using a specified Nequix model.
-"""
+"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the Nequix potential."""
 
 from __future__ import annotations
 
@@ -10,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -19,14 +16,11 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class NequixCalculator(BaseCalculator, BaseMDCalculator):
-    """A calculator class for performing material property calculations and structure relaxation using the Nequix potential.
-
-    The `NequixCalculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified Nequix model.
+    """Calculator for material property calculations and structure relaxation using the Nequix potential.
 
     Attributes:
-        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "energy", "forces", and "stresses".
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
+            "forces", and "stresses".
 
     References:
         - Nequix: https://arxiv.org/abs/2508.16067
@@ -36,7 +30,7 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
         self,
-        model: str = "nequix-mp-1",
+        model: str = "nequix-oam-1",
         model_path: str | None = None,
         capacity_multiplier: float = 1.1,  # Only for jax backend
         backend: str = "jax",
@@ -46,12 +40,8 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
     ) -> None:
         """Initializes the NequixCalculator with the specified model and calculation settings.
 
-        This method sets up the calculator with a predefined Nequix model, which will be used
-        to calculate properties and perform structure relaxation. Additional parameters
-        for the relaxation process can be passed via `basecalculator_kwargs`.
-
         Args:
-            model (str): The Nequix model to use.
+            model (str): The Nequix model to use. Defaults to "nequix-oam-1".
             model_path (str, optional): The path to the Nequix model to use. Defaults to None.
             capacity_multiplier (float): The multiplier to use for calculating properties. Defaults to 1.1.
             backend (str): The backend to use for calculations. Defaults to "jax".
@@ -59,12 +49,7 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
             use_compile (bool): Whether to use compilation for calculations (only applicable for the torch backend). Defaults to False.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
-        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
-
-        # BaseCalculator and BaseMDCalculator specific attributes
-        BaseCalculator.__init__(self, **basecalculator_kwargs)
-        BaseMDCalculator.__init__(self, **basemd_kwargs)
+        super().__init__(**kwargs)
 
         # Nequix specific attributes
         self.model = model
@@ -76,26 +61,20 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
 
         self._calculator = None
 
-    @property
+    @lazy_property("_calculator")
     def calculator(self) -> Calculator:
-        """Creates and returns the ASE Calculator object associated with this calculator instance.
-
-        This property initializes the Calculator object using the Nequix potential and other settings
-        specified during the initialization of this calculator. The Calculator object is then returned
-        to the caller. If the Calculator object has already been created, it is returned directly.
+        """Lazily builds the ASE Calculator object for the Nequix potential, using the settings from initialization.
 
         Returns:
             Calculator: The ASE Calculator object configured with the Nequix potential.
         """
-        if self._calculator is None:
-            from nequix.calculator import NequixCalculator
+        from nequix.calculator import NequixCalculator
 
-            self._calculator = NequixCalculator(
-                model_name=self.model,
-                model_path=self.model_path,
-                capacity_multiplier=self.capacity_multiplier,
-                backend=self.backend,
-                use_kernel=self.use_kernel,
-                use_compile=self.use_compile,
-            )
-        return self._calculator
+        return NequixCalculator(
+            model_name=self.model,
+            model_path=self.model_path,  # ty: ignore[invalid-argument-type]
+            capacity_multiplier=self.capacity_multiplier,
+            backend=self.backend,
+            use_kernel=self.use_kernel,
+            use_compile=self.use_compile,
+        )

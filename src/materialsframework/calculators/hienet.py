@@ -1,8 +1,4 @@
-"""This module provides a class for performing calculations using the HIENet potential.
-
-The `HIENetCalculator` class is designed to calculate properties such as potential energy,
-forces, and stresses, and to perform structure relaxation using a specified HIENet model.
-"""
+"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the HIENet potential."""
 
 from __future__ import annotations
 
@@ -10,6 +6,7 @@ from typing import TYPE_CHECKING, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -19,14 +16,11 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class HIENetCalculator(BaseCalculator, BaseMDCalculator):
-    """A calculator class for performing material property calculations and structure relaxation using the HIENet potential.
-
-    The `HIENetCalculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified HIENet model.
+    """Calculator for material property calculations and structure relaxation using the HIENet potential.
 
     Attributes:
-        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "energy", "forces", and "stress".
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
+            "forces", and "stress".
 
     References:
         - HIENet: https://doi.org/10.48550/arXiv.2503.05771
@@ -56,20 +50,7 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining values for the arguments are set to the default values for the HIENet potential.
         """
-        basecalculator_kwargs = {
-            key: kwargs.pop(key)
-            for key in BaseCalculator.__init__.__annotations__
-            if key in kwargs
-        }
-        basemd_kwargs = {
-            key: kwargs.pop(key)
-            for key in BaseMDCalculator.__init__.__annotations__
-            if key in kwargs
-        }
-
-        # BaseCalculator and BaseMDCalculator specific attributes
-        BaseCalculator.__init__(self, **basecalculator_kwargs)
-        BaseMDCalculator.__init__(self, **basemd_kwargs)
+        super().__init__(**kwargs)
 
         # HIENet specific attributes
         self.model = model
@@ -78,22 +59,17 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
 
         self._calculator = None
 
-    @property
+    @lazy_property("_calculator")
     def calculator(self) -> Calculator:
-        """Returns the ASE calculator associated with this instance.
-
-        If the calculator has not been initialized yet, it will be created
-        using the potential attribute of this instance.
+        """Lazily builds and returns the ASE Calculator object for the HIENet potential.
 
         Returns:
-            HIENetCalculator: The ASE calculator associated with this instance.
+            Calculator: The ASE Calculator object configured with the HIENet potential.
         """
-        if self._calculator is None:
-            from hienet.hienet_calculator import HIENetCalculator as HIENetASECalculator
+        from hienet.hienet_calculator import HIENetCalculator as HIENetASECalculator
 
-            self._calculator = HIENetASECalculator(
-                model=self.model,
-                file_type=self.file_type,
-                device=self.device,
-            )
-        return self._calculator
+        return HIENetASECalculator(
+            model=self.model,
+            file_type=self.file_type,
+            device=self.device,
+        )
