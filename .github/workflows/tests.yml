@@ -138,6 +138,11 @@ jobs:
               uv pip install
               "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git@4cef93a9aa573c86c6bb9100d3d48978ad616429"
             tests: tests/calculators/test_gptff.py
+          - name: equflash
+            install: ""
+            extra_install: >-
+              uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
+            tests: tests/calculators/test_equflash.py
           - name: posegnn
             install: ""
             extra_install: git clone --depth 1 https://github.com/IBM/materials.git /tmp/ibm-materials
