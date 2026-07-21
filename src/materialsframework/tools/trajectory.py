@@ -102,7 +102,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         if self.include_magmoms:
             self.magmoms.append(self.atoms.get_magnetic_moments())
         if self.include_dipoles:
-            self.dipoles.append(self.atoms.get_array("dipole"))
+            self.dipoles.append(self.atoms.get_dipole_moment())
         if self.include_velocities:
             self.velocities.append(self.atoms.get_velocities())
         self.atom_positions.append(self.atoms.get_positions())
