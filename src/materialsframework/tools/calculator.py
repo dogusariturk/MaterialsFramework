@@ -174,9 +174,7 @@ class BaseCalculator(ABC):
             Calculator: An ASE Calculator instance configured for the specific
             relaxation and calculation task.
         """
-        raise NotImplementedError(
-            "Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance."
-        )
+        raise NotImplementedError("Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance.")
 
     def relax(
         self,

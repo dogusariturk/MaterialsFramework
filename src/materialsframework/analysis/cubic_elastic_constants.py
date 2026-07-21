@@ -70,7 +70,11 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         self._cubic_transformation = cubic_transformation
 
     @require_properties("energy")
-    def calculate(self, structure: Structure | Atoms, is_relaxed: bool = False) -> dict[str, float]:
+    def calculate(
+            self,
+            structure: Structure | Atoms,
+            is_relaxed: bool = False
+    ) -> dict[str, float]:
         """Calculates the cubic elastic constants for a given structure.
 
         Applies cubic distortions to the input structure, computes the potential energies of the deformed
@@ -198,7 +202,9 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         return self._fit_eos(volumes, energies)
 
     def _get_tetragonal_shear_modulus(
-        self, orthorhombic_distorted_structures: dict[float, Structure], initial_volume: float
+            self,
+            orthorhombic_distorted_structures: dict[float, Structure],
+            initial_volume: float
     ) -> float:
         """Calculates the tetragonal shear modulus from orthorhombic distortions.
 
@@ -222,7 +228,11 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         )
         return EV_A3_TO_GPA * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
-    def _get_shear_modulus(self, monoclinic_distorted_structures: dict[float, Structure], initial_volume: float) -> float:
+    def _get_shear_modulus(
+            self,
+            monoclinic_distorted_structures: dict[float, Structure],
+            initial_volume: float
+    ) -> float:
         """Calculates the shear modulus from monoclinic distortions.
 
         Args:

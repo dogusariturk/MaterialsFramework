@@ -1,4 +1,4 @@
-"""This module provides a class to perform the second-order ANNNI formulae on a composition to calculate intrinsic and extrinsic stacking fault energies.
+"""This module provides a class to compute intrinsic and extrinsic stacking fault energies using the second-order ANNNI formulae.
 
 The `ANNNIStackingFaultAnalyzer` class derives the intrinsic and extrinsic stacking fault energies
 (ISFE and ESFE) from the energy differences between FCC, HCP, and DHCP structures, using the

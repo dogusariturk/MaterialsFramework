@@ -1,4 +1,4 @@
-"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the PET-MAD potential, served via UPET."""
+"""Calculator for computing potential energy, forces, and stresses, and relaxing structures with the PET-MAD potential, served via UPET."""
 
 from __future__ import annotations
 

@@ -67,7 +67,6 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
 
         self._calculator = None
 
-
     @lazy_property("_calculator")
     def calculator(self) -> Calculator:
         """Lazily builds the ASE Calculator object for the M3GNet potential, using `state_attr` and `stress_weight`.

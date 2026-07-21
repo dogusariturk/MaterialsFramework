@@ -162,9 +162,7 @@ class StabilityMap:
             from pandarallel import pandarallel
             from pycalphad import Database
         except ImportError as e:
-            raise ImportError(
-                "pycalphad and pandarallel are required. Install them with: pip install materialsframework[calphad]"
-            ) from e
+            raise ImportError("pycalphad and pandarallel are required. Install them with: pip install materialsframework[calphad]") from e
 
         pandarallel.initialize(
             nb_workers=nb_workers if nb_workers is not None else os.cpu_count(),
@@ -265,10 +263,7 @@ class StabilityMap:
             }
 
             hessian = np.array(
-                [
-                    [dmu_dx[comp][i] - dmu_dx[self.elements[-1]][i] for comp in self.elements[:-1]]
-                    for i in range(len(self.elements) - 1)
-                ]
+                [[dmu_dx[comp][i] - dmu_dx[self.elements[-1]][i] for comp in self.elements[:-1]] for i in range(len(self.elements) - 1)]
             )
 
             orthogonalization_matrix = self.ORTHOGONALIZATION[: len(self.elements) - 1, : len(self.elements) - 1]
@@ -306,7 +301,11 @@ class StabilityMap:
         if "negative_eigenvalues" not in self.compositions.columns:
             raise KeyError("The 'negative_eigenvalues' column is missing. Please run the fit() method first.")
 
-        def _generate_regular_pentagon(radius: float = 0.5, center: tuple = (0, 0), rotation_angle: float = 0) -> np.ndarray:
+        def _generate_regular_pentagon(
+                radius: float = 0.5,
+                center: tuple = (0, 0),
+                rotation_angle: float = 0
+        ) -> np.ndarray:
             """Generate vertices of a regular pentagon and rotate it by a given angle.
 
             Args:

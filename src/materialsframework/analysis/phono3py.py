@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     from ase import Atoms
     from numpy.typing import ArrayLike
+    from phono3py import Phono3py
     from phono3py.conductivity.direct_solution import ConductivityLBTE
     from phono3py.conductivity.rta import ConductivityRTA
     from pymatgen.core import Structure
@@ -90,7 +91,8 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             is_lbte (bool, optional): Whether to use the Linearized Boltzmann Transport Equation (LBTE). Defaults to False.
             is_isotope (bool, optional): Whether to include isotope scattering in the calculations. Defaults to False.
             conductivity_type (Literal["wigner", "kubo"], optional): The type of conductivity calculation to perform. Defaults to None.
-            boundary_mfp (float, optional): Mean free path in micrometre to calculate simple boundary scattering contribution to thermal conductivity. None ignores this contribution.
+            boundary_mfp (float, optional): Mean free path in micrometre to calculate simple boundary scattering
+                contribution to thermal conductivity. None ignores this contribution.
             t_min (float, optional): The minimum temperature for thermal conductivity calculations. Defaults to 0.
             t_max (float, optional): The maximum temperature for thermal conductivity calculations. Defaults to 1000.
             t_step (float, optional): The step size for temperature increments. Defaults to 10.
@@ -146,7 +148,12 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         """
         return Phono3pyDisplacementTransformation()
 
-    def _produce_force_constants(self, phonon, supercells_with_displacements, phonon_supercells_with_displacements) -> None:
+    def _produce_force_constants(
+            self,
+            phonon: Phono3py,
+            supercells_with_displacements: list[Structure],
+            phonon_supercells_with_displacements: list[Structure]
+    ) -> None:
         """Produces the force constants using the forces calculated from the calculator.
 
         This method calculates the forces on the displaced atoms using the provided calculator and then
@@ -158,14 +165,11 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             phonon_supercells_with_displacements (list[Structure]): Displaced supercells for phonon (second-order)
                 force constants.
         """
-        forces = [
-            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements
-        ]
+        forces = [self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements]
         phonon.forces = np.array(forces)
 
         phonon_forces = [
-            self.calculator.calculate(displaced_structure)["forces"]
-            for displaced_structure in phonon_supercells_with_displacements
+            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in phonon_supercells_with_displacements
         ]
         phonon.phonon_forces = np.array(phonon_forces)
 

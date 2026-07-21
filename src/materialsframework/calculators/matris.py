@@ -1,4 +1,4 @@
-"""Calculator for computing potential energy, forces, stresses, and magnetic moments, and for relaxing structures, with the MatRIS potential."""
+"""Calculator for computing potential energy, forces, stresses, and magnetic moments, and relaxing structures with the MatRIS potential."""
 
 from __future__ import annotations
 
@@ -21,6 +21,9 @@ class MatRISCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
             "forces", "stress", and "magmoms".
+
+    References:
+        - MatRIS: https://doi.org/10.48550/arXiv.2603.02002
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress", "magmoms"]

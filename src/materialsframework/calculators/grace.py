@@ -1,4 +1,4 @@
-"""Calculator for computing potential energy, forces, stresses, and magnetic moments, and for relaxing structures, with the Grace potential."""
+"""Calculator for computing potential energy, forces, stresses, and magnetic moments, and relaxing structures with the Grace potential."""
 
 from __future__ import annotations
 

@@ -55,7 +55,8 @@ class ClusterExpansion:
             symprec (float): Symmetry precision for structure analysis.
             position_tolerance (float | None): Tolerance for atomic position comparison.
             is_relaxed (bool): Whether the input structures are relaxed.
-            fit_method (Literal["ardr", "bayesian-ridge", "elasticnet", "lasso", "least-squares", "omp", "rfe", "ridge", "split-bregman"]): Method used for fitting the cluster expansion.
+            fit_method (Literal["ardr", "bayesian-ridge", "elasticnet", "lasso", "least-squares", "omp", "rfe", "ridge",
+                "split-bregman"]): Method used for fitting the cluster expansion.
             standardize (bool): Whether to standardize the data before fitting.
             validation_method (Literal["shuffle-split", "k-fold"]): Method used for validation of the model.
             n_splits (int): Number of splits for cross-validation.
@@ -133,11 +134,7 @@ class ClusterExpansion:
                 )
         else:
             for structure in self.structures:
-                result = (
-                    self.calculator.calculate(structure)
-                    if self.is_relaxed
-                    else self.calculator.relax(structure, verbose=self.verbose)
-                )
+                result = self.calculator.calculate(structure) if self.is_relaxed else self.calculator.relax(structure, verbose=self.verbose)
 
                 self.structure_container.add_structure(
                     structure=result["final_structure"].to_ase_atoms(msonable=False),

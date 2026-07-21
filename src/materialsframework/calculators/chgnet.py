@@ -1,4 +1,4 @@
-"""Calculator for computing potential energy, forces, stresses, and magnetic moments, and for relaxing structures, with the CHGNet potential."""
+"""Calculator for computing potential energy, forces, stresses, and magnetic moments, and relaxing structures with the CHGNet potential."""
 
 from __future__ import annotations
 
