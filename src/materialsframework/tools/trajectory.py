@@ -109,16 +109,16 @@ class TrajectoryObserver(collections.abc.Sequence):
         self.atomic_numbers.append(self.atoms.get_atomic_numbers())
         self.chemical_symbols.append(self.atoms.get_chemical_symbols())
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> tuple[Any, ...]:
         """Returns a tuple of recorded properties at the specified index.
 
         Args:
             item (int): The index of the step to retrieve properties for.
 
         Returns:
-            tuple: A tuple containing the total energies, potential energies, kinetic energies,
-            forces, stresses, cell parameters, atomic positions, atomic numbers, chemical symbols,
-            and, if applicable, temperatures, magnetic moments, dipoles, and velocities at the specified step.
+            tuple: A tuple containing the total energies, potential energies, kinetic energies, forces, stresses, cell
+                parameters, atomic positions, atomic numbers, chemical symbols, and, if applicable, temperatures, magnetic
+                moments, dipoles, and velocities at the specified step.
         """
         item_properties = (
             self.total_energies[item],
