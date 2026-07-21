@@ -54,6 +54,16 @@ def test_calculate_stress(calc: MatRISCalculator, bcc_fe) -> None:
 
 
 @pytest.mark.integration
+def test_calculate_magmoms(calc: MatRISCalculator, bcc_fe) -> None:
+    """calculate() returns non-null per-atom magnetic moments for BCC Fe."""
+    result = calc.calculate(bcc_fe)
+    assert "magmoms" in result
+    magmoms = np.array(result["magmoms"])
+    assert magmoms.shape == (len(bcc_fe),)
+    assert np.all(magmoms > 0)
+
+
+@pytest.mark.integration
 def test_relax_returns_structure(calc: MatRISCalculator, bcc_fe) -> None:
     """relax() returns a dict with 'final_structure' and 'trajectory'."""
     result = calc.relax(bcc_fe)
