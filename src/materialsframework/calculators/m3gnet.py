@@ -66,18 +66,7 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         self.use_voigt = use_voigt
 
         self._calculator = None
-        self._potential = None
 
-    @lazy_property("_potential")
-    def potential(self) -> Any:
-        """Lazily loads and returns the M3GNet potential specified during initialization.
-
-        Returns:
-            Any: The loaded M3GNet model instance used for calculations.
-        """
-        import matgl
-
-        return matgl.load_model(path=self.model)
 
     @lazy_property("_calculator")
     def calculator(self) -> Calculator:
@@ -86,10 +75,13 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         Returns:
             Calculator: The ASE Calculator object configured with the M3GNet potential.
         """
+        import matgl
         from matgl.ext.ase import PESCalculator
 
+        potential = matgl.load_model(path=self.model)
+
         return PESCalculator(
-            potential=self.potential,
+            potential=potential,
             state_attr=self.state_attr,
             stress_unit=self.stress_unit,
             stress_weight=self.stress_weight,

@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
-
-from materialsframework.utils import lazy_property
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -28,16 +26,16 @@ class MEGNetCalculator:
 
     def __init__(
         self,
-        model: str = "MEGNet-MP-2018.6.1-Eform",
+        model: str = "MEGNet-Eform-MP-2018.6.1",
     ) -> None:
         """Initializes a MEGNetCalculator instance with the specified MEGNet model.
 
         Args:
             model (str, optional): The name of the MEGNet model to use for calculations. Defaults to
-                "MEGNet-MP-2018.6.1-Eform".
+                "MEGNet-Eform-MP-2018.6.1".
 
         Examples:
-            >>> megnet_calculator = MEGNetCalculator(model="MEGNet-MP-2018.6.1-Eform")
+            >>> megnet_calculator = MEGNetCalculator(model="MEGNet-Eform-MP-2018.6.1")
 
         Note:
             The remaining parameters for the MEGNet potential are set to their default values.
@@ -46,17 +44,6 @@ class MEGNetCalculator:
         self.model = model
 
         self._potential = None
-
-    @lazy_property("_potential")
-    def potential(self) -> Any:
-        """Lazily loads and returns the MEGNet potential specified during initialization.
-
-        Returns:
-            Any: The loaded MEGNet model instance used for calculations.
-        """
-        import matgl
-
-        return matgl.load_model(self.model)
 
     def calculate(self, structure: Structure) -> dict[str, float]:
         """Calculates the formation energy of the provided structure using the MEGNet model.
@@ -73,4 +60,8 @@ class MEGNetCalculator:
             >>> megnet_calculator = MEGNetCalculator()
             >>> result = megnet_calculator.calculate(structure=struct)
         """
-        return {"formation_energy": self.potential.predict_structure(structure)}
+        import matgl
+
+        potential = matgl.load_model(self.model)
+
+        return {"formation_energy": float(potential.predict_structure(structure))}

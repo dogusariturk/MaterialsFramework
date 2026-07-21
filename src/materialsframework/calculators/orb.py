@@ -54,23 +54,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         self.device = device
         self.precision = precision
 
-        self._potential = None
-        self._atoms_adapter = None
         self._calculator = None
-
-    @property
-    def potential(self) -> dict[str, Any]:
-        """Lazily loads and returns the ORB potential specified during initialization.
-
-        Returns:
-            dict[str, Any]: A dictionary containing the loaded ORB potential and the corresponding atoms adapter.
-        """
-        if self._potential is None:
-            from orb_models.forcefield import pretrained
-
-            model = pretrained.ORB_PRETRAINED_MODELS[self.model]
-            self._potential, self._atoms_adapter = model(device=self.device, precision=self.precision)  # ty:ignore[unknown-argument]
-        return {"model": self._potential, "atoms_adapter": self._atoms_adapter}
 
     @lazy_property("_calculator")
     def calculator(self) -> Calculator:
@@ -79,11 +63,16 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         Returns:
             Calculator: The ASE Calculator object configured with the ORB potential.
         """
+        from orb_models.forcefield import pretrained
         from orb_models.forcefield.inference.calculator import (
             ORBCalculator as ORBASECalculator,
         )
 
+        model = pretrained.ORB_PRETRAINED_MODELS[self.model]
+        potential, atoms_adapter = model(device=self.device, precision=self.precision)  # ty:ignore[unknown-argument]
+
         return ORBASECalculator(
-            **self.potential,
+            potential,
+            atoms_adapter,
             device=self.device,
         )

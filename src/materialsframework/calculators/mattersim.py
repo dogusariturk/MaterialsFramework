@@ -10,7 +10,6 @@ from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
-    from mattersim.forcefield import Potential
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -66,18 +65,6 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         self.device = device
 
         self._calculator = None
-        self._potential = None
-
-    @lazy_property("_potential")
-    def potential(self) -> Potential:
-        """Lazily loads and returns the MatterSim potential specified during initialization.
-
-        Returns:
-            Potential: The loaded MatterSim model instance used for calculations.
-        """
-        from mattersim.forcefield import Potential
-
-        return Potential.from_checkpoint(load_path=self.model, device=self.device)
 
     @lazy_property("_calculator")
     def calculator(self) -> Calculator:
@@ -86,12 +73,13 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         Returns:
             Calculator: The ASE Calculator object configured with the MatterSim potential.
         """
-        from mattersim.forcefield import (
-            MatterSimCalculator as MatterSimASECalculator,
-        )
+        from mattersim.forcefield import MatterSimCalculator as MatterSimASECalculator
+        from mattersim.forcefield import Potential
+
+        potential = Potential.from_checkpoint(load_path=self.model, device=self.device)
 
         return MatterSimASECalculator(
-            potential=self.potential,
+            potential=potential,
             args_dict=self.args_dict,
             compute_stress=self.compute_stress,
             stress_weight=self.stress_weight,

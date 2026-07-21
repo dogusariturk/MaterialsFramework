@@ -10,7 +10,6 @@ from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
-    from chgnet.model import CHGNet
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -70,23 +69,6 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         self.verbose = verbose
 
         self._calculator = None
-        self._potential = None
-
-    @lazy_property("_potential")
-    def potential(self) -> CHGNet:
-        """Lazily loads and returns the CHGNet potential specified during initialization.
-
-        Returns:
-            CHGNet: The loaded CHGNet model instance used for calculations.
-        """
-        from chgnet.model import CHGNet
-
-        return CHGNet.load(
-            model_name=self.model,
-            use_device=self.device,
-            check_cuda_mem=self.check_cuda_mem,
-            verbose=self.verbose,
-        )
 
     @lazy_property("_calculator")
     def calculator(self) -> Calculator:
@@ -95,10 +77,18 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         Returns:
             Calculator: The ASE Calculator object configured with the CHGNet potential.
         """
+        from chgnet.model import CHGNet
         from chgnet.model import CHGNetCalculator as CHGNetASECalculator
 
+        model = CHGNet.load(
+            model_name=self.model,
+            use_device=self.device,
+            check_cuda_mem=self.check_cuda_mem,
+            verbose=self.verbose,
+        )
+
         return CHGNetASECalculator(
-            model=self.potential,
+            model=model,
             use_device=self.device,
             check_cuda_mem=self.check_cuda_mem,
             stress_weight=self.stress_weight,
