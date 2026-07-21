@@ -7,10 +7,18 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-core:
     name: "Core Tests (${{ matrix.os }})"
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -39,6 +47,7 @@ jobs:
   test-mlip:
     name: "${{ matrix.name }} Tests"
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -75,9 +84,12 @@ jobs:
           - name: nequip
             install: --extra nequip
             tests: tests/calculators/test_nequip.py
-          - name: eqv2 + esen
-            install: --extra eqv2 --extra esen
-            tests: tests/calculators/test_eqv2.py tests/calculators/test_esen.py
+          - name: eqv2
+            install: --extra eqv2
+            tests: tests/calculators/test_eqv2.py
+          - name: esen
+            install: --extra esen
+            tests: tests/calculators/test_esen.py
           - name: orb
             install: --extra orb
             tests: tests/calculators/test_orb.py
@@ -118,8 +130,16 @@ jobs:
             install: --extra alphanet
             tests: tests/calculators/test_alphanet.py
           - name: gptff
-            install: --extra gptff
+            install: ""
+            extra_install: >-
+              uv pip install
+              "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git@4cef93a9aa573c86c6bb9100d3d48978ad616429"
             tests: tests/calculators/test_gptff.py
+          - name: posegnn
+            install: ""
+            extra_install: git clone --depth 1 https://github.com/IBM/materials.git /tmp/ibm-materials
+            python_path: /tmp/ibm-materials/models/pos_egnn
+            tests: tests/calculators/test_posegnn.py
           - name: hienet
             install: --extra hienet
             tests: tests/calculators/test_hienet.py
@@ -144,5 +164,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen ${{ matrix.install }} --group dev
 
+      - name: Install extra dependency from GitHub
+        if: matrix.extra_install
+        run: ${{ matrix.extra_install }}
+
       - name: Run tests
         run: uv run pytest -v -m "not slow" ${{ matrix.tests }}
+        env:
+          PYTHONPATH: ${{ matrix.python_path || '' }}
