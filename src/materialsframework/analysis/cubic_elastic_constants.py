@@ -44,13 +44,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
     def __init__(
         self,
         eos_name: Literal[
-            "murnaghan",
-            "birch",
-            "birch_murnaghan",
-            "pourier_tarantola",
-            "vinet",
-            "deltafactor",
-            "numerical_eos"
+            "murnaghan", "birch", "birch_murnaghan", "pourier_tarantola", "vinet", "deltafactor", "numerical_eos"
         ] = "birch_murnaghan",
         delta_max: float = 0.05,
         step_size: float = 0.01,
@@ -120,6 +114,13 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         c44 = shear_modulus
 
         elastic_tensor = self._build_cubic_elastic_tensor(c11, c12, c44)
+        pugh_ratio = elastic_tensor.g_vrh / elastic_tensor.k_vrh
+
+        chen_vickers_hardness = (
+            2.0 * pugh_ratio**2 * elastic_tensor.g_vrh - 3.0
+            if pugh_ratio >= 1.071
+            else 2.0 * pugh_ratio ** (-0.5) * elastic_tensor.g_vrh - 3.0
+        )
 
         return {
             "C11": c11,
@@ -133,7 +134,8 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
             "voigt_reuss_hill_bulk_modulus": elastic_tensor.k_vrh,
             "voigt_reuss_hill_shear_modulus": elastic_tensor.g_vrh,
             "poisson_ratio": elastic_tensor.homogeneous_poisson,
-            "pugh_ratio": elastic_tensor.g_vrh / elastic_tensor.k_vrh,
+            "pugh_ratio": pugh_ratio,
+            "chen_vickers_hardness": chen_vickers_hardness,
         }
 
     @lazy_property("_cubic_transformation")

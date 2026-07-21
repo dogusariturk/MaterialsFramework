@@ -132,6 +132,14 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
 
         elastic_tensor = self._build_elastic_tensor(cij, cij_order, structure)
 
+        pugh_ratio = elastic_tensor.g_vrh / elastic_tensor.k_vrh
+
+        chen_vickers_hardness = (
+            2.0 * pugh_ratio**2 * elastic_tensor.g_vrh - 3.0
+            if pugh_ratio >= 1.071
+            else 2.0 * pugh_ratio ** (-0.5) * elastic_tensor.g_vrh - 3.0
+        )
+
         return {
             **dict(zip(cij_order, cij, strict=False)),
             "youngs_modulus": elastic_tensor.y_mod / 1e9,
@@ -142,7 +150,8 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
             "voigt_reuss_hill_bulk_modulus": elastic_tensor.k_vrh,
             "voigt_reuss_hill_shear_modulus": elastic_tensor.g_vrh,
             "poisson_ratio": elastic_tensor.homogeneous_poisson,
-            "pugh_ratio": elastic_tensor.g_vrh / elastic_tensor.k_vrh,
+            "pugh_ratio": pugh_ratio,
+            "chen_vickers_hardness": chen_vickers_hardness,
         }
 
     @lazy_property("_elastic_constant_transformation")
