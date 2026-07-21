@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -34,7 +34,7 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
         version: str = "latest",
         checkpoint_path: str | None = None,
         device: Literal["cuda", "cpu", "mps"] = "cpu",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the PetMadCalculator with the specified model and calculation settings.
 

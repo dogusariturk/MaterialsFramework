@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -35,7 +35,7 @@ class UMACalculator(BaseCalculator, BaseMDCalculator):
         inference_settings: Literal["default", "turbo"] = "default",
         device: Literal["cpu", "cuda"] = "cpu",
         seed: int = 41,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the UMACalculator with the specified model and calculation settings.
 

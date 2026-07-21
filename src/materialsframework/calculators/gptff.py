@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -29,10 +29,10 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "stress"]
 
     def __init__(
-            self,
-            model: str = "GPTFF-MatPES_PBE_2025.2",
-            device: Literal["cpu", "cuda"] = "cpu",
-            **kwargs
+        self,
+        model: str = "GPTFF-MatPES_PBE_2025.2",
+        device: Literal["cpu", "cuda"] = "cpu",
+        **kwargs: Any,
     ) -> None:
         """Initializes the GPTFFCalculator with the specified model and calculation settings.
 

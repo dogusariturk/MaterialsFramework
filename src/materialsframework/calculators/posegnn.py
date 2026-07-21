@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -33,7 +33,7 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         model: str,
         device: Literal["cuda", "cpu", "mps"] = "cpu",
         compute_stress: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initialize a PosEGNNCalculator instance with a specified model and calculation settings.
 

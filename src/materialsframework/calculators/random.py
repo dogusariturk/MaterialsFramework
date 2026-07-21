@@ -32,7 +32,7 @@ class RandomCalculator(BaseCalculator):
 
         return Calculator()
 
-    def calculate(self, structure: Atoms | Structure | Molecule, **kwargs) -> dict[str, Any]:
+    def calculate(self, structure: Atoms | Structure | Molecule, **kwargs: Any) -> dict[str, Any]:
         """Pretend to calculate: return a random energy and random forces.
 
         Args:
@@ -43,7 +43,7 @@ class RandomCalculator(BaseCalculator):
         forces = [[random.uniform(-10, 10) for _ in range(3)] for _ in range(len(structure))]
         return {"energy": energy, "forces": forces}
 
-    def relax(self, structure: Atoms | Structure | Molecule, **kwargs) -> dict[str, Any]:
+    def relax(self, structure: Atoms | Structure | Molecule, **kwargs: Any) -> dict[str, Any]:
         """Pretend to relax: return the same structure, a random energy, and random forces.
 
         Args:

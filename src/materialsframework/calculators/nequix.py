@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -36,7 +36,7 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
         backend: str = "jax",
         use_kernel: bool = True,
         use_compile: bool = False,  # Only for torch backend
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the NequixCalculator with the specified model and calculation settings.
 

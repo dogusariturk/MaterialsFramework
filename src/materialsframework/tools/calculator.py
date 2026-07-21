@@ -181,7 +181,7 @@ class BaseCalculator(ABC):
     def relax(
         self,
         structure: Atoms | Structure | Molecule,
-        **kwargs,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Relaxes a given atomic structure using the specified optimizer and calculator.
 

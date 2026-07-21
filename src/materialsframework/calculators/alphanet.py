@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -34,7 +34,7 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         config: str,
         device: Literal["cuda", "cpu", "mps"] = "cpu",
         precision: Literal["32", "64"] = "32",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the AlphaNetCalculator with the specified model and calculation settings.
 

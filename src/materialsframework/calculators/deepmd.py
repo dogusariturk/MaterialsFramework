@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -32,7 +32,7 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
 
     AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "virial", "stress"]
 
-    def __init__(self, model: str | Path, **kwargs) -> None:
+    def __init__(self, model: str | Path, **kwargs: Any) -> None:
         """Initializes the DeePMDCalculator with the specified model and calculation settings.
 
         Args:

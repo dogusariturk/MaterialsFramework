@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -36,7 +36,7 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         stress_unit: Literal["eV/A3", "GPa"] = "GPa",
         stress_weight: float = 1.0,
         use_voigt: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the M3GNetCalculator with the specified model and calculation settings.
 
@@ -69,11 +69,11 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         self._potential = None
 
     @lazy_property("_potential")
-    def potential(self):
+    def potential(self) -> Any:
         """Lazily loads and returns the M3GNet potential specified during initialization.
 
         Returns:
-            CHGNet: The loaded M3GNet model instance used for calculations.
+            Any: The loaded M3GNet model instance used for calculations.
         """
         import matgl
 
@@ -93,5 +93,5 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
             state_attr=self.state_attr,
             stress_unit=self.stress_unit,
             stress_weight=self.stress_weight,
-            use_voigt=self.use_voigt
+            use_voigt=self.use_voigt,
         )

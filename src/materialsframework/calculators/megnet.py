@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from materialsframework.utils import lazy_property
 
@@ -48,11 +48,11 @@ class MEGNetCalculator:
         self._potential = None
 
     @lazy_property("_potential")
-    def potential(self):
+    def potential(self) -> Any:
         """Lazily loads and returns the MEGNet potential specified during initialization.
 
         Returns:
-            MEGNet: The loaded MEGNet model instance used for calculations.
+            Any: The loaded MEGNet model instance used for calculations.
         """
         import matgl
 

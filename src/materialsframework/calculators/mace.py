@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -38,7 +38,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
         device: Literal["cuda", "cpu", "mps"] = "cpu",
         default_dtype: str = "",
         model_type: Literal["MACE", "DipoleMACE", "EnergyDipoleMACE"] = "MACE",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the MACECalculator with the specified model and calculation settings.
 

@@ -32,7 +32,7 @@ class PhonopyDisplacementTransformation:
         supercell_matrix: list | None = None,
         primitive_matrix: list | None = None,
         log_level: int = 0,
-        **kwargs,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Generate displaced supercells for Phonopy calculations.
 

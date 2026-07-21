@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -35,7 +35,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         modal: str = "mpa",
         file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
         device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initialize a SevenNetCalculator instance with a specified model and calculation settings.
 

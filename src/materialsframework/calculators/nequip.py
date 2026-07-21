@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -33,7 +33,7 @@ class NequIPCalculator(BaseCalculator, BaseMDCalculator):
         model: str = "",
         device: Literal["cpu", "cuda"] = "cpu",
         chemical_species_to_atom_type_map: dict[str, str] | bool | None = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the NequIPCalculator with the specified model and calculation settings.
 

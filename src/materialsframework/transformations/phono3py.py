@@ -36,7 +36,7 @@ class Phono3pyDisplacementTransformation:
         primitive_matrix: list | str = "auto",
         phonon_supercell_matrix: list | None = None,
         log_level: int = 0,
-        **kwargs,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """Generate displaced supercells for Phono3py calculations.
 

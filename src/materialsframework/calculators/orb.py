@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -34,7 +34,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         model: str = "orb-v3-conservative-inf-omat",
         device: Literal["cuda", "cpu", "mps"] = "cpu",
         precision: Literal["float32-high", "float32-highest", "float64"] = "float32-high",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the ORBCalculator with the specified model and calculation settings.
 
@@ -59,11 +59,11 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         self._calculator = None
 
     @property
-    def potential(self):
+    def potential(self) -> dict[str, Any]:
         """Lazily loads and returns the ORB potential specified during initialization.
 
         Returns:
-            dict: A dictionary containing the loaded ORB potential and the corresponding atoms adapter.
+            dict[str, Any]: A dictionary containing the loaded ORB potential and the corresponding atoms adapter.
         """
         if self._potential is None:
             from orb_models.forcefield import pretrained

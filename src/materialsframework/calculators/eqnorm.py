@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -31,7 +31,7 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
         model_name: str = "eqnorm",
         device: str = "cpu",
         compile_model: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the EqnormCalculator with the specified model and calculation settings.
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -34,7 +34,7 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
         pad_neighbors_fraction: float = 0.05,
         pad_atoms_number: int = 1,
         min_dist: float | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the GraceCalculator with the specified model and calculation settings.
 

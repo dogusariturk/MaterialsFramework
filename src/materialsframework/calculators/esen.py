@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -33,7 +33,7 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         model: str = "esen-sm-conserving-all-omol",
         checkpoint_path: str | None = None,
         device: Literal["cpu", "cuda"] = "cpu",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the eSENCalculator with the specified model and calculation settings.
 

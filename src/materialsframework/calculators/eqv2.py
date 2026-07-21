@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -35,7 +35,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         local_cache: str = "~/.cache/eqv2/",
         device: Literal["cpu", "cuda"] = "cpu",
         seed: int | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the EqV2Calculator with the specified model and calculation settings.
 

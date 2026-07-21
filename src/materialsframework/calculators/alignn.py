@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -35,7 +35,7 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         model_filename="best_model.pt",
         config_filename="config.json",
         device: Literal["cuda", "cpu", "mps"] = "cpu",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the AlignnCalculator with the specified model and calculation settings.
 

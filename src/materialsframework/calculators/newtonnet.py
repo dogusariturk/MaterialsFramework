@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -34,7 +34,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         properties: list | None = None,
         device: Literal["cpu", "cuda"] = "cpu",
         precision: Literal["float64", "float32", "float16"] = "float32",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the NewtonNetCalculator with the specified model and calculation settings.
 

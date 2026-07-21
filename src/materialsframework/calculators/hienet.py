@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -33,7 +33,7 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
         model: str,
         file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
         device: Literal["cuda", "cpu", "mps", "auto"] = "cpu",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initialize a HIENetCalculator instance with a specified model and calculation settings.
 

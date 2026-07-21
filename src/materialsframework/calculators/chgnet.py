@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -10,6 +10,7 @@ from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
+    from chgnet.model import CHGNet
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -37,7 +38,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         device: Literal["cpu", "cuda", "mps"] = "cpu",
         check_cuda_mem: bool = True,
         verbose: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the CHGNetCalculator with the specified model and calculation settings.
 
@@ -72,7 +73,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         self._potential = None
 
     @lazy_property("_potential")
-    def potential(self):
+    def potential(self) -> CHGNet:
         """Lazily loads and returns the CHGNet potential specified during initialization.
 
         Returns:

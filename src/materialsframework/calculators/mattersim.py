@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
@@ -10,6 +10,7 @@ from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
+    from mattersim.forcefield import Potential
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -35,7 +36,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         compute_stress: bool = True,
         stress_weight: float = 1.0,
         device: Literal["cuda", "cpu"] = "cpu",
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initializes the MatterSimCalculator with the specified model and calculation settings.
 
@@ -68,7 +69,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         self._potential = None
 
     @lazy_property("_potential")
-    def potential(self):
+    def potential(self) -> Potential:
         """Lazily loads and returns the MatterSim potential specified during initialization.
 
         Returns:
