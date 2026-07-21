@@ -8,9 +8,9 @@ from ase.db.sqlite import SQLite3Database
 
 if TYPE_CHECKING:
     from ase import Atoms
+    from pymatgen.core import Structure
 
     from materialsframework.tools.calculator import BaseCalculator
-    from materialsframework.tools.md import BaseMDCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
@@ -41,7 +41,7 @@ class ClusterExpansion:
         check_condition: bool = True,
         seed: int = 42,
         verbose: bool = False,
-        calculator: BaseCalculator | BaseMDCalculator | None = None,
+        calculator: BaseCalculator | None = None,
     ) -> None:
         """Initialize the ClusterExpansion instance.
 
@@ -56,7 +56,7 @@ class ClusterExpansion:
             check_condition (bool): Whether to check the condition number of the fit.
             seed (int): Random seed for reproducibility.
             verbose (bool): Whether to print detailed output during relaxation and fitting.
-            calculator (BaseCalculator | BaseMDCalculator | None): Calculator for energy and property calculations.
+            calculator (BaseCalculator | None): Calculator for energy and property calculations.
         """
         self.symprec = symprec
         self.position_tolerance = position_tolerance
@@ -78,27 +78,29 @@ class ClusterExpansion:
 
     def fit(
         self,
-        structures: list[Atoms] | SQLite3Database = None,
-        primitive_structure: Atoms | None = None,
-        cutoffs: list[float] | None = None,
-        chemical_symbols: list[str] | list[list[str]] | None = None,
-        properties: list[str] | None = None,
+        structures: list[Structure] | SQLite3Database,
+        primitive_structure: Atoms,
+        cutoffs: list[float],
+        chemical_symbols: list[str] | list[list[str]],
+        properties: list[str],
         fit_property: str = "mixing_energy",
     ):
         """Fit the cluster expansion model using the provided structures and calculator.
 
         Parameters:
-            structures (list[Atoms] | SQLite3Database): List of structures or an ASE database containing structures.
-            primitive_structure (Atoms | None): Primitive structure for the cluster space.
-            cutoffs (list[float] | None): Cutoff distances for the cluster space.
-            chemical_symbols (list[str] | list[list[str]] | None): Chemical symbols for the cluster space.
-            properties (list[str] | None): Properties to be calculated and stored in the structure container.
+            structures (list[Structure] | SQLite3Database): List of structures or an ASE database containing structures.
+            primitive_structure (Atoms): Primitive structure for the cluster space.
+            cutoffs (list[float]): Cutoff distances for the cluster space.
+            chemical_symbols (list[str] | list[list[str]]): Chemical symbols for the cluster space.
+            properties (list[str]): Properties to be calculated and stored in the structure container.
             fit_property (str): Property to be used for fitting the cluster expansion model.
         """
         from icet import (
+            ClusterExpansion as IcetClusterExpansion,
+        )
+        from icet import (
             ClusterSpace,
             StructureContainer,
-            ClusterExpansion as IcetClusterExpansion,
         )
         from trainstation import CrossValidationEstimator
 
@@ -125,17 +127,15 @@ class ClusterExpansion:
                 )
         else:
             for structure in self.structures:
-                if not self.is_relaxed:
-                    structure = self.calculator.relax(structure, verbose=self.verbose)[
-                        "final_structure"
-                    ]
+                result = (
+                    self.calculator.calculate(structure)
+                    if self.is_relaxed
+                    else self.calculator.relax(structure, verbose=self.verbose)
+                )
 
                 self.structure_container.add_structure(
-                    structure=structure.to_ase_atoms(msonable=False),
-                    properties={
-                        prop: self.calculator.calculator.results.get(prop, None)
-                        for prop in properties
-                    },
+                    structure=result["final_structure"].to_ase_atoms(msonable=False),
+                    properties={prop: result.get(prop) for prop in properties},
                 )
 
         if self.verbose:

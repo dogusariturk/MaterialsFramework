@@ -101,8 +101,8 @@ def d019_cell(el_a: str, el_b: str, a: float, c: float) -> Structure:
 class BondLatticeParameter:
     """Bond-based lattice parameter model for FCC, BCC, or HCP alloy systems.
 
-    Predicts alloy lattice parameters from pairwise bond lengths obtained
-    via ML potential relaxations, following Tandoc et al. (Materialia 2025).
+    Predicts lattice parameters from pairwise bond lengths obtained via ML potential
+    relaxations, following Tandoc et al. (Materialia 2025).
 
     Two ways to create:
 
@@ -114,15 +114,14 @@ class BondLatticeParameter:
         a = model.predict({"Co": 0.25, "Cr": 0.25, "Fe": 0.25, "Ni": 0.25})
 
     Args:
-        structure: Crystal structure type — ``"fcc"``, ``"bcc"``, or ``"hcp"``.
+        structure: Crystal structure type: ``"fcc"``, ``"bcc"``, or ``"hcp"``.
         elements: Element symbols defining the alloy system.
         initial_a: Lattice parameter guesses per element. Falls back to
             built-in defaults for missing entries.
         initial_ca: c/a ratios per element for HCP. Falls back to built-in
             defaults (ideal c/a = 1.633 for non-native HCP elements).
             Ignored for FCC/BCC.
-        calculator: Pre-configured calculator for relaxations. Defaults to
-            ``M3GNetCalculator(fmax=0.01, optimizer="FIRE", fix_symmetry=True, relax_cell=True)``.
+        calculator: Pre-configured calculator for relaxations.
     """
 
     _DEFAULT_A: dict[str, dict[str, float]] = {
@@ -397,8 +396,7 @@ class BondLatticeParameter:
         Returns:
             dict[str, dict]: Dictionary with keys:
                 - ``bonds``: Mapping of ``(el_i, el_j)`` pairs to FNN bond lengths.
-                - ``a_pure``: Mapping of element symbols to relaxed pure lattice
-                  parameters.
+                - ``a_pure``: Mapping of element symbols to relaxed pure lattice parameters.
         """
         self._relax_pure()
         self._relax_binaries()

@@ -192,13 +192,10 @@ class BaseCalculator(ABC):
 
         Returns:
             dict[str, Any]: Dictionary with keys:
-                - ``final_structure``: Final relaxed structure as a pymatgen
-                  ``Structure``.
-                - ``trajectory``: ``TrajectoryObserver`` containing intermediate
-                  relaxation states.
-                - Property keys from ``AVAILABLE_PROPERTIES`` (for example
-                  ``energy``, ``forces``, ``stress``) populated from the calculator
-                  results.
+                - ``final_structure``: Final relaxed structure as a pymatgen ``Structure``.
+                - ``trajectory``: ``TrajectoryObserver`` containing intermediate relaxation states.
+                - Property keys from ``AVAILABLE_PROPERTIES`` (for example ``energy``, ``forces``, ``stress``)
+                    populated from the calculator results.
 
         Raises:
             ValueError: If the structure cannot be relaxed.
@@ -266,9 +263,8 @@ class BaseCalculator(ABC):
         Returns:
             dict[str, Any]: Dictionary with keys:
                 - ``final_structure``: Input structure as a pymatgen ``Structure``.
-                - Property keys from ``AVAILABLE_PROPERTIES`` (for example
-                  ``energy``, ``forces``, ``stress``) populated from the calculator
-                  results.
+                - Property keys from ``AVAILABLE_PROPERTIES`` (for example ``energy``, ``forces``, ``stress``)
+                    populated from the calculator results.
         """
         atoms = to_atoms(structure)
 

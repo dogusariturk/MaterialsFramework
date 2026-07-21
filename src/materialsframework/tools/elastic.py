@@ -471,8 +471,7 @@ def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) ->
     Args:
         base_cryst (Atoms): The base structure.
         axis (int): Deformation axis (0, 1, 2 for x, y, z; 3,4,5 for shear).
-        size (float): Magnitude of the deformation (percentage for axial deformation
-                      and degrees for shear deformation).
+        size (float): Magnitude of the deformation (percentage for axial deformation and degrees for shear deformation).
 
     Returns:
         Atoms: New structure with deformed cell.
