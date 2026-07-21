@@ -146,6 +146,9 @@ jobs:
           - name: tace
             install: --extra tace
             tests: tests/calculators/test_tace.py
+          - name: matris
+            install: --extra matris
+            tests: tests/calculators/test_matris.py
           - name: ce
             install: --extra ce
             tests: tests/tools/test_cluster_expansion.py

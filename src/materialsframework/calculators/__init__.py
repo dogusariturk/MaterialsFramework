@@ -25,6 +25,7 @@ _CALCULATOR_MAP: dict[str, tuple[str, str]] = {
     "HIENetCalculator": ("materialsframework.calculators.hienet", "HIENetCalculator"),
     "M3GNetCalculator": ("materialsframework.calculators.m3gnet", "M3GNetCalculator"),
     "MACECalculator": ("materialsframework.calculators.mace", "MACECalculator"),
+    "MatRISCalculator": ("materialsframework.calculators.matris", "MatRISCalculator"),
     "MatterSimCalculator": ("materialsframework.calculators.mattersim", "MatterSimCalculator"),
     "MEGNetCalculator": ("materialsframework.calculators.megnet", "MEGNetCalculator"),
     "NequIPCalculator": ("materialsframework.calculators.nequip", "NequIPCalculator"),
