@@ -59,7 +59,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the MACE potential are set to their default values.
         """
-        super().__init__(**kwargs)
+        super().__init__(include_dipoles=include_dipoles, **kwargs)
 
         # MACE specific attributes
         self.model = model
