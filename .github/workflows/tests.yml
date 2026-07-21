@@ -143,6 +143,9 @@ jobs:
           - name: hienet
             install: --extra hienet
             tests: tests/calculators/test_hienet.py
+          - name: tace
+            install: --extra tace
+            tests: tests/calculators/test_tace.py
           - name: ce
             install: --extra ce
             tests: tests/tools/test_cluster_expansion.py

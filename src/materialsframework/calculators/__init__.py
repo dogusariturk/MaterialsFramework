@@ -35,6 +35,7 @@ _CALCULATOR_MAP: dict[str, tuple[str, str]] = {
     "PosEGNNCalculator": ("materialsframework.calculators.posegnn", "PosEGNNCalculator"),
     "RandomCalculator": ("materialsframework.calculators.random", "RandomCalculator"),
     "SevenNetCalculator": ("materialsframework.calculators.sevennet", "SevenNetCalculator"),
+    "TACECalculator": ("materialsframework.calculators.tace", "TACECalculator"),
     "UMACalculator": ("materialsframework.calculators.uma", "UMACalculator"),
     "VASPCalculator": ("materialsframework.calculators.vasp", "VASPCalculator"),
 }
