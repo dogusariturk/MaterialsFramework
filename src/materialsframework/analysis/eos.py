@@ -59,8 +59,8 @@ class EOSAnalyzer(BaseAnalyzer):
             num (int, optional): The number of strain values to generate between the start and stop. Defaults to 11.
             eos_name (str, optional): The name of the equation of state (EOS) used for fitting. Defaults to "birch_murnaghan".
             calculator (BaseCalculator | None, optional): The calculator used for energy calculations.
-            eos_transformation (EOSTransformation | None, optional): The transformation used to generate deformed structures.
-                                                                         Defaults to `EOSTransformation`.
+            eos_transformation (EOSTransformation | None, optional): The transformation used to generate deformed
+                structures. Defaults to `EOSTransformation`.
         """
         super().__init__(calculator)
         self.start = start

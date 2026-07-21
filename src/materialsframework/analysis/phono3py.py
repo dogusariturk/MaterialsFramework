@@ -49,8 +49,8 @@ class Phono3pyAnalyzer(BaseAnalyzer):
 
         Args:
             calculator (BaseCalculator, optional): The calculator used to compute forces and energies.
-            phono3py_transformation (Phono3pyDisplacementTransformation, optional): The transformation object used
-                                                                                   to generate displaced structures.
+            phono3py_transformation (Phono3pyDisplacementTransformation, optional): The transformation object used to
+                generate displaced structures.
         """
         super().__init__(calculator)
         self._phono3py_transformation = phono3py_transformation

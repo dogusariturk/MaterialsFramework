@@ -69,9 +69,8 @@ class USFETransformation:
             structure (Structure): Input structure used as the reference state.
 
         Returns:
-            dict[str, dict[float, Structure] | float]: A dictionary with keys ``"displaced_structures"``,
-                mapping displacement fractions to the corresponding displaced `Structure`, and
-                ``"fault_area"``, the fault-plane area in Angstrom squared.
+            dict[str, dict[float, Structure] | float]: A dictionary with keys ``"displaced_structures"``, mapping displacement
+                fractions to the corresponding displaced `Structure`, and ``"fault_area"``, the fault-plane area in Angstrom squared.
         """
         displaced_structures: dict[float, Structure] = {}
 

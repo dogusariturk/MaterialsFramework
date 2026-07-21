@@ -42,9 +42,8 @@ class ANNNIStackingFaultAnalyzer(BaseAnalyzer):
 
         Args:
             calculator (BaseCalculator | None, optional): The calculator object used for relaxation and potential energy calculations.
-            annni_transformation (ANNNIStackingFaultTransformation | None, optional): The transformation object used to generate stacking
-                                                                                        fault structures. If not provided, a default instance
-                                                                                        is initialized.
+            annni_transformation (ANNNIStackingFaultTransformation | None, optional): The transformation object used
+                to generate stacking fault structures. If not provided, a default instance is initialized.
         """
         super().__init__(calculator)
         self._annni_transformation = annni_transformation
@@ -57,8 +56,8 @@ class ANNNIStackingFaultAnalyzer(BaseAnalyzer):
         FCC unit cell.
 
         Args:
-            composition (Composition | str): The composition of the supercell, either as a `Composition` object
-                                                   or as a string.
+            composition (Composition | str): The composition of the supercell, either as a `Composition` object or as
+                a string.
 
         Returns:
             dict[str, float]: Dictionary with keys:

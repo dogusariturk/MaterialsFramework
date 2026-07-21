@@ -41,9 +41,8 @@ class FormationEnergyTransformation:
                 determines which elemental references are generated.
 
         Returns:
-            list[tuple[list[Structure], int]]: A list of ``(candidates, n_atoms)`` tuples, where
-                ``candidates`` is a list of FCC/BCC/HCP pymatgen ``Structure`` objects and
-                ``n_atoms`` is the count of that element in the compound.
+            list[tuple[list[Structure], int]]: A list of ``(candidates, n_atoms)`` tuples, where ``candidates`` is a list of
+                FCC/BCC/HCP pymatgen ``Structure`` objects and ``n_atoms`` is the count of that element in the compound.
         """
         pure_structures: list[tuple[list[Structure], int]] = []
 

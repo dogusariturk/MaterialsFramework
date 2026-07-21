@@ -61,13 +61,12 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
 
         Args:
             eos_name (str, optional): The name of the equation of state (EOS) used for fitting energy-volume data.
-                                      Defaults to "birch_murnaghan".
+                Defaults to "birch_murnaghan".
             delta_max (float, optional): The maximum deformation magnitude. Defaults to 0.05.
             step_size (float, optional): The step size for deformations. Defaults to 0.01.
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
             cubic_transformation (CubicElasticConstantsDeformationTransformation | None, optional): The transformation
-                                                                                                    object used to apply
-                                                                                                    cubic distortions.
+                object used to apply cubic distortions.
         """
         super().__init__(calculator)
         self.eos_name = eos_name
@@ -178,8 +177,8 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         """Calculates the bulk modulus using equation of state (EOS) fitting.
 
         Args:
-            uniform_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to
-                                                                    uniformly distorted structures.
+            uniform_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to uniformly
+                distorted structures.
 
         Returns:
             float: The bulk modulus in GPa.
@@ -203,7 +202,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
 
         Args:
             orthorhombic_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to
-                                                                         orthorhombically distorted structures.
+                orthorhombically distorted structures.
             initial_volume (float): The initial volume of the undeformed structure.
 
         Returns:
@@ -226,7 +225,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
 
         Args:
             monoclinic_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to
-                                                                       monoclinically distorted structures.
+                monoclinically distorted structures.
             initial_volume (float): The initial volume of the undeformed structure.
 
         Returns:

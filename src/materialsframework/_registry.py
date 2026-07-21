@@ -27,9 +27,9 @@ def make_registry(group: str, label: str) -> tuple[Callable[[], list[str]], Call
         label (str): Singular noun used in the "Unknown <label> ..." error message, e.g. "analyzer".
 
     Returns:
-        tuple[Callable[[], list[str]], Callable[..., Any]]: A `(list_x, get_x)` pair, where `list_x()`
-            returns the sorted registered names and `get_x(name, **kwargs)` instantiates the entry
-            registered under `name`, forwarding `**kwargs` to its `__init__`.
+        tuple[Callable[[], list[str]], Callable[..., Any]]: A `(list_x, get_x)` pair, where `list_x()` returns the sorted
+            registered names and `get_x(name, **kwargs)` instantiates the entry registered under `name`, forwarding `**kwargs` to
+            its `__init__`.
     """
 
     def list_x() -> list[str]:

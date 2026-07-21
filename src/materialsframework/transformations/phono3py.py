@@ -44,18 +44,18 @@ class Phono3pyDisplacementTransformation:
             structure (Structure): The input structure to be used for generating displacements.
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
             supercell_matrix (list, optional): The supercell matrix for third-order force constant calculations.
-                                               Defaults to a 2x2x2 supercell.
+                Defaults to a 2x2x2 supercell.
             primitive_matrix (list | str, optional): The primitive matrix for the supercell. Defaults to 'auto'.
-            phonon_supercell_matrix (list, optional): The supercell matrix for second-order force constant calculations.
-                                                      Defaults to a 3x3x3 supercell.
+            phonon_supercell_matrix (list, optional): The supercell matrix for second-order force constant
+                calculations. Defaults to a 3x3x3 supercell.
             log_level (int, optional): The log level for Phono3py. Defaults to 0.
             **kwargs: Additional keyword arguments for the `Phono3py.generate_displacement` method.
 
         Returns:
             dict[str, Phono3py | list[Structure]]: Dictionary with keys:
                 - ``phonon``: The `Phono3py` object used to generate the displacements.
-                - ``phonon_supercells_with_displacements``: Displaced supercells for phonon (second-order)
-                  force constant calculations.
+                - ``phonon_supercells_with_displacements``: Displaced supercells for phonon (second-order) force
+                    constant calculations.
                 - ``supercells_with_displacements``: Displaced supercells for third-order force constant calculations.
                 - ``phonon_displacements``: The atomic displacements for the phonon supercells.
                 - ``supercell_displacements``: The atomic displacements for the third-order force-constant supercells.
@@ -108,12 +108,12 @@ class Phono3pyDisplacementTransformation:
             phonon (Phono3py): The `Phono3py` object to generate the displacements for.
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
             is_plusminus (bool | str, optional): Whether to generate both positive and negative displacements.
-                                                 Defaults to "auto".
+                Defaults to "auto".
             is_diagonal (bool, optional): Whether to only displace atoms along diagonal directions. Defaults to True.
 
         Returns:
-            tuple[list[Structure], list[Structure]]: Two lists of displaced structures for phonon (second-order)
-                                                               and third-order force constant calculations.
+            tuple[list[Structure], list[Structure]]: Two lists of displaced structures for phonon (second-order) and third-order
+                force constant calculations.
         """
         try:
             from pymatgen.io.phonopy import get_pmg_structure

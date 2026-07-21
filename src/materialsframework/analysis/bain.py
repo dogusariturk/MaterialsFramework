@@ -47,8 +47,7 @@ class BainPathAnalyzer(BaseAnalyzer):
             step (float, optional): The step size for incrementing the c/a ratio. Defaults to 0.01.
             calculator (BaseCalculator | None, optional): The calculator object used to compute potential energies.
             bain_transformation (BainDisplacementTransformation | None, optional): The transformation object used to
-                                                                                      apply Bain displacements. If not provided,
-                                                                                      a new instance is initialized.
+                apply Bain displacements. If not provided, a new instance is initialized.
         """
         super().__init__(calculator)
         self.start = start

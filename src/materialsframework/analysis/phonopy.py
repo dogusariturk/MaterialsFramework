@@ -40,8 +40,8 @@ class PhonopyAnalyzer(BaseAnalyzer):
 
         Args:
             calculator (BaseCalculator, optional): The calculator used to compute forces and energies.
-            phonopy_transformation (PhonopyDisplacementTransformation, optional): The transformation object used
-                                                                                  to generate displaced supercells.
+            phonopy_transformation (PhonopyDisplacementTransformation, optional): The transformation object used to
+                generate displaced supercells.
         """
         super().__init__(calculator)
         self._phonopy_transformation = phonopy_transformation

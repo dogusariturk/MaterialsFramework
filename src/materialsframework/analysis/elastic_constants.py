@@ -71,9 +71,8 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
             num_deform (int, optional): The number of deformations to apply. Defaults to 5.
             max_deform (float, optional): The maximum deformation size in percent and degrees. Defaults to 2%.
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
-            elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The transformation
-                                                                                                    object used to apply
-                                                                                                    cubic distortions.
+            elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The
+                transformation object used to apply cubic distortions.
         """
         super().__init__(calculator)
         self.num_deform = num_deform
@@ -89,13 +88,12 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
 
         Args:
             structure (Structure | Atoms): The input structure to calculate the elastic constants.
-            is_relaxed (bool, optional): A flag to indicate whether the input structure is already relaxed.
-                                         Defaults to False.
+            is_relaxed (bool, optional): A flag to indicate whether the input structure is already relaxed. Defaults
+                to False.
 
         Returns:
             dict[str, float]: Dictionary with keys:
-                - ``C_ij`` entries: Elastic constants in GPa for all fitted tensor
-                  components.
+                - ``C_ij`` entries: Elastic constants in GPa for all fitted tensor components.
                 - ``youngs_modulus``: Young's modulus in GPa.
                 - ``voigt_bulk_modulus``: Voigt bulk modulus in GPa.
                 - ``voigt_shear_modulus``: Voigt shear modulus in GPa.
