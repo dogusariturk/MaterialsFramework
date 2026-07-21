@@ -1,4 +1,4 @@
-"""Shared utility functions used across the analysis, calculators, tools, and transformations packages."""
+"""This module contains utility functions shared across the analysis, calculators, tools, and transformations packages."""
 
 from __future__ import annotations
 

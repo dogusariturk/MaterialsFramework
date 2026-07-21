@@ -1,4 +1,4 @@
-"""This module contains a class to calculate the formation energy of materials.
+"""This module provides a class to calculate the formation energy of materials.
 
 The `FormationEnergyAnalyzer` class computes the formation energy of a material based on its
 composition and structure.

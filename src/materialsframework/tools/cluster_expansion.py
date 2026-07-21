@@ -1,4 +1,10 @@
-"""Cluster expansion module for fitting and predicting material properties."""
+"""Cluster expansion module for fitting and predicting material properties.
+
+`ClusterExpansion` builds an `icet` cluster space from a primitive structure, evaluates
+training structures with a `BaseCalculator`, and fits a cross-validated model (via
+`trainstation`) that predicts a chosen property, such as mixing energy, for new
+configurations of the same cluster space.
+"""
 
 from __future__ import annotations
 

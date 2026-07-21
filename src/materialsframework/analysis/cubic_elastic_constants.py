@@ -1,4 +1,4 @@
-"""This module contains a class to calculate the cubic elastic constants of a given structure.
+"""This module provides a class to calculate the cubic elastic constants of a given structure.
 
 The `CubicElasticConstantsAnalyzer` class computes the elastic constants (C11, C12, and C44)
 for a cubic crystal structure using energy-volume data and various deformation modes. The class

@@ -1,7 +1,7 @@
-"""This module provides a class to generate BCC interstitial structures for hydrogen solubility calculations.
+"""Generates BCC interstitial structures for hydrogen solubility calculations.
 
-The `HSolubilityTransformation` class builds host and H-inserted structures at octahedral and
-tetrahedral sites, for composition-driven or structure-driven H-solubility workflows.
+Builds host and H-inserted structures at octahedral and tetrahedral sites, for
+composition-driven or structure-driven H-solubility workflows.
 """
 
 from __future__ import annotations

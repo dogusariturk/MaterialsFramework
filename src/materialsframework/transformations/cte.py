@@ -1,7 +1,7 @@
-"""This module provides a class to generate structures and tasks for coefficient of thermal expansion (CTE) workflows.
+"""Generates structures and tasks for coefficient of thermal expansion (CTE) workflows.
 
-The `CTETransformation` class prepares per-temperature structure/task inputs for MD-based
-CTE analysis.
+Prepares per-temperature structure/task inputs consumed by MD sampling to estimate the
+volumetric CTE from temperature-dependent equilibrium volumes.
 """
 
 from __future__ import annotations

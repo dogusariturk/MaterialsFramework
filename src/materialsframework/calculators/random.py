@@ -1,4 +1,4 @@
-"""A calculator that returns random energies for every call."""
+"""Calculator that returns random energies and forces for every call, without an installed ML backend."""
 
 from __future__ import annotations
 

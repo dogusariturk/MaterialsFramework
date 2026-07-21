@@ -1,4 +1,4 @@
-"""This package provides tools for parsing and writing files."""
+"""This package provides tools for parsing files."""
 
 from .file_parser import FileParser
 

@@ -1,4 +1,4 @@
-"""This module contains a class to calculate the elastic constant tensor of a given structure.
+"""This module provides a class to calculate the elastic constant tensor of a given structure.
 
 The `ElasticConstantsAnalyzer` class computes the elastic constant tensor of a structure using
 energy-volume data and various deformation modes. The class also computes additional mechanical

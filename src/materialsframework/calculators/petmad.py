@@ -1,4 +1,4 @@
-"""This module provides a class for calculations and relaxations with PET-MAD models via UPET."""
+"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the PET-MAD potential, served via UPET."""
 
 from __future__ import annotations
 

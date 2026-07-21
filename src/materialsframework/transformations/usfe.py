@@ -1,8 +1,7 @@
-"""This module provides a class to generate structures for USFE calculations.
+"""Generates structures for USFE calculations.
 
-The `USFETransformation` class creates rigidly displaced structures along a selected BCC slip
-system, for generalized stacking fault energy (GSFE) and unstable stacking fault energy (USFE)
-analyses.
+Creates rigidly displaced structures along a selected BCC slip system, for generalized
+stacking fault energy (GSFE) and unstable stacking fault energy (USFE) analyses.
 """
 
 from __future__ import annotations

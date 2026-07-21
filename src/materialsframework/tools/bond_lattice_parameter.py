@@ -1,23 +1,10 @@
 """Bond-based lattice parameter model for FCC, BCC, and HCP alloys.
 
-Implements the method of Tandoc et al. (Materialia 2025) for predicting
-alloy lattice parameters from pairwise bond lengths obtained via ML
-potential relaxations.
-
-**BCC mode**
-    - Pure BCC cells for i-i bonds:  d_ii = a * sqrt(3) / 2
-    - B2 (CsCl-type) cells for i-j bonds:  d_ij = a_B2 * sqrt(3) / 2
-    - Alloy lattice parameter:  a_bar = (2 / sqrt(3)) * sum_ij x_i x_j d_ij
-
-**FCC mode** (extension suggested in the paper):
-    - Pure FCC cells for i-i bonds:  d_ii = a / sqrt(2)
-    - L1_0 (CuAu-type) cells for i-j bonds:  d_ij = sqrt(2a^2 + c^2) / 2
-    - Alloy lattice parameter:  a_bar = sqrt(2) * sum_ij x_i x_j d_ij
-
-**HCP mode** (extension using D0_19 ordered hexagonal cells):
-    - Pure HCP cells for i-i bonds:  d_ii = sqrt(a^2/3 + c^2/4)
-    - D0_19 (Ni3Sn-type) cells for i-j bonds:  d_ij = sqrt(a^2/3 + c^2/4)
-    - Alloy lattice parameter:  a_bar = d_bar (exact for ideal c/a)
+Implements the method of Tandoc et al. (Materialia 2025) for predicting alloy lattice
+parameters from pairwise nearest-neighbor bond lengths. Bond lengths are extracted from
+ML potential relaxations of pure-element cells and binary intermetallic reference cells
+(B2, L1_0, or D0_19, depending on the crystal structure), then combined into a
+composition-weighted average bond length and converted to a lattice parameter.
 """
 
 from __future__ import annotations
