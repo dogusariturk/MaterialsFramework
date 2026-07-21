@@ -243,7 +243,7 @@ class BaseCalculator(ABC):
             "trajectory": obs,
         }
 
-        out_dict.update({prop: self.calculator.results.get(prop, None) for prop in self.__class__.AVAILABLE_PROPERTIES})
+        out_dict.update({prop: self.calculator.results.get(prop, None) for prop in self.AVAILABLE_PROPERTIES})
 
         return out_dict
 
@@ -287,7 +287,7 @@ class BaseCalculator(ABC):
             "final_structure": self.ase_adaptor.get_structure(atoms),
         }
 
-        out_dict.update({prop: self.calculator.results[prop] for prop in self.__class__.AVAILABLE_PROPERTIES})
+        out_dict.update({prop: self.calculator.results[prop] for prop in self.AVAILABLE_PROPERTIES})
 
         return out_dict
 

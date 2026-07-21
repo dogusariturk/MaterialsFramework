@@ -69,7 +69,7 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
         self.model_type = model_type
 
         if include_dipoles:
-            self.__class__.AVAILABLE_PROPERTIES.append("dipole")
+            self.AVAILABLE_PROPERTIES = [*MACECalculator.AVAILABLE_PROPERTIES, "dipole"]
 
         self._calculator = None
 
