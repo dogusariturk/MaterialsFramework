@@ -14,6 +14,7 @@ __email__ = "dogu.sariturk@gmail.com"
 
 _CALCULATOR_MAP: dict[str, tuple[str, str]] = {
     "AlignnCalculator": ("materialsframework.calculators.alignn", "AlignnCalculator"),
+    "AllegroCalculator": ("materialsframework.calculators.allegro", "AllegroCalculator"),
     "AlphaNetCalculator": ("materialsframework.calculators.alphanet", "AlphaNetCalculator"),
     "CHGNetCalculator": ("materialsframework.calculators.chgnet", "CHGNetCalculator"),
     "DeePMDCalculator": ("materialsframework.calculators.deepmd", "DeePMDCalculator"),
