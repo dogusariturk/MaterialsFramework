@@ -140,7 +140,7 @@ class BaseCalculator(ABC):
 
         self.fmax = fmax
         self.steps = steps
-        self.optimizer: Optimizer = OPTIMIZERS[optimizer.lower()].value if isinstance(optimizer, str) else optimizer
+        self.optimizer: type[Optimizer] = OPTIMIZERS[optimizer.lower()].value if isinstance(optimizer, str) else optimizer
         self.relax_cell = relax_cell
         self.fix_symmetry = fix_symmetry
         self.fix_atoms = fix_atoms
@@ -206,10 +206,13 @@ class BaseCalculator(ABC):
         self._reset_calculator_results()
         atoms.calc = self.calculator
 
+        constraints = []
         if self.fix_symmetry:
-            atoms.set_constraint([FixSymmetry(atoms=atoms, symprec=self.sym_prec)])
+            constraints.append(FixSymmetry(atoms=atoms, symprec=self.sym_prec))
         if self.fix_atoms:
-            atoms.set_constraint([FixAtoms(mask=[True for _ in atoms])])
+            constraints.append(FixAtoms(mask=[True for _ in atoms]))
+        if constraints:
+            atoms.set_constraint(constraints)
 
         with contextlib.redirect_stdout(stream):
             obs = TrajectoryObserver(
