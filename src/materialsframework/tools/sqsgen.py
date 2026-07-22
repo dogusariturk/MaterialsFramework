@@ -1,9 +1,8 @@
-"""This module contains classes for generating Special Quasirandom Structures (SQS).
+"""This module provides a class for generating Special Quasirandom Structures (SQS).
 
-The `SqsGenerator` class allows users to generate SQS structures, which are designed
-to mimic the statistical properties of a random alloy, using the method implemented in the `sqsgenerator`.
-SQS structures are important in simulating disordered systems or alloys, as they approximate randomness
-while maintaining computational tractability.
+The `SqsGenerator` class generates SQS structures that mimic the statistical properties of a
+random alloy, using the method implemented in `sqsgenerator`. SQS structures approximate
+randomness while keeping simulations of disordered systems and alloys computationally tractable.
 """
 
 from __future__ import annotations
@@ -25,10 +24,8 @@ __email__ = "dogu.sariturk@gmail.com"
 class SqsGenerator:
     """A class used to generate Special Quasirandom Structures (SQS).
 
-    The `SqsGenerator` class provides methods to generate SQS structures using the SQS method,
-    which produces structures that approximate a random arrangement of atoms while matching specific
-    pair and multi-site correlation functions. These structures are widely used in simulations of
-    disordered systems and alloys.
+    Generates structures that approximate a random arrangement of atoms while matching specific
+    pair and multi-site correlation functions.
     """
 
     def __init__(
@@ -46,25 +43,14 @@ class SqsGenerator:
             make_structures (bool, optional): Whether to generate the structures during the optimization process. Defaults to True.
             mode (Literal["random", "systematic"], optional): The mode for SQS generation. Defaults to "random".
             structure_format (str, optional): The structure format for the generated SQS structure. Defaults to "pymatgen".
-            log_level (Literal["trace", "debug", "info", "warning", "error"], optional): The log level for the SQS generation. Defaults to "warning".
+            log_level (Literal["trace", "debug", "info", "warning", "error"], optional): The log level for the SQS
+                generation. Defaults to "warning".
         """
         self._iterations = iterations
         self._make_structures = make_structures
         self._mode = mode
         self._structure_format = structure_format
         self._log_level = log_level
-
-        self._lattice: Lattice | None = None
-        self._coords: dict[str, list[float]] | None = None
-        self._multiplier: int | None = None
-        self._supercell_size: tuple[int, int, int] | None = None
-        self._composition: dict[str, int] | None = None
-
-        self._sqs: Structure | None = None
-        self._objective: float | None = None
-
-        self.results: Any | None = None
-        self.timings: None = None
 
     def generate(
         self,
@@ -92,25 +78,24 @@ class SqsGenerator:
         if isinstance(composition, str):
             composition = Composition(composition)
 
-        self._supercell_size = supercell_size
-        self._lattice = self._get_lattice(composition=composition, crystal_structure=crystal_structure.lower())
-        self._coords = self._get_coords(crystal_structure=crystal_structure.lower())
-        self._multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
-        self._composition = self._determine_composition(supercell_size=self._supercell_size, composition=composition)
+        lattice = self._get_lattice(composition=composition, crystal_structure=crystal_structure.lower())
+        coords = self._get_coords(crystal_structure=crystal_structure.lower())
+        multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
+        sqs_composition = self._determine_composition(supercell_size=supercell_size, composition=composition, multiplier=multiplier)
 
         if shell_weights is None:
             shell_weights = {1: 1.0} if supercell_size == (1, 1, 1) else {1: 1.0, 2: 0.5}
 
         configuration = {
             "structure": {
-                "lattice": self._lattice.matrix,
-                "coords": self._coords,
-                "species": ["W"] * self._multiplier,  # Tungsten used here as a placeholder element
-                "supercell": self._supercell_size,
+                "lattice": lattice.matrix,
+                "coords": coords,
+                "species": ["W"] * multiplier,  # Tungsten used here as a placeholder element
+                "supercell": supercell_size,
             },
             "iterations": self._iterations,
             "shell_weights": shell_weights,
-            "composition": self._composition,
+            "composition": sqs_composition,
             "iteration_mode": self._mode,
         }
 
@@ -128,16 +113,15 @@ class SqsGenerator:
             "error": LogLevel.error,
         }
 
-        self.results = optimize(
+        results = optimize(
             parse_config(configuration),
             level=_log_level_map.get(self._log_level, LogLevel.warn),
         )
-        self.timings = None
 
-        self._sqs = self._parse_results_for_structure()
-        self._objective = self._parse_results_for_objective()
+        sqs = self._parse_results_for_structure(results)
+        objective = self._parse_results_for_objective(results)
 
-        return {"structure": self._sqs, "objective": self._objective}
+        return {"structure": sqs, "objective": objective}
 
     @staticmethod
     def _get_lattice(composition: Composition, crystal_structure: str) -> Lattice:
@@ -155,12 +139,8 @@ class SqsGenerator:
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
 
         lattice_creators = {
-            "hcp": lambda: Lattice.hexagonal(
-                a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0)
-            ).get_niggli_reduced_lattice(),
-            "dhcp": lambda: Lattice.hexagonal(
-                a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2
-            ).get_niggli_reduced_lattice(),
+            "hcp": lambda: Lattice.hexagonal(a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0)).get_niggli_reduced_lattice(),
+            "dhcp": lambda: Lattice.hexagonal(a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2).get_niggli_reduced_lattice(),
             "fcc_prim": lambda: Lattice(
                 matrix=[
                     [0, avg_radius * np.sqrt(2), avg_radius * np.sqrt(2)],
@@ -174,17 +154,20 @@ class SqsGenerator:
             "sc": lambda: Lattice.cubic(a=avg_radius),
         }
 
-        return lattice_creators.get(crystal_structure, lambda: ValueError("Invalid crystal structure."))()
+        if crystal_structure not in lattice_creators:
+            raise ValueError(f"Invalid crystal structure: {crystal_structure!r}")
+
+        return lattice_creators[crystal_structure]()
 
     @staticmethod
-    def _get_coords(crystal_structure) -> dict[str, list[float]]:
+    def _get_coords(crystal_structure) -> list[list[float]]:
         """Returns the coordinates of atoms based on the crystal structure.
 
         Args:
             crystal_structure (str): The crystal structure of the supercell.
 
         Returns:
-            dict[str, list[float]: The coordinates of atoms based on the crystal structure.
+            list[list[float]]: The coordinates of atoms based on the crystal structure.
 
         Raises:
             ValueError: If the crystal structure is invalid.
@@ -195,8 +178,8 @@ class SqsGenerator:
                 [2.0 / 3.0, 1.0 / 3.0, 3.0 / 4.0],
             ],
             "dhcp": [
-                [0, 0, 0],
-                [0, 0, 1.0 / 2.0],
+                [0.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0 / 2.0],
                 [1.0 / 3.0, 2.0 / 3.0, 1.0 / 4.0],
                 [2.0 / 3.0, 1.0 / 3.0, 3.0 / 4.0],
             ],
@@ -207,7 +190,10 @@ class SqsGenerator:
             "sc": [[0.0, 0.0, 0.0]],
         }
 
-        return coords_creators.get(crystal_structure, ValueError("Invalid crystal structure."))
+        if crystal_structure not in coords_creators:
+            raise ValueError(f"Invalid crystal structure: {crystal_structure!r}")
+
+        return coords_creators[crystal_structure]
 
     @staticmethod
     def _get_multiplier(crystal_structure) -> int:
@@ -232,73 +218,49 @@ class SqsGenerator:
             "sc": 1,
         }
 
-        return multiplier_creators.get(crystal_structure, ValueError("Invalid crystal structure."))
+        if crystal_structure not in multiplier_creators:
+            raise ValueError(f"Invalid crystal structure: {crystal_structure!r}")
 
-    def _determine_composition(self, supercell_size: tuple[int, int, int], composition: Composition) -> dict[str, int]:
+        return multiplier_creators[crystal_structure]
+
+    def _determine_composition(self, supercell_size: tuple[int, int, int], composition: Composition, multiplier: int) -> dict[str, int]:
         """Determines the composition of the supercell.
 
         Args:
             supercell_size (tuple[int, int, int]): The size of the supercell.
             composition (Composition): The composition of the supercell.
+            multiplier (int): The multiplier for the crystal structure.
 
         Returns:
             dict[str, int]: A dictionary containing the element symbols as keys and the corresponding
             number of atoms as values.
         """
-        result = self._multiplier * reduce(operator.mul, supercell_size)
+        result = multiplier * reduce(operator.mul, supercell_size)
 
         return {el: int(round(amt, 5) * result) for el, amt in composition.fractional_composition.as_reduced_dict().items()}
 
-    def _parse_results_for_structure(self) -> Structure:
-        """Parses the results dictionary from the generate function.
+    @staticmethod
+    def _parse_results_for_structure(results: Any) -> Structure:
+        """Parses the results dictionary from the generate function to extract the SQS structure.
 
-        This function takes the results dictionary generated by the generate function and
-        parses it to extract the SQS structure.
+        Args:
+            results (Any): The results object returned by the SQS optimization.
 
         Returns:
             Structure: The SQS structure generated by the calculator.
         """
         from sqsgenerator import to_pymatgen
 
-        return to_pymatgen(self.results.best().structure()).get_sorted_structure()
+        return to_pymatgen(results.best().structure()).get_sorted_structure()
 
-    def _parse_results_for_objective(self) -> float:
-        """Parses the results dictionary from the generate function.
+    @staticmethod
+    def _parse_results_for_objective(results: Any) -> float:
+        """Parses the results dictionary from the generate function to extract the objective value.
 
-        This function takes the results dictionary generated by the generate function and
-        parses it to extract the objective value.
-
-        Returns:
-            float: The objective value of the SQS structure.
-        """
-        return self.results.best().objective
-
-    @property
-    def sqs(self) -> Structure:
-        """Returns the SQS generated by the calculator.
-
-        Raises:
-            ValueError: If the SQS has not been generated yet.
-
-        Returns:
-            Structure: The SQS structure.
-        """
-        if self._sqs is None:
-            raise ValueError("SQS has not been generated yet.")
-
-        return self._sqs
-
-    @property
-    def objective(self) -> float:
-        """Returns the objective value of the SQS generated by the calculator.
-
-        Raises:
-            ValueError: If the SQS has not been generated yet.
+        Args:
+            results (Any): The results object returned by the SQS optimization.
 
         Returns:
             float: The objective value of the SQS structure.
         """
-        if self._objective is None:
-            raise ValueError("SQS has not been generated yet.")
-
-        return self._objective
+        return results.best().objective
