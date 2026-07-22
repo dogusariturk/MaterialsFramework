@@ -33,6 +33,7 @@ class MatRISCalculator(BaseCalculator, BaseMDCalculator):
         model: Literal["matris_10m_oam", "matris_10m_mp"] = "matris_10m_oam",
         task: Literal["e", "em", "ef", "efs", "efsm"] = "efsm",
         device: Literal["cpu", "cuda"] = "cpu",
+        include_magmoms: bool = False,
         **kwargs: Any,
     ) -> None:
         """Initializes the MatRISCalculator with the specified model and calculation settings.
@@ -45,6 +46,7 @@ class MatRISCalculator(BaseCalculator, BaseMDCalculator):
                 energy ("e"), magnetic moments ("m"), forces ("f"), and stress ("s") the model predicts. Defaults
                 to "efsm".
             device (Literal["cpu", "cuda"], optional): The device to use for calculations. Defaults to "cpu".
+            include_magmoms (bool, optional): Whether to include magnetic moments in the trajectory. Defaults to False.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
@@ -53,7 +55,7 @@ class MatRISCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining parameters for the MatRIS potential are set to their default values.
         """
-        super().__init__(**kwargs)
+        super().__init__(include_magmoms=include_magmoms, **kwargs)
 
         # MatRIS specific attributes
         self.model = model
