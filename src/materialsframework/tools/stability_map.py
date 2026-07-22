@@ -144,16 +144,16 @@ class StabilityMap:
         """Initialize the StabilityMap class.
 
         Args:
-            db (str): Path to the thermodynamic database file.
-            elements (list | None): List of elements to include in the stability map.
+            db (Database | str): pycalphad Database object or path to the thermodynamic database file.
+            elements (list[str] | None, optional): List of elements to include in the stability map.
                 If not provided, all elements in the database will be used.
-            phase (str | None): The phase to include in the stability map.
+            phase (str | None, optional): The phase to include in the stability map.
                 If not provided, the phase in the database will be used.
-            step (float): Step size for generating compositions. Default is 0.05, i.e., 5%.
-            temperature (float): Temperature in Kelvin. Default is 1500 K.
-            pressure (float): Pressure in Pascals. Default is 101325 Pa.
-            nb_workers (int | None): Number of workers for parallel processing. Default is None, which uses all available cores.
-            progress_bar (bool): Whether to show a progress bar during calculations. Default is False.
+            step (float, optional): Step size for generating compositions. Default is 0.05, i.e., 5%.
+            temperature (int | float, optional): Temperature in Kelvin. Default is 1500 K.
+            pressure (int | float, optional): Pressure in Pascals. Default is 101325 Pa.
+            nb_workers (int | None, optional): Number of workers for parallel processing. Default is None, which uses all available cores.
+            progress_bar (bool, optional): Whether to show a progress bar during calculations. Default is False.
 
         Raises:
             ValueError: If multiple phases are found in the database and phase is not specified.
@@ -174,7 +174,7 @@ class StabilityMap:
             raise ValueError(f"Multiple phases found in the database. Please specify one of {list(self.dbf.phases.keys())}.")
 
         self.elements = sorted(self.dbf.elements) if elements is None else elements
-        self.phase = list(db.phases.keys())[0] if phase is None else phase
+        self.phase = list(self.dbf.phases.keys())[0] if phase is None else phase
         self.compositions = self._generate_compositions(self.elements, step=step)
         self.temperature = temperature
         self.pressure = pressure
