@@ -138,7 +138,7 @@ class StabilityMap:
         step: float = 0.05,
         temperature: int | float = 1500,
         pressure: int | float = 101325,
-        nb_workers: int = None,
+        nb_workers: int | None = None,
         progress_bar: bool = False,
     ) -> None:
         """Initialize the StabilityMap class.
