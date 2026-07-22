@@ -207,7 +207,7 @@ class BaseMDCalculator(ABC):
             pressure_au=self.pressure * 1.01325 * units.bar,
             taut=self.taut * units.fs,
             taup=self.taup * units.fs,
-            compressibility=self.compressibility / units.bar,
+            compressibility_au=self.compressibility / units.bar,
         )
 
     def _initialize_inhomogeneous_npt_berendsen(self, ase_atoms: Atoms) -> Inhomogeneous_NPTBerendsen:
@@ -226,7 +226,7 @@ class BaseMDCalculator(ABC):
             pressure_au=self.pressure * 1.01325 * units.bar,
             taut=self.taut * units.fs,
             taup=self.taup * units.fs,
-            compressibility=self.compressibility / units.bar,
+            compressibility_au=self.compressibility / units.bar,
             mask=self.mask,
         )
 
