@@ -62,11 +62,12 @@ class BaseMDCalculator(ABC):
         taut: float = 0.5e3,  # fs
         taup: float = 1e3,  # fs
         compressibility: float = 5e-7,  # 1/bar
-        mask: tuple[int] = (1, 1, 1),
+        mask: tuple[int, int, int] = (1, 1, 1),
         stationary: bool = True,
         zero_rotation: bool = True,
         logfile: str | None = None,
         loginterval: int = 1,
+        interval: int = 1,
         **kwargs: Any,
     ) -> None:
         """Initializes the `BaseMDCalculator` with the specified parameters for running MD simulations.
@@ -82,12 +83,13 @@ class BaseMDCalculator(ABC):
             taut (float, optional): Time constant for Berendsen temperature coupling in fs. Defaults to 0.5e3 fs.
             taup (float, optional): Time constant for Berendsen pressure coupling in fs. Defaults to 1e3 fs.
             compressibility (float, optional): Compressibility for the NPT ensemble in 1/bar. Defaults to 5e-7 1/bar.
-            mask (tuple[int], optional): Specifies which axes participate in the barostat for the Inhomogeneous NPT
+            mask (tuple[int, int, int], optional): Specifies which axes participate in the barostat for the Inhomogeneous NPT
                 Berendsen ensemble. Defaults to (1, 1, 1).
             stationary (bool, optional): Whether to set the center-of-mass motion to zero. Defaults to True.
             zero_rotation (bool, optional): Whether to set the total angular momentum to zero. Defaults to True.
             logfile (str | None, optional): The file to log simulation output. If None, no logging occurs. Defaults to None.
             loginterval (int, optional): The interval at which to log the simulation results. Defaults to 1 (every step).
+            interval (int, optional): The interval at which to record the simulation trajectory. Defaults to 1 (every step).
             **kwargs: Forwarded to the next class in the MRO, so cooperative subclasses can chain a
                 single `super().__init__(**kwargs)` call instead of splitting kwargs by hand.
 
@@ -113,12 +115,13 @@ class BaseMDCalculator(ABC):
         self.taut: float = taut
         self.taup: float = taup
         self.compressibility: float = compressibility
-        self.mask: tuple[int] = mask
+        self.mask: tuple[int, int, int] = mask
         self.ttime: float = ttime
         self.stationary: bool = stationary
         self.zero_rotation: bool = zero_rotation
         self.logfile: str | None = logfile
         self.loginterval: int = loginterval
+        self.interval: int = interval
         self.ase_adaptor = AseAtomsAdaptor()
 
         super().__init__(**kwargs)
@@ -138,7 +141,9 @@ class BaseMDCalculator(ABC):
             Calculator: An ASE Calculator instance configured for the specific
             molecular dynamics task.
         """
-        raise NotImplementedError("Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance.")
+        raise NotImplementedError(
+            "Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance."
+        )
 
     def _initialize_npt_nose_hoover(self, ase_atoms: Atoms) -> NPT:
         """Initializes the NPT Nose-Hoover ensemble for MD simulations.
@@ -271,7 +276,7 @@ class BaseMDCalculator(ABC):
             dyn = self._initialize_inhomogeneous_npt_berendsen(ase_atoms)
 
         if self.logfile:
-            self._initialize_logger(dyn, ase_atoms)
+            self._initialize_logger(dyn, ase_atoms, self.logfile)
 
         trajectory = TrajectoryObserver(ase_atoms, include_temperature=True, include_velocities=True)
         dyn.attach(trajectory, interval=self.interval)
@@ -289,17 +294,18 @@ class BaseMDCalculator(ABC):
             "final_structure": self.ase_adaptor.get_structure(dyn.atoms),
         }
 
-    def _initialize_logger(self, dyn, ase_atoms) -> None:
+    def _initialize_logger(self, dyn, ase_atoms, logfile: str) -> None:
         """Initializes the logger for the MD simulation.
 
         Args:
             dyn: The MD dynamics object being logged.
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
+            logfile (str): The file to log simulation output to.
         """
         logger = MDLogger(
             dyn=dyn,
             atoms=ase_atoms,
-            logfile=self.logfile,
+            logfile=logfile,
             stress=True,
         )
         dyn.attach(logger, interval=self.loginterval)
