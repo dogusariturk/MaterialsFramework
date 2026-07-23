@@ -23,7 +23,7 @@ _MISSING = not MODEL_PATH
 def calc() -> GPTFFCalculator:
     """GPTFFCalculator loaded from env-var model path, skipped if var is unset."""
     if _MISSING:
-        pytest.skip("GPTFF_MODEL env var not set")
+        pytest.skip(f"GPTFF model not found at {MODEL_PATH}")
     return GPTFFCalculator(model=MODEL_PATH)
 
 

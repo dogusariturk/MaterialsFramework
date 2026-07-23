@@ -23,7 +23,7 @@ _MISSING = not MODEL_PATH
 def calc() -> EquFlashCalculator:
     """EquFlashCalculator loaded from env-var checkpoint path, skipped if var is unset."""
     if _MISSING:
-        pytest.skip("EQUFLASH_MODEL env var not set")
+        pytest.skip(f"EquFlash model not found at {MODEL_PATH}")
     return EquFlashCalculator(model=MODEL_PATH)
 
 

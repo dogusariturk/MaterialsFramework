@@ -23,7 +23,7 @@ _MISSING = not MODEL_PATH
 def calc() -> AllegroCalculator:
     """AllegroCalculator loaded from env-var model path, skipped if var is unset."""
     if _MISSING:
-        pytest.skip("ALLEGRO_MODEL env var not set")
+        pytest.skip(f"Allegro model not found at {MODEL_PATH}")
     return AllegroCalculator(model=MODEL_PATH)
 
 

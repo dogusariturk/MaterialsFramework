@@ -23,7 +23,7 @@ _MISSING = not MODEL_PATH
 def calc() -> NequIPCalculator:
     """NequIPCalculator loaded from env-var model path, skipped if var is unset."""
     if _MISSING:
-        pytest.skip("NEQUIP_MODEL env var not set")
+        pytest.skip(f"NequIP model not found at {MODEL_PATH}")
     return NequIPCalculator(model=MODEL_PATH)
 
 

@@ -23,7 +23,7 @@ _MISSING = not MODEL_PATH
 def calc() -> DeePMDCalculator:
     """DeePMDCalculator loaded from env-var model path, skipped if var is unset."""
     if _MISSING:
-        pytest.skip("DEEPMD_MODEL env var not set")
+        pytest.skip(f"DeePMD model not found at {MODEL_PATH}")
     return DeePMDCalculator(model=MODEL_PATH)
 
 

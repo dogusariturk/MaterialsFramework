@@ -21,7 +21,7 @@ _MISSING = not MODEL_PATH
 def calc() -> PosEGNNCalculator:
     """PosEGNNCalculator loaded from env-var model path, skipped if var is unset."""
     if _MISSING:
-        pytest.skip("POSEGNN_MODEL env var not set")
+        pytest.skip(f"PosEGNN model not found at {MODEL_PATH}")
     return PosEGNNCalculator(model=MODEL_PATH, device="cpu")
 
 

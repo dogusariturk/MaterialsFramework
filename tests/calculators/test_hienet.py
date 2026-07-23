@@ -15,16 +15,16 @@ pytest.importorskip("hienet")
 
 from materialsframework.calculators.hienet import HIENetCalculator
 
-_MODEL_PATH = os.environ.get("HIENET_MODEL", "")
-_MISSING = not _MODEL_PATH
+MODEL_PATH = os.environ.get("HIENET_MODEL", "")
+_MISSING = not MODEL_PATH
 
 
 @pytest.fixture(scope="module")
 def calc() -> HIENetCalculator:
     """HIENetCalculator on CPU, skipped if the model file is not present."""
-    if not _MODEL_PATH.exists():
-        pytest.skip(f"HIENet model not found at {_MODEL_PATH}")
-    return HIENetCalculator(model=str(_MODEL_PATH))
+    if _MISSING:
+        pytest.skip(f"HIENet model not found at {MODEL_PATH}")
+    return HIENetCalculator(model=str(MODEL_PATH))
 
 
 @pytest.mark.integration
