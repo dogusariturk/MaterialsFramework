@@ -41,12 +41,12 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the NequixCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): The Nequix model to use. Defaults to "nequix-oam-1".
+            model (str, optional): The Nequix model to use. Defaults to "nequix-oam-1".
             model_path (str, optional): The path to the Nequix model to use. Defaults to None.
-            capacity_multiplier (float): The multiplier to use for calculating properties. Defaults to 1.1.
-            backend (str): The backend to use for calculations. Defaults to "jax".
-            use_kernel (bool): Whether to use the kernel for calculations. Defaults to True.
-            use_compile (bool): Whether to use compilation for calculations (only applicable for the torch backend). Defaults to False.
+            capacity_multiplier (float, optional): The multiplier to use for calculating properties. Defaults to 1.1.
+            backend (str, optional): The backend to use for calculations. Defaults to "jax".
+            use_kernel (bool, optional): Whether to use the kernel for calculations. Defaults to True.
+            use_compile (bool, optional): Whether to use compilation for calculations (only applicable for the torch backend). Defaults to False.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         super().__init__(**kwargs)

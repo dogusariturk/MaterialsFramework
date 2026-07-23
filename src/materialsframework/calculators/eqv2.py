@@ -40,10 +40,10 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         """Initializes the EqV2Calculator with the specified model and calculation settings.
 
         Args:
-            model (str): The name of the EqV2 model to use for calculations. Defaults to 'EquiformerV2-153M-OMAT24-MP-sAlex'.
+            model (str, optional): The name of the EqV2 model to use for calculations. Defaults to 'EquiformerV2-153M-OMAT24-MP-sAlex'.
             checkpoint_path (str, optional): The path to the checkpoint file for the EqV2 model.
-            local_cache (str): The path to the local cache directory for the EqV2 model. Defaults to "~/.cache/eqv2/".
-            device (Literal["cpu", "cuda"]): The device to use for the calculations. Defaults to "cpu".
+            local_cache (str, optional): The path to the local cache directory for the EqV2 model. Defaults to "~/.cache/eqv2/".
+            device (Literal["cpu", "cuda"], optional): The device to use for the calculations. Defaults to "cpu".
             seed (int, optional): The seed value for the model.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """

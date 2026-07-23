@@ -51,19 +51,20 @@ class ClusterExpansion:
     ) -> None:
         """Initialize the ClusterExpansion instance.
 
-        Parameters:
-            symprec (float): Symmetry precision for structure analysis.
-            position_tolerance (float | None): Tolerance for atomic position comparison.
-            is_relaxed (bool): Whether the input structures are relaxed.
-            fit_method (Literal["ardr", "bayesian-ridge", "elasticnet", "lasso", "least-squares", "omp", "rfe", "ridge",
-                "split-bregman"]): Method used for fitting the cluster expansion.
-            standardize (bool): Whether to standardize the data before fitting.
-            validation_method (Literal["shuffle-split", "k-fold"]): Method used for validation of the model.
-            n_splits (int): Number of splits for cross-validation.
-            check_condition (bool): Whether to check the condition number of the fit.
-            seed (int): Random seed for reproducibility.
-            verbose (bool): Whether to print detailed output during relaxation and fitting.
-            calculator (BaseCalculator | None): Calculator for energy and property calculations.
+        Args:
+            symprec (float, optional): Symmetry precision for structure analysis. Defaults to 1e-5.
+            position_tolerance (float | None, optional): Tolerance for atomic position comparison. Defaults to None.
+            is_relaxed (bool, optional): Whether the input structures are relaxed. Defaults to True.
+            fit_method (Literal["ardr", "bayesian-ridge", "elasticnet", "lasso", "least-squares", "omp", "rfe", "ridge", "split-bregman"], optional):
+                Method used for fitting the cluster expansion. Defaults to "ardr".
+            standardize (bool, optional): Whether to standardize the data before fitting. Defaults to True.
+            validation_method (Literal["shuffle-split", "k-fold"], optional): Method used for validation of the model.
+                Defaults to "k-fold".
+            n_splits (int, optional): Number of splits for cross-validation. Defaults to 10.
+            check_condition (bool, optional): Whether to check the condition number of the fit. Defaults to True.
+            seed (int, optional): Random seed for reproducibility. Defaults to 42.
+            verbose (bool, optional): Whether to print detailed output during relaxation and fitting. Defaults to False.
+            calculator (BaseCalculator | None, optional): Calculator for energy and property calculations. Defaults to None.
         """
         self.symprec = symprec
         self.position_tolerance = position_tolerance
@@ -94,13 +95,13 @@ class ClusterExpansion:
     ):
         """Fit the cluster expansion model using the provided structures and calculator.
 
-        Parameters:
+        Args:
             structures (list[Structure] | SQLite3Database): List of structures or an ASE database containing structures.
             primitive_structure (Atoms): Primitive structure for the cluster space.
             cutoffs (list[float]): Cutoff distances for the cluster space.
             chemical_symbols (list[str] | list[list[str]]): Chemical symbols for the cluster space.
             properties (list[str]): Properties to be calculated and stored in the structure container.
-            fit_property (str): Property to be used for fitting the cluster expansion model.
+            fit_property (str, optional): Property to be used for fitting the cluster expansion model. Defaults to "mixing_energy".
         """
         from icet import (
             ClusterExpansion as IcetClusterExpansion,

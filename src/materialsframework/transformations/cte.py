@@ -32,8 +32,8 @@ class CTETransformation:
         """Initialize the transformation object.
 
         Args:
-            ensemble: Requested MD ensemble label.
-            pressure: Target pressure value in atm.
+            ensemble (str, optional): Requested MD ensemble label. Defaults to "npt_berendsen".
+            pressure (float, optional): Target pressure value in atm. Defaults to 1.0.
         """
         self.ensemble = ensemble
         self.pressure = pressure
@@ -47,9 +47,9 @@ class CTETransformation:
         """Prepare structures and task metadata for each target temperature.
 
         Args:
-            structure: Input structure for MD sampling.
-            temperatures: Target temperatures in Kelvin.
-            steps: Number of MD steps per temperature.
+            structure (Structure | Atoms): Input structure for MD sampling.
+            temperatures (Sequence[float]): Target temperatures in Kelvin.
+            steps (int, optional): Number of MD steps per temperature. Defaults to 10000.
 
         Raises:
             ValueError: If temperatures are invalid or steps is non-positive.

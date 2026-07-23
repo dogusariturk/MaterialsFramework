@@ -31,7 +31,7 @@ class ANNNIStackingFaultTransformation:
         """Initializes the `ANNNIStackingFaultTransformation` object.
 
         Args:
-            sqs_gen (SqsGenerator | None): An optional SQS generator object. If not provided, a new instance will be
+            sqs_gen (SqsGenerator | None, optional): An optional SQS generator object. If not provided, a new instance will be
                 created when needed.
         """
         self._sqs_gen = sqs_gen

@@ -42,7 +42,7 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         Args:
             model (str, optional): The name or the path of the SevenNet model to use. Defaults to '7net-mf-ompa'.
             modal (Literal["mpa", "omat24"], optional): The fidelity of the model to use. Defaults to 'mpa'.
-            file_type (Literal["checkpoint", "torchscript"]): The format of the model file.
+            file_type (Literal["checkpoint", "torchscript"], optional): The format of the model file.
                 Defaults to 'checkpoint'.
             device (Literal["cuda", "cpu", "mps", "auto"], optional): The device to use for calculations. Defaults to "auto".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.

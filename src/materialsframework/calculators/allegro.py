@@ -43,8 +43,8 @@ class AllegroCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the AllegroCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): The path to a compiled Allegro model.
-            device (Literal["cuda", "cpu"]): The device to use for calculations. Defaults to "cpu".
+            model (str, optional): The path to a compiled Allegro model.
+            device (Literal["cuda", "cpu"], optional): The device to use for calculations. Defaults to "cpu".
             chemical_species_to_atom_type_map (Optional[Union[Dict[str, str], bool]], optional): A mapping from chemical species to atom
                 types expected by the Allegro model. Defaults to True, which means that the mapping will be automatically inferred from
                 the model.

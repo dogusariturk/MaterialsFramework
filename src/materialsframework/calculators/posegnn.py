@@ -38,7 +38,7 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         """Initialize a PosEGNNCalculator instance with a specified model and calculation settings.
 
         Args:
-            model (str, optional): The name or the path of the PosEGNN model to use. Defaults to 'PosEGNN-0'.
+            model (str): The name or the path of the PosEGNN model to use.
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             compute_stress (bool, optional): Whether to compute stress. Defaults to True.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.

@@ -99,16 +99,6 @@ class BondLatticeParameter:
 
         model = BondLatticeParameter.from_csv("fcc", "fcc_bond_model.csv")
         a = model.predict({"Co": 0.25, "Cr": 0.25, "Fe": 0.25, "Ni": 0.25})
-
-    Args:
-        structure: Crystal structure type: ``"fcc"``, ``"bcc"``, or ``"hcp"``.
-        elements: Element symbols defining the alloy system.
-        initial_a: Lattice parameter guesses per element. Falls back to
-            built-in defaults for missing entries.
-        initial_ca: c/a ratios per element for HCP. Falls back to built-in
-            defaults (ideal c/a = 1.633 for non-native HCP elements).
-            Ignored for FCC/BCC.
-        calculator: Pre-configured calculator for relaxations.
     """
 
     _DEFAULT_A: dict[str, dict[str, float]] = {
@@ -232,7 +222,17 @@ class BondLatticeParameter:
         initial_ca: dict[str, float] | None = None,
         calculator: BaseCalculator | None = None,
     ) -> None:
-        """Initialize with crystal structure type, element system, and optional calculator."""
+        """Initialize with crystal structure type, element system, and optional calculator.
+
+        Args:
+            structure (Literal["fcc", "bcc", "hcp"]): Crystal structure type.
+            elements (Sequence[str]): Element symbols defining the alloy system.
+            initial_a (dict[str, float] | None, optional): Lattice parameter guesses per element. Falls back to
+                built-in defaults for missing entries. Defaults to None.
+            initial_ca (dict[str, float] | None, optional): c/a ratios per element for HCP. Falls back to built-in
+                defaults (ideal c/a = 1.633 for non-native HCP elements). Ignored for FCC/BCC. Defaults to None.
+            calculator (BaseCalculator | None, optional): Pre-configured calculator for relaxations. Defaults to None.
+        """
         self.structure = structure
         self.elements = list(elements)
 

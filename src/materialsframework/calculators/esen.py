@@ -38,13 +38,13 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the eSENCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): The name of the eSEN model to use for calculations. Must be one of the
+            model (str, optional): The name of the eSEN model to use for calculations. Must be one of the
                 models available in fairchem-core (e.g. ``esen-sm-conserving-all-omol``,
                 ``esen-md-direct-all-omol``, ``esen-sm-conserving-all-oc25``). Ignored if
                 ``checkpoint_path`` is provided. Defaults to ``"esen-sm-conserving-all-omol"``.
             checkpoint_path (str, optional): Path to a local eSEN checkpoint file. When provided,
                 the model registry name is ignored.
-            device (Literal["cpu", "cuda"]): The device to use for the calculations. Defaults to "cpu".
+            device (Literal["cpu", "cuda"], optional): The device to use for the calculations. Defaults to "cpu".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         super().__init__(**kwargs)

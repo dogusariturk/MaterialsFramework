@@ -34,11 +34,11 @@ class SimulationGrid:
         """Initializes the simulation grid with given parameters.
 
         Args:
-            nx (int): Number of grid points in x-direction. Default is 128.
-            ny (int): Number of grid points in y-direction. Default is 128.
-            lx (float): Length of the grid in x-direction. Default is 2e-6.
-            ly (float): Length of the grid in y-direction. Default is 2e-6.
-            dt (float): Time step for the simulation. Default is 1e-12.
+            nx (int, optional): Number of grid points in x-direction. Defaults to 128.
+            ny (int, optional): Number of grid points in y-direction. Defaults to 128.
+            lx (float, optional): Length of the grid in x-direction. Defaults to 2e-6.
+            ly (float, optional): Length of the grid in y-direction. Defaults to 2e-6.
+            dt (float, optional): Time step for the simulation. Defaults to 1e-12.
         """
         self.nx, self.ny = nx, ny
         self.lx, self.ly = lx, ly
@@ -73,8 +73,8 @@ class MaterialParameters:
             temperature (float): Temperature in Kelvin.
             component (str): Component name.
             composition (float): Composition value.
-            elements (list[str] | None): List of elements. Default is None.
-            phase (str | None): Phase name. Default is None.
+            elements (list[str] | None, optional): List of elements. Defaults to None.
+            phase (str | None, optional): Phase name. Defaults to None.
 
         Raises:
             ValueError: If multiple phases are found in the database and no phase is specified.
@@ -89,10 +89,11 @@ class MaterialParameters:
         except ImportError as e:
             raise ImportError("pycalphad is required. Install it with: pip install materialsframework[calphad]") from e
 
-        if phase is None and len(db.phases) > 1:
+        dbf = db if isinstance(db, Database) else Database(db)
+
+        if phase is None and len(dbf.phases) > 1:
             raise ValueError("Multiple phases found in the database. Please specify a phase.")
 
-        dbf = db if isinstance(db, Database) else Database(db)
         comps = sorted(dbf.elements) if elements is None else elements
         if "/-" in comps:
             comps.remove("/-")
@@ -126,10 +127,11 @@ class PhaseFieldModel:
 
         Args:
             material_properties (MaterialParameters): Material properties for the simulation.
-            simulation_grid (SimulationGrid): The grid for the simulation.
-            wrt_cycle (int): Frequency of writing output files. Default is 5000.
-            stop_iter (int): Number of iterations to run the simulation. Default is 50000.
-            seed (int): Seed for the random number generator. Default is 42.
+            simulation_grid (SimulationGrid | None, optional): The grid for the simulation. Defaults to None,
+                meaning a new `SimulationGrid` with default parameters is created.
+            wrt_cycle (int, optional): Frequency of writing output files. Defaults to 5000.
+            stop_iter (int, optional): Number of iterations to run the simulation. Defaults to 50000.
+            seed (int, optional): Seed for the random number generator. Defaults to 42.
         """
         np.random.seed(seed)
 

@@ -41,8 +41,8 @@ class EquFlashCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the EquFlashCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): The path to a downloaded EquFlash/EquFlashV2 checkpoint file.
-            device (Literal["cuda", "cpu"]): The device to use for calculations. Defaults to "cpu".
+            model (str, optional): The path to a downloaded EquFlash/EquFlashV2 checkpoint file.
+            device (Literal["cuda", "cpu"], optional): The device to use for calculations. Defaults to "cpu".
             seed (int, optional): The seed value for reproducibility. Defaults to None, meaning the seed
                 stored in the checkpoint is used.
             only_output (list[str], optional): Restricts the calculator to a subset of the checkpoint's outputs.

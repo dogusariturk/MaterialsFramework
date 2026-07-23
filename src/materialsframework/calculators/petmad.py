@@ -39,11 +39,11 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the PetMadCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): PET-MLIP model to use. Default is "pet-mad-s". Ignored if `checkpoint_path` is provided.
-            version (str): Version of the model to use. Default is "latest". Ignored if `checkpoint_path` is provided.
+            model (str, optional): PET-MLIP model to use. Default is "pet-mad-s". Ignored if `checkpoint_path` is provided.
+            version (str, optional): Version of the model to use. Default is "latest". Ignored if `checkpoint_path` is provided.
             checkpoint_path (str, optional): Path to the model checkpoint file. If not provided, the model will be
                 downloaded using the "version" parameter.
-            device (str): The device to use for calculations. Options are "cuda", "cpu", or "mps".
+            device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         super().__init__(**kwargs)

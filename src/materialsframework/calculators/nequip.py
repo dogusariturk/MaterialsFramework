@@ -38,8 +38,8 @@ class NequIPCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the NequIPCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): The NequIP model to use.
-            device (Literal["cuda", "cpu"]): The device to use for calculations. Defaults to "cpu".
+            model (str, optional): The NequIP model to use. Defaults to "".
+            device (Literal["cuda", "cpu"], optional): The device to use for calculations. Defaults to "cpu".
             chemical_species_to_atom_type_map (Optional[Union[Dict[str, str], bool]], optional): A mapping from chemical species to atom
                 types expected by the NequIP model. Defaults to True, which means that the mapping will be automatically inferred from the
                 model.

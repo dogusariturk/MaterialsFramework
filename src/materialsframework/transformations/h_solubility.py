@@ -60,7 +60,7 @@ class HSolubilityTransformation:
         """Initializes the transformation.
 
         Args:
-            sqs_gen (SqsGenerator | None): Optional SQS generator for composition-driven host generation.
+            sqs_gen (SqsGenerator | None, optional): Optional SQS generator for composition-driven host generation.
         """
         self._sqs_gen = sqs_gen
 

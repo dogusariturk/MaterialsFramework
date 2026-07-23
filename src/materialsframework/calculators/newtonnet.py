@@ -39,11 +39,11 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the NewtonNetCalculator with the specified model and calculation settings.
 
         Args:
-            model (str | Literal["ani1", "ani1x", "t1x"]): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
-            properties (list): List of properties to calculate, such as "energy", "forces", etc. Defaults to None,
+            model (str | Literal["ani1", "ani1x", "t1x"], optional): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
+            properties (list | None, optional): List of properties to calculate, such as "energy", "forces", etc. Defaults to None,
                 which will calculate all available properties.
-            device (Literal["cpu", "cuda"]): The device to use for calculations. Defaults to "cpu".
-            precision (Literal["float64", "float32", "float16"]): Floating-point precision of the calculations. Defaults to "float32".
+            device (Literal["cpu", "cuda"], optional): The device to use for calculations. Defaults to "cpu".
+            precision (Literal["float64", "float32", "float16"], optional): Floating-point precision of the calculations. Defaults to "float32".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         # Cooperatively initializes BaseCalculator, then BaseMDCalculator, per the MRO.

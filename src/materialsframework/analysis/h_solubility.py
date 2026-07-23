@@ -36,8 +36,8 @@ class HSolubilityAnalyzer(BaseAnalyzer):
         """Initializes the analyzer.
 
         Args:
-            calculator (BaseCalculator | None): Calculator for total-energy evaluations.
-            h_solubility_transformation (HSolubilityTransformation | None): Optional transformation instance.
+            calculator (BaseCalculator | None, optional): Calculator for total-energy evaluations.
+            h_solubility_transformation (HSolubilityTransformation | None, optional): Optional transformation instance.
             hydrogen_reference_energy (float, optional): Reference energy per inserted hydrogen atom,
                 e.g., 1/2 E(H2).
         """

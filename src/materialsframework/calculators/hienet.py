@@ -39,7 +39,7 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
 
         Args:
             model (str): The path of the HIENet model to use.
-            file_type (Literal["checkpoint", "torchscript"]): The format of the model file.
+            file_type (Literal["checkpoint", "torchscript"], optional): The format of the model file.
                 Defaults to 'checkpoint'.
             device (Literal["cuda", "cpu", "mps", "auto"], optional): The device to use for calculations. Defaults to "auto".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.

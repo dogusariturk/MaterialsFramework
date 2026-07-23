@@ -36,8 +36,8 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the EqnormCalculator with the specified model and calculation settings.
 
         Args:
-            model (Literal["eqnorm-mptrj", "eqnorm-omat", "eqnorm-max-mptrj"]): The Eqnorm model variant. Defaults to "eqnorm-mptrj".
-            model_name (str): The name of the Eqnorm model to use for calculations.
+            model (Literal["eqnorm-mptrj", "eqnorm-omat", "eqnorm-max-mptrj"], optional): The Eqnorm model variant. Defaults to "eqnorm-mptrj".
+            model_name (str, optional): The name of the Eqnorm model to use for calculations. Defaults to "eqnorm".
             device (str, optional): The device to use for calculations. Defaults to "cpu".
             compile_model (bool, optional): Whether to compile the model with torch.compile. Defaults to False.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.

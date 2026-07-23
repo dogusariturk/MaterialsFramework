@@ -40,11 +40,11 @@ class UMACalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the UMACalculator with the specified model and calculation settings.
 
         Args:
-            model (str): The name of the UMA model to use. Defaults to "uma-m-1p1".
-            task_name (Literal["omol", "omat", "oc20", "odac", "omc"]): The task name. Defaults to "omat".
-            inference_settings (Literal["default", "turbo"]): The inference settings. Defaults to "default".
-            device (Literal["cpu", "cuda"]): The device for calculations. Defaults to "cpu".
-            seed (int): The seed value for reproducibility. Defaults to 41.
+            model (str, optional): The name of the UMA model to use. Defaults to "uma-m-1p1".
+            task_name (Literal["omol", "omat", "oc20", "odac", "omc"], optional): The task name. Defaults to "omat".
+            inference_settings (Literal["default", "turbo"], optional): The inference settings. Defaults to "default".
+            device (Literal["cpu", "cuda"], optional): The device for calculations. Defaults to "cpu".
+            seed (int, optional): The seed value for reproducibility. Defaults to 41.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         super().__init__(**kwargs)

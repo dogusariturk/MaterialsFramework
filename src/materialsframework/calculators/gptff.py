@@ -37,8 +37,8 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the GPTFFCalculator with the specified model and calculation settings.
 
         Args:
-            model (str): Path to the GPTFF model file. Defaults to "GPTFF-MatPES_PBE_2025.2".
-            device (Literal["cpu", "cuda"]): Device to use for calculations ("cpu" or "cuda").
+            model (str, optional): Path to the GPTFF model file. Defaults to "GPTFF-MatPES_PBE_2025.2".
+            device (Literal["cpu", "cuda"], optional): Device to use for calculations ("cpu" or "cuda"). Defaults to "cpu".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
         super().__init__(**kwargs)

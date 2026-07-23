@@ -40,10 +40,10 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         """Initializes the AlignnCalculator with the specified model and calculation settings.
 
         Args:
-            model (str | None): The path to the directory containing the ALIGNN-FF model files. If None,
+            model (str | None, optional): The path to the directory containing the ALIGNN-FF model files. If None,
                 'v12.2.2024_dft_3d_307k' model will be used.
-            model_filename (str): The filename of the model file. Defaults to "best_model.pt".
-            config_filename (str): The filename of the configuration file. Defaults to "config.json".
+            model_filename (str, optional): The filename of the model file. Defaults to "best_model.pt".
+            config_filename (str, optional): The filename of the configuration file. Defaults to "config.json".
             device (Literal["cuda", "cpu", "mps"], optional): The device to use for calculations. Defaults to "cpu".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
