@@ -22,6 +22,8 @@ from materialsframework.transformations.cubic_elastic_constants import (
 from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ase import Atoms
     from pymatgen.core import Structure
 
@@ -70,11 +72,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         self._cubic_transformation = cubic_transformation
 
     @require_properties("energy")
-    def calculate(
-            self,
-            structure: Structure | Atoms,
-            is_relaxed: bool = False
-    ) -> dict[str, float]:
+    def calculate(self, structure: Structure | Atoms, is_relaxed: bool = False) -> dict[str, float]:
         """Calculates the cubic elastic constants for a given structure.
 
         Applies cubic distortions to the input structure, computes the potential energies of the deformed
@@ -151,12 +149,12 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         """
         return CubicElasticConstantsDeformationTransformation(delta_max=self.delta_max, step_size=self.step_size)
 
-    def _fit_eos(self, volumes: list[float], energies: list[float]) -> float:
+    def _fit_eos(self, volumes: Sequence[float], energies: Sequence[float]) -> float:
         """Fits the equation of state (EOS) to the given volumes and energies, returning the bulk modulus.
 
         Args:
-            volumes (list[float]): A list of volumes.
-            energies (list[float]): A list of energies.
+            volumes (Sequence[float]): A sequence of volumes.
+            energies (Sequence[float]): A sequence of energies.
 
         Returns:
             float: The bulk modulus obtained from the EOS fit in GPa.
@@ -165,12 +163,12 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         return eos_fit.b0_GPa
 
     @staticmethod
-    def _fit_poly(deltas: list[float], energies: list[float], degree: int = 2) -> float:
+    def _fit_poly(deltas: Sequence[float], energies: Sequence[float], degree: int = 2) -> float:
         """Fits a polynomial to the given deltas and energies data points and calculates the second-order coefficient.
 
         Args:
-            deltas (list[float]): The array of delta values.
-            energies (list[float]): The array of energy values.
+            deltas (Sequence[float]): The sequence of delta values.
+            energies (Sequence[float]): The sequence of energy values.
             degree (int, optional): The degree of the polynomial to fit. Defaults to 2.
 
         Returns:
@@ -202,9 +200,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         return self._fit_eos(volumes, energies)
 
     def _get_tetragonal_shear_modulus(
-            self,
-            orthorhombic_distorted_structures: dict[float, Structure],
-            initial_volume: float
+        self, orthorhombic_distorted_structures: dict[float, Structure], initial_volume: float
     ) -> float:
         """Calculates the tetragonal shear modulus from orthorhombic distortions.
 
@@ -228,11 +224,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         )
         return EV_A3_TO_GPA * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
-    def _get_shear_modulus(
-            self,
-            monoclinic_distorted_structures: dict[float, Structure],
-            initial_volume: float
-    ) -> float:
+    def _get_shear_modulus(self, monoclinic_distorted_structures: dict[float, Structure], initial_volume: float) -> float:
         """Calculates the shear modulus from monoclinic distortions.
 
         Args:
