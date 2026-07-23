@@ -40,13 +40,7 @@ class EOSAnalyzer(BaseAnalyzer):
         stop: float = 0.1,
         num: int = 11,
         eos_name: Literal[
-            "murnaghan",
-            "birch",
-            "birch_murnaghan",
-            "pourier_tarantola",
-            "vinet",
-            "deltafactor",
-            "numerical_eos"
+            "murnaghan", "birch", "birch_murnaghan", "pourier_tarantola", "vinet", "deltafactor", "numerical_eos"
         ] = "birch_murnaghan",
         calculator: BaseCalculator | None = None,
         eos_transformation: EOSTransformation | None = None,
@@ -101,20 +95,9 @@ class EOSAnalyzer(BaseAnalyzer):
         prev_relax_cell = self.calculator.relax_cell
         self.calculator.relax_cell = False
         try:
-            volume_list, energy_list = map(
-                list,
-                zip(
-                    *[
-                        (
-                            result["final_structure"].volume,
-                            result["energy"],
-                        )
-                        for deformed_structure in structures
-                        for result in [self.calculator.relax(structure=deformed_structure)]
-                    ],
-                    strict=False,
-                ),
-            )
+            results = [self.calculator.relax(structure=deformed_structure) for deformed_structure in structures]
+            volume_list = [result["final_structure"].volume for result in results]
+            energy_list = [result["energy"] for result in results]
         finally:
             self.calculator.relax_cell = prev_relax_cell
 

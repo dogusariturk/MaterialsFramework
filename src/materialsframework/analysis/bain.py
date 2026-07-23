@@ -78,13 +78,11 @@ class BainPathAnalyzer(BaseAnalyzer):
 
         displaced_structures = self.bain_transformation.apply_transformation(structure=structure)
 
-        c_a_list, energy_list = zip(
-            *[
-                (c_a, self.calculator.calculate(structure=deformed_structure)["energy"])
-                for c_a, deformed_structure in displaced_structures.items()
-            ],
-            strict=False,
-        )
+        c_a_list = list(displaced_structures.keys())
+        energy_list = [
+            self.calculator.calculate(structure=deformed_structure)["energy"]
+            for deformed_structure in displaced_structures.values()
+        ]
 
         return {"c_a_list": c_a_list, "energy_list": energy_list}
 
