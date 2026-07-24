@@ -70,9 +70,9 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         is_isotope: bool = False,
         conductivity_type: Literal["wigner", "kubo"] | None = None,
         boundary_mfp: float | None = None,
-        t_min: float | None = 0,
-        t_max: float | None = 1000,
-        t_step: float | None = 10,
+        t_min: float = 0,
+        t_max: float = 1000,
+        t_step: float = 10,
         log_level: Literal[0, 1, 2] = 0,
     ) -> dict[str, ConductivityRTA | ConductivityLBTE]:
         """Calculates the phonon properties of the given structure, including thermal conductivity.
@@ -149,10 +149,10 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         return Phono3pyDisplacementTransformation()
 
     def _produce_force_constants(
-            self,
-            phonon: Phono3py,
-            supercells_with_displacements: list[Structure],
-            phonon_supercells_with_displacements: list[Structure]
+        self,
+        phonon: Phono3py,
+        supercells_with_displacements: list[Structure],
+        phonon_supercells_with_displacements: list[Structure],
     ) -> None:
         """Produces the force constants using the forces calculated from the calculator.
 
@@ -165,11 +165,14 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             phonon_supercells_with_displacements (list[Structure]): Displaced supercells for phonon (second-order)
                 force constants.
         """
-        forces = [self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements]
+        forces = [
+            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements
+        ]
         phonon.forces = np.array(forces)
 
         phonon_forces = [
-            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in phonon_supercells_with_displacements
+            self.calculator.calculate(displaced_structure)["forces"]
+            for displaced_structure in phonon_supercells_with_displacements
         ]
         phonon.phonon_forces = np.array(phonon_forces)
 
