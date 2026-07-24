@@ -10,8 +10,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from materialsframework.analysis.utils import default_calculator
-from materialsframework.utils import lazy_property, to_structure
+from materialsframework.utils import default_calculator, lazy_property, to_structure
 
 if TYPE_CHECKING:
     from ase import Atoms
@@ -36,7 +35,7 @@ class BaseAnalyzer(ABC):
 
         Args:
             calculator (BaseCalculator | None, optional): The calculator used for the analysis.
-                Defaults to a lazily constructed `M3GNetCalculator`.
+                Defaults to a lazily constructed default calculator.
         """
         self._calculator = calculator
 
@@ -44,8 +43,8 @@ class BaseAnalyzer(ABC):
     def calculator(self) -> BaseCalculator:
         """Returns the calculator instance used for the analysis.
 
-        If the calculator instance is not already initialized, this method creates a new
-        `M3GNetCalculator` instance.
+        If the calculator instance is not already initialized, this method returns the default
+        calculator.
 
         Returns:
             BaseCalculator: The calculator object used for the analysis.

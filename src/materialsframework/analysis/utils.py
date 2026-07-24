@@ -8,24 +8,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from materialsframework.tools.calculator import BaseCalculator
-
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
-
-
-def default_calculator(**kwargs) -> BaseCalculator:
-    """Returns a new `M3GNetCalculator` instance, the shared default calculator for analyzers.
-
-    Args:
-        **kwargs: Keyword arguments forwarded to `M3GNetCalculator`.
-
-    Returns:
-        BaseCalculator: A new `M3GNetCalculator` instance.
-    """
-    from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-    return M3GNetCalculator(**kwargs)
 
 
 def require_properties(*properties: str) -> Callable:

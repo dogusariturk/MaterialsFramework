@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from materialsframework.analysis.base import BaseAnalyzer
-from materialsframework.analysis.utils import default_calculator, require_properties
+from materialsframework.analysis.utils import require_properties
 from materialsframework.transformations.formation_energy import (
     FormationEnergyTransformation,
 )

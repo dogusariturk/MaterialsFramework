@@ -17,6 +17,8 @@ from typing import TYPE_CHECKING, Literal
 
 from pymatgen.core import Lattice, Structure
 
+from materialsframework.utils import default_calculator
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -257,16 +259,16 @@ class BondLatticeParameter:
     def calculator(self) -> BaseCalculator:
         """Returns the calculator instance used for relaxations.
 
-        If the calculator instance is not already initialized, this method creates a new
-        ``M3GNetCalculator`` with settings suitable for bond-length extraction.
+        If the calculator instance is not already initialized, this method returns the default
+        calculator. In either case, ``fix_symmetry`` and ``relax_cell`` are forced to ``True``,
+        since this method requires a relaxed cell and preserved crystal symmetry to extract
+        physically meaningful bond lengths.
 
         Returns:
             BaseCalculator: The calculator object used for relaxations.
         """
         if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator(fmax=0.01, optimizer="FIRE")
+            self._calculator = default_calculator()
 
         self._calculator.fix_symmetry = True
         self._calculator.relax_cell = True
@@ -426,7 +428,9 @@ class BondLatticeParameter:
         """
         if not self.bonds:
             raise ValueError("No bond data available. Run calculate() first or load from CSV via from_csv().")
-        d_bar = sum(composition[ei] * composition[ej] * self.bonds[self._bond_key(ei, ej)] for ei in composition for ej in composition)
+        d_bar = sum(
+            composition[ei] * composition[ej] * self.bonds[self._bond_key(ei, ej)] for ei in composition for ej in composition
+        )
         return self._d_to_a(d_bar)
 
     def vegard(self, composition: dict[str, float]) -> float:

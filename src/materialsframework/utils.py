@@ -11,8 +11,24 @@ from pymatgen.io.ase import AseAtomsAdaptor
 if TYPE_CHECKING:
     from pymatgen.core import Molecule, Structure
 
+    from materialsframework.tools.calculator import BaseCalculator
+
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
+
+
+def default_calculator(**kwargs) -> BaseCalculator:
+    """Returns a new `M3GNetCalculator` instance, the shared default calculator across the framework.
+
+    Args:
+        **kwargs: Keyword arguments forwarded to `M3GNetCalculator`.
+
+    Returns:
+        BaseCalculator: A new `M3GNetCalculator` instance.
+    """
+    from materialsframework.calculators.m3gnet import M3GNetCalculator
+
+    return M3GNetCalculator(**kwargs)
 
 
 def lazy_property(attr: str):

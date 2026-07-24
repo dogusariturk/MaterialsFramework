@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Literal
 
 from ase.db.sqlite import SQLite3Database
 
+from materialsframework.utils import default_calculator
+
 if TYPE_CHECKING:
     from ase import Atoms
     from pymatgen.core import Structure
@@ -135,7 +137,11 @@ class ClusterExpansion:
                 )
         else:
             for structure in self.structures:
-                result = self.calculator.calculate(structure) if self.is_relaxed else self.calculator.relax(structure, verbose=self.verbose)
+                result = (
+                    self.calculator.calculate(structure)
+                    if self.is_relaxed
+                    else self.calculator.relax(structure, verbose=self.verbose)
+                )
 
                 self.structure_container.add_structure(
                     structure=result["final_structure"].to_ase_atoms(msonable=False),
@@ -173,13 +179,11 @@ class ClusterExpansion:
     def calculator(self) -> BaseCalculator:
         """Returns the calculator used for energy and force calculations.
 
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
+        If the calculator instance is not already initialized, this method returns the default calculator.
 
         Returns:
             BaseCalculator: The calculator object used for force and energy calculations.
         """
         if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
+            self._calculator = default_calculator()
         return self._calculator
