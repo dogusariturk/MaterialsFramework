@@ -187,16 +187,11 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         Returns:
             float: The bulk modulus in GPa.
         """
-        volumes, energies = zip(
-            *[
-                (
-                    deformed_structure.volume,
-                    self.calculator.calculate(structure=deformed_structure)["energy"],
-                )
-                for _, deformed_structure in uniform_distorted_structures.items()
-            ],
-            strict=False,
-        )
+        deformed_structures = list(uniform_distorted_structures.values())
+        volumes = [deformed_structure.volume for deformed_structure in deformed_structures]
+        energies = [
+            self.calculator.calculate(structure=deformed_structure)["energy"] for deformed_structure in deformed_structures
+        ]
         return self._fit_eos(volumes, energies)
 
     def _get_tetragonal_shear_modulus(
@@ -212,16 +207,11 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         Returns:
             float: The tetragonal shear modulus in GPa.
         """
-        deltas, energies = zip(
-            *[
-                (
-                    delta,
-                    self.calculator.calculate(structure=deformed_structure)["energy"],
-                )
-                for delta, deformed_structure in orthorhombic_distorted_structures.items()
-            ],
-            strict=False,
-        )
+        deltas = list(orthorhombic_distorted_structures.keys())
+        energies = [
+            self.calculator.calculate(structure=deformed_structure)["energy"]
+            for deformed_structure in orthorhombic_distorted_structures.values()
+        ]
         return EV_A3_TO_GPA * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
     def _get_shear_modulus(self, monoclinic_distorted_structures: dict[float, Structure], initial_volume: float) -> float:
@@ -235,16 +225,11 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         Returns:
             float: The shear modulus in GPa.
         """
-        deltas, energies = zip(
-            *[
-                (
-                    delta,
-                    self.calculator.calculate(structure=deformed_structure)["energy"],
-                )
-                for delta, deformed_structure in monoclinic_distorted_structures.items()
-            ],
-            strict=False,
-        )
+        deltas = list(monoclinic_distorted_structures.keys())
+        energies = [
+            self.calculator.calculate(structure=deformed_structure)["energy"]
+            for deformed_structure in monoclinic_distorted_structures.values()
+        ]
         return EV_A3_TO_GPA * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
     @staticmethod
