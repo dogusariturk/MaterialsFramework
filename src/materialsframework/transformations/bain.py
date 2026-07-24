@@ -73,9 +73,9 @@ class BainDisplacementTransformation:
             Structure: The displaced structure with the Bain transformation applied.
         """
         transformation_matrix = [
-            [1 + delta, 0, 0],
-            [0, 1 + delta, 0],
-            [0, 0, 1 / (1 + delta) ** 2],
+            [1.0 + delta, 0.0, 0.0],
+            [0.0, 1.0 + delta, 0.0],
+            [0.0, 0.0, 1.0 / (1.0 + delta) ** 2.0],
         ]
 
         deformation = DeformStructureTransformation(deformation=transformation_matrix)
