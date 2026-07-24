@@ -51,9 +51,10 @@ class FormationEnergyAnalyzer(BaseAnalyzer):
     def calculate(self, structure: Atoms | Structure, is_relaxed: bool = False) -> dict[str, float]:
         """Calculates the formation energy of the given structure.
 
-        For elemental references, three candidate crystal structures (FCC, BCC, HCP) are
-        relaxed with the same calculator for each element and the lowest energy per atom
-        is used.
+        For elemental references, each element's known experimental ground-state structure
+        (see `FormationEnergyTransformation`) is relaxed with the same calculator. For the
+        few elements whose ground state can't be constructed directly, several candidate
+        crystal structures are relaxed instead and the lowest energy per atom is used.
 
         Args:
             structure (Atoms | Structure): The structure for which the formation energy is calculated.
