@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from materialsframework.utils import requires
+
 if TYPE_CHECKING:
     from phonopy import Phonopy
     from pymatgen.core import Structure
@@ -25,6 +27,7 @@ class PhonopyDisplacementTransformation:
     conductivity, and other lattice-dynamical properties.
     """
 
+    @requires("phonopy", extra="phonopy")
     def apply_transformation(
         self,
         structure: Structure,
@@ -51,11 +54,8 @@ class PhonopyDisplacementTransformation:
                 - ``displaced_structures``: The list of displaced structures for phonon calculations.
                 - ``displacements``: The displacement vectors used to generate the displaced structures.
         """
-        try:
-            from phonopy import Phonopy
-            from pymatgen.io.phonopy import get_phonopy_structure
-        except ImportError as e:
-            raise ImportError("phonopy is required. Install it with: pip install materialsframework[phonopy]") from e
+        from phonopy import Phonopy
+        from pymatgen.io.phonopy import get_phonopy_structure
 
         supercell_matrix_arr = np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
 
@@ -73,6 +73,7 @@ class PhonopyDisplacementTransformation:
 
         return {"phonon": phonon, "displaced_structures": displaced_structures, "displacements": displacements}
 
+    @requires("phonopy", extra="phonopy")
     def _get_displaced_structures(self, phonon: Phonopy, distance: float = 0.01, **kwargs) -> list[Structure]:
         """Generate displaced structures using Phonopy.
 
@@ -84,10 +85,7 @@ class PhonopyDisplacementTransformation:
         Returns:
             list[Structure]: A list of displaced structures for phonon calculations.
         """
-        try:
-            from pymatgen.io.phonopy import get_pmg_structure
-        except ImportError as e:
-            raise ImportError("phonopy is required. Install it with: pip install materialsframework[phonopy]") from e
+        from pymatgen.io.phonopy import get_pmg_structure
 
         phonon.generate_displacements(distance=distance, **kwargs)
 

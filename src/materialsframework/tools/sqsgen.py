@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 from pymatgen.core import Composition, Lattice
 
+from materialsframework.utils import requires
+
 if TYPE_CHECKING:
     from pymatgen.core import Structure
 
@@ -52,6 +54,7 @@ class SqsGenerator:
         self._structure_format = structure_format
         self._log_level = log_level
 
+    @requires("sqsgenerator", extra="sqsgen")
     def generate(
         self,
         composition: Composition | str,
@@ -81,7 +84,9 @@ class SqsGenerator:
         lattice = self._get_lattice(composition=composition, crystal_structure=crystal_structure.lower())
         coords = self._get_coords(crystal_structure=crystal_structure.lower())
         multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
-        sqs_composition = self._determine_composition(supercell_size=supercell_size, composition=composition, multiplier=multiplier)
+        sqs_composition = self._determine_composition(
+            supercell_size=supercell_size, composition=composition, multiplier=multiplier
+        )
 
         if shell_weights is None:
             shell_weights = {1: 1.0} if supercell_size == (1, 1, 1) else {1: 1.0, 2: 0.5}
@@ -99,11 +104,8 @@ class SqsGenerator:
             "iteration_mode": self._mode,
         }
 
-        try:
-            from sqsgenerator import optimize, parse_config
-            from sqsgenerator.core import LogLevel
-        except ImportError as e:
-            raise ImportError("sqsgenerator is required. Install it with: pip install materialsframework[sqsgen]") from e
+        from sqsgenerator import optimize, parse_config
+        from sqsgenerator.core import LogLevel
 
         _log_level_map = {
             "trace": LogLevel.trace,
@@ -139,8 +141,12 @@ class SqsGenerator:
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
 
         lattice_creators = {
-            "hcp": lambda: Lattice.hexagonal(a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0)).get_niggli_reduced_lattice(),
-            "dhcp": lambda: Lattice.hexagonal(a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2).get_niggli_reduced_lattice(),
+            "hcp": lambda: Lattice.hexagonal(
+                a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0)
+            ).get_niggli_reduced_lattice(),
+            "dhcp": lambda: Lattice.hexagonal(
+                a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2
+            ).get_niggli_reduced_lattice(),
             "fcc_prim": lambda: Lattice(
                 matrix=[
                     [0, avg_radius * np.sqrt(2), avg_radius * np.sqrt(2)],
@@ -223,7 +229,9 @@ class SqsGenerator:
 
         return multiplier_creators[crystal_structure]
 
-    def _determine_composition(self, supercell_size: tuple[int, int, int], composition: Composition, multiplier: int) -> dict[str, int]:
+    def _determine_composition(
+        self, supercell_size: tuple[int, int, int], composition: Composition, multiplier: int
+    ) -> dict[str, int]:
         """Determines the composition of the supercell.
 
         Args:
@@ -240,6 +248,7 @@ class SqsGenerator:
         return {el: int(round(amt, 5) * result) for el, amt in composition.fractional_composition.as_reduced_dict().items()}
 
     @staticmethod
+    @requires("sqsgenerator", extra="sqsgen")
     def _parse_results_for_structure(results: Any) -> Structure:
         """Parses the results dictionary from the generate function to extract the SQS structure.
 

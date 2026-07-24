@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 
+from materialsframework.utils import requires
+
 if TYPE_CHECKING:
     from pycalphad import Database
 
@@ -130,6 +132,7 @@ class StabilityMap:
         ]
     )
 
+    @requires("pandarallel", "pycalphad", extra="calphad")
     def __init__(
         self,
         db: Database | str,
@@ -158,11 +161,8 @@ class StabilityMap:
         Raises:
             ValueError: If multiple phases are found in the database and phase is not specified.
         """
-        try:
-            from pandarallel import pandarallel
-            from pycalphad import Database
-        except ImportError as e:
-            raise ImportError("pycalphad and pandarallel are required. Install them with: pip install materialsframework[calphad]") from e
+        from pandarallel import pandarallel
+        from pycalphad import Database
 
         pandarallel.initialize(
             nb_workers=nb_workers if nb_workers is not None else os.cpu_count(),
@@ -226,6 +226,7 @@ class StabilityMap:
         negative_eigenvalues = sum(1 for col in row.index if col.startswith("eigenvalue") and row[col] < 0)
         return negative_eigenvalues
 
+    @requires("pycalphad", extra="calphad")
     def _process_row(self, df_row: pd.Series) -> list:
         """Process a row of compositions and calculate eigenvalues.
 
@@ -239,12 +240,9 @@ class StabilityMap:
             ValueError: If the calculation fails.
         """
         try:
-            try:
-                from pycalphad import Workspace
-                from pycalphad import variables as v
-                from pycalphad.property_framework import IsolatedPhase
-            except ImportError as e:
-                raise ImportError("pycalphad is required. Install it with: pip install materialsframework[calphad]") from e
+            from pycalphad import Workspace
+            from pycalphad import variables as v
+            from pycalphad.property_framework import IsolatedPhase
 
             wks = Workspace(
                 database=self.dbf,
@@ -263,17 +261,21 @@ class StabilityMap:
             }
 
             hessian = np.array(
-                [[dmu_dx[comp][i] - dmu_dx[self.elements[-1]][i] for comp in self.elements[:-1]] for i in range(len(self.elements) - 1)]
+                [
+                    [dmu_dx[comp][i] - dmu_dx[self.elements[-1]][i] for comp in self.elements[:-1]]
+                    for i in range(len(self.elements) - 1)
+                ]
             )
 
             orthogonalization_matrix = self.ORTHOGONALIZATION[: len(self.elements) - 1, : len(self.elements) - 1]
             eigen_values = np.sort(np.linalg.eig(orthogonalization_matrix.T @ hessian @ orthogonalization_matrix)[0])
 
-            return eigen_values
+            return eigen_values.tolist()
 
         except (ValueError, ZeroDivisionError):
             return [None] * (len(self.elements) - 1)
 
+    @requires("matplotlib", extra="plots")
     def plot(self, show: bool = True, save: bool = False) -> tuple:
         """Plot the stability map.
 
@@ -288,11 +290,8 @@ class StabilityMap:
             ValueError: If the number of elements is not 4.
             KeyError: If the 'negative_eigenvalues' column is missing.
         """
-        try:
-            import matplotlib.pyplot as plt
-            from matplotlib.ticker import MaxNLocator
-        except ImportError as e:
-            raise ImportError("matplotlib is required for plotting. Install it with: pip install matplotlib") from e
+        import matplotlib.pyplot as plt
+        from matplotlib.ticker import MaxNLocator
 
         required_elements = 4
         if len(self.elements) != required_elements:
@@ -301,11 +300,7 @@ class StabilityMap:
         if "negative_eigenvalues" not in self.compositions.columns:
             raise KeyError("The 'negative_eigenvalues' column is missing. Please run the fit() method first.")
 
-        def _generate_regular_pentagon(
-                radius: float = 0.5,
-                center: tuple = (0, 0),
-                rotation_angle: float = 0
-        ) -> np.ndarray:
+        def _generate_regular_pentagon(radius: float = 0.5, center: tuple = (0, 0), rotation_angle: float = 0) -> np.ndarray:
             """Generate vertices of a regular pentagon and rotate it by a given angle.
 
             Args:

@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Literal
 
 from ase.db.sqlite import SQLite3Database
 
-from materialsframework.utils import default_calculator
+from materialsframework.utils import default_calculator, requires
 
 if TYPE_CHECKING:
     from ase import Atoms
@@ -86,6 +86,7 @@ class ClusterExpansion:
         self.structures = []
         self._calculator = calculator
 
+    @requires("icet", "trainstation", extra="ce")
     def fit(
         self,
         structures: list[Structure] | SQLite3Database,

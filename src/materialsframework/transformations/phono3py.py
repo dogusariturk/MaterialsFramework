@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from materialsframework.utils import requires
+
 if TYPE_CHECKING:
     from phono3py import Phono3py
     from pymatgen.core import Structure
@@ -28,6 +30,7 @@ class Phono3pyDisplacementTransformation:
     def __init__(self) -> None:
         """Initializes the `Phono3pyDisplacementTransformation` object."""
 
+    @requires("phono3py", extra="phono3py")
     def apply_transformation(
         self,
         structure: Structure,
@@ -60,11 +63,8 @@ class Phono3pyDisplacementTransformation:
                 - ``phonon_displacements``: The atomic displacements for the phonon supercells.
                 - ``supercell_displacements``: The atomic displacements for the third-order force-constant supercells.
         """
-        try:
-            from phono3py import Phono3py
-            from pymatgen.io.phonopy import get_phonopy_structure
-        except ImportError as e:
-            raise ImportError("phono3py is required. Install it with: pip install materialsframework[phono3py]") from e
+        from phono3py import Phono3py
+        from pymatgen.io.phonopy import get_phonopy_structure
 
         supercell_matrix_arr = np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
         phonon_supercell_matrix_arr = np.diag(phonon_supercell_matrix) if phonon_supercell_matrix else np.diag([3, 3, 3])
@@ -95,6 +95,7 @@ class Phono3pyDisplacementTransformation:
             "supercell_displacements": supercell_displacements,
         }
 
+    @requires("phono3py", extra="phono3py")
     def _get_displaced_structures(
         self,
         phonon: Phono3py,
@@ -115,10 +116,7 @@ class Phono3pyDisplacementTransformation:
             tuple[list[Structure], list[Structure]]: Two lists of displaced structures for phonon (second-order) and third-order
                 force constant calculations.
         """
-        try:
-            from pymatgen.io.phonopy import get_pmg_structure
-        except ImportError as e:
-            raise ImportError("phono3py is required. Install it with: pip install materialsframework[phono3py]") from e
+        from pymatgen.io.phonopy import get_pmg_structure
 
         phonon.generate_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
 

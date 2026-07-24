@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 from scipy.optimize import curve_fit
 
+from materialsframework.utils import requires
+
 if TYPE_CHECKING:
     from pycalphad import Database
 
@@ -57,6 +59,7 @@ class SimulationGrid:
 class MaterialParameters:
     """Stores material parameters such as energy and kinetic properties."""
 
+    @requires("pycalphad", extra="calphad")
     def __init__(
         self,
         db: Database | str,
@@ -84,10 +87,7 @@ class MaterialParameters:
             """Polynomial function for fitting."""
             return a * x**10 + b * x**9 + c * x**8 + d * x**7 + e * x**6 + f * x**5 + g * x**4 + h * x**3 + i * x**2 + j * x + k
 
-        try:
-            from pycalphad import Database, calculate
-        except ImportError as e:
-            raise ImportError("pycalphad is required. Install it with: pip install materialsframework[calphad]") from e
+        from pycalphad import Database, calculate
 
         dbf = db if isinstance(db, Database) else Database(db)
 
@@ -193,16 +193,14 @@ class PhaseFieldModel:
         self.grid.lap_chem_pot = self.laplacian(self.grid.chem_pot)
         self.grid.phi += self.material.mobility * self.grid.lap_chem_pot * self.grid.dt
 
+    @requires("matplotlib", extra="plots")
     def save_plot(self, iteration: int) -> None:
         """Saves the current phase field as an image.
 
         Args:
             iteration (int): The current iteration number.
         """
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError as e:
-            raise ImportError("matplotlib is required for plotting. Install it with: pip install matplotlib") from e
+        import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
         im = ax.imshow(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 from functools import wraps
 from typing import TYPE_CHECKING
 
@@ -9,6 +10,8 @@ from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pymatgen.core import Molecule, Structure
 
     from materialsframework.tools.calculator import BaseCalculator
@@ -52,6 +55,37 @@ def lazy_property(attr: str):
             if getattr(self, attr) is None:
                 setattr(self, attr, func(self))
             return getattr(self, attr)
+
+        return wrapper
+
+    return decorator
+
+
+def requires(*packages: str, extra: str | None = None) -> Callable:
+    """Decorator raising a clear `ImportError` before the wrapped callable runs if any of `packages` is not importable.
+
+    Args:
+        *packages (str): Top-level module names that must be importable (e.g. "pycalphad").
+        extra (str | None, optional): Name of this package's optional-dependency extra that provides
+            `packages`, used to build the install hint as `pip install materialsframework[<extra>]`.
+            If not given, the hint falls back to `pip install <packages>`. Defaults to None.
+
+    Returns:
+        Callable: A decorator that checks importability of `packages` before running the wrapped
+            function or method.
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            missing = [pkg for pkg in packages if importlib.util.find_spec(pkg) is None]
+            if missing:
+                names = " and ".join(f"'{pkg}'" for pkg in missing)
+                verb = "is" if len(missing) == 1 else "are"
+                pronoun = "it" if len(missing) == 1 else "them"
+                hint = f"pip install materialsframework[{extra}]" if extra else f"pip install {' '.join(missing)}"
+                raise ImportError(f"{names} {verb} required. Install {pronoun} with: {hint}")
+            return func(*args, **kwargs)
 
         return wrapper
 
