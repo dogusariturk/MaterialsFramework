@@ -57,13 +57,13 @@ class PhonopyDisplacementTransformation:
         except ImportError as e:
             raise ImportError("phonopy is required. Install it with: pip install materialsframework[phonopy]") from e
 
-        supercell_matrix = np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
+        supercell_matrix_arr = np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
 
         phonopy_structure = get_phonopy_structure(structure)
 
         phonon = Phonopy(
             unitcell=phonopy_structure,
-            supercell_matrix=supercell_matrix,
+            supercell_matrix=supercell_matrix_arr,
             primitive_matrix=primitive_matrix,
             log_level=log_level,
         )
