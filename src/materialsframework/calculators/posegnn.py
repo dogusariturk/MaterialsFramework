@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
-from materialsframework.utils import lazy_property
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -56,6 +56,10 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         self._calculator = None
 
     @lazy_property("_calculator")
+    @requires(
+        "posegnn",
+        hint="clone https://github.com/IBM/materials and add models/pos_egnn to PYTHONPATH (see the posegnn job in .github/workflows/tests.yml)",
+    )
     def calculator(self) -> Calculator:
         """Lazily builds and returns the ASE Calculator object for the PosEGNN potential.
 

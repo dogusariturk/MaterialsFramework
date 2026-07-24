@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
-from materialsframework.utils import lazy_property
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -59,6 +59,7 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         self._calculator = None
 
     @lazy_property("_calculator")
+    @requires("fairchem", extra="eqv2")
     def calculator(self) -> Calculator:
         """Creates and returns the ASE Calculator object associated with this calculator instance.
 

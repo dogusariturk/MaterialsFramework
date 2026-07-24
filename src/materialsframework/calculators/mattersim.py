@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
-from materialsframework.utils import lazy_property
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -67,6 +67,7 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         self._calculator = None
 
     @lazy_property("_calculator")
+    @requires("mattersim", extra="mattersim")
     def calculator(self) -> Calculator:
         """Lazily builds the ASE Calculator object for the MatterSim potential, using the settings from initialization.
 

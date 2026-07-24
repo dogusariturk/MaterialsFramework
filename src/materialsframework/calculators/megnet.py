@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from materialsframework.utils import lazy_property
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -48,6 +48,7 @@ class MEGNetCalculator:
         self._potential = None
 
     @lazy_property("_potential")
+    @requires("matgl", extra="matgl")
     def potential(self) -> Any:
         """Lazily loads and caches the MEGNet potential specified during initialization.
 

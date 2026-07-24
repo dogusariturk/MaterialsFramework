@@ -61,14 +61,18 @@ def lazy_property(attr: str):
     return decorator
 
 
-def requires(*packages: str, extra: str | None = None) -> Callable:
+def requires(*packages: str, extra: str | None = None, hint: str | None = None) -> Callable:
     """Decorator raising a clear `ImportError` before the wrapped callable runs if any of `packages` is not importable.
 
     Args:
         *packages (str): Top-level module names that must be importable (e.g. "pycalphad").
         extra (str | None, optional): Name of this package's optional-dependency extra that provides
             `packages`, used to build the install hint as `pip install materialsframework[<extra>]`.
-            If not given, the hint falls back to `pip install <packages>`. Defaults to None.
+            Ignored if `hint` is given. Defaults to None.
+        hint (str | None, optional): Install instructions to use verbatim, for packages that aren't
+            installable via a `materialsframework` extra (e.g. git-only dependencies). Takes precedence
+            over `extra`. If neither is given, the hint falls back to `pip install <packages>`.
+            Defaults to None.
 
     Returns:
         Callable: A decorator that checks importability of `packages` before running the wrapped
@@ -83,8 +87,13 @@ def requires(*packages: str, extra: str | None = None) -> Callable:
                 names = " and ".join(f"'{pkg}'" for pkg in missing)
                 verb = "is" if len(missing) == 1 else "are"
                 pronoun = "it" if len(missing) == 1 else "them"
-                hint = f"pip install materialsframework[{extra}]" if extra else f"pip install {' '.join(missing)}"
-                raise ImportError(f"{names} {verb} required. Install {pronoun} with: {hint}")
+                if hint:
+                    install_hint = hint
+                elif extra:
+                    install_hint = f"pip install materialsframework[{extra}]"
+                else:
+                    install_hint = f"pip install {' '.join(missing)}"
+                raise ImportError(f"{names} {verb} required. Install {pronoun} with: {install_hint}")
             return func(*args, **kwargs)
 
         return wrapper

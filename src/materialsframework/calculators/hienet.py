@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
-from materialsframework.utils import lazy_property
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -60,6 +60,7 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
         self._calculator = None
 
     @lazy_property("_calculator")
+    @requires("hienet", extra="hienet")
     def calculator(self) -> Calculator:
         """Lazily builds and returns the ASE Calculator object for the HIENet potential.
 
