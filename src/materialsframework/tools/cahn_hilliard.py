@@ -46,7 +46,7 @@ class SimulationGrid:
         self.dt = dt
 
         # Precompute constant for the 9-point Laplacian stencil
-        self.laplace_factor = 1.0 / (3.0 * self.dx**2)
+        self.laplace_factor = 1.0 / (4.0 * self.dx**2)
 
         self.phi = np.zeros((nx, ny), dtype=np.float64)
         self.lap_phi = np.zeros((nx, ny), dtype=np.float64)
