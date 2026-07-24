@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -45,6 +47,17 @@ class MEGNetCalculator:
 
         self._potential = None
 
+    @lazy_property("_potential")
+    def potential(self) -> Any:
+        """Lazily loads and caches the MEGNet potential specified during initialization.
+
+        Returns:
+            Any: The loaded `matgl` MEGNet potential.
+        """
+        import matgl
+
+        return matgl.load_model(self.model)
+
     def calculate(self, structure: Structure) -> dict[str, float]:
         """Calculates the formation energy of the provided structure using the MEGNet model.
 
@@ -60,8 +73,4 @@ class MEGNetCalculator:
             >>> megnet_calculator = MEGNetCalculator()
             >>> result = megnet_calculator.calculate(structure=struct)
         """
-        import matgl
-
-        potential = matgl.load_model(self.model)
-
-        return {"formation_energy": float(potential.predict_structure(structure))}
+        return {"formation_energy": float(self.potential.predict_structure(structure))}
