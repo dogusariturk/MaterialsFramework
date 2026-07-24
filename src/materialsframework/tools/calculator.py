@@ -98,7 +98,7 @@ class BaseCalculator(ABC):
         self,
         fmax: float = 0.1,
         steps: int = 1000,
-        optimizer: Optimizer | str = "FIRE",
+        optimizer: type[Optimizer] | str = "FIRE",
         relax_cell: bool = True,
         fix_symmetry: bool = False,
         fix_atoms: bool = False,
@@ -117,8 +117,8 @@ class BaseCalculator(ABC):
         Args:
             fmax (float, optional): Maximum force convergence criterion. Defaults to 0.1.
             steps (int, optional): Maximum number of optimization steps. Defaults to 1000.
-            optimizer (Optimizer | str, optional): The optimization algorithm to use. Can be
-                either an instance of `Optimizer` or a string referring to one of the OPTIMIZERS
+            optimizer (type[Optimizer] | str, optional): The optimization algorithm to use. Can be
+                either an Optimizer subclass or a string referring to one of the OPTIMIZERS
                 enum members. Defaults to "FIRE".
             relax_cell (bool, optional): If True, relaxes the unit cell dimensions. Defaults to True.
             fix_symmetry (bool, optional): If True, enforces symmetry constraints during relaxation. Defaults to False.
@@ -174,7 +174,9 @@ class BaseCalculator(ABC):
             Calculator: An ASE Calculator instance configured for the specific
             relaxation and calculation task.
         """
-        raise NotImplementedError("Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance.")
+        raise NotImplementedError(
+            "Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance."
+        )
 
     def relax(
         self,
@@ -226,7 +228,7 @@ class BaseCalculator(ABC):
                     hydrostatic_strain=self.hydrostatic_strain,
                     **params_asecellfilter,
                 )
-            optimizer = self.optimizer(atoms, **kwargs)
+            optimizer = self.optimizer(atoms, **kwargs)  # ty: ignore[invalid-argument-type]
             optimizer.attach(obs, interval=self.interval)
             optimizer.run(fmax=self.fmax, steps=self.steps)
             obs()
