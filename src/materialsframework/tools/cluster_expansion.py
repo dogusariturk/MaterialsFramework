@@ -137,11 +137,7 @@ class ClusterExpansion:
                 )
         else:
             for structure in self.structures:
-                result = (
-                    self.calculator.calculate(structure)
-                    if self.is_relaxed
-                    else self.calculator.relax(structure, verbose=self.verbose)
-                )
+                result = self.calculator.calculate(structure) if self.is_relaxed else self.calculator.relax(structure)
 
                 self.structure_container.add_structure(
                     structure=result["final_structure"].to_ase_atoms(msonable=False),
