@@ -12,7 +12,7 @@ from materialsframework.transformations.bain import BainDisplacementTransformati
 @pytest.fixture(scope="module")
 def analyzer(calc):
     """BainPathAnalyzer with a small c/a range for fast integration tests."""
-    return BainPathAnalyzer(start=0.9, stop=1.1, step=0.1, calculator=calc)
+    return BainPathAnalyzer(calculator=calc)
 
 
 @pytest.fixture(scope="module")
@@ -24,16 +24,13 @@ def result(analyzer, bcc_fe):
 def test_default_params() -> None:
     """Analyzer stores the correct default start, stop, and step values."""
     analyzer = BainPathAnalyzer()
-    assert analyzer.start == pytest.approx(0.89)
-    assert analyzer.stop == pytest.approx(1.5)
-    assert analyzer.step == pytest.approx(0.01)
     assert analyzer._calculator is None
     assert analyzer._bain_transformation is None
 
 
 def test_bain_transformation_lazy_property() -> None:
     """Accessing .bain_transformation creates a BainDisplacementTransformation."""
-    analyzer = BainPathAnalyzer(start=0.9, stop=1.1, step=0.1)
+    analyzer = BainPathAnalyzer()
     assert isinstance(analyzer.bain_transformation, BainDisplacementTransformation)
 
 
@@ -41,7 +38,7 @@ def test_calculate_returns_keys_with_random_calc(bcc_fe) -> None:
     """calculate() returns required keys without any ML dependency."""
     from materialsframework.calculators.random import RandomCalculator
 
-    analyzer = BainPathAnalyzer(start=0.9, stop=1.1, step=0.1, calculator=RandomCalculator())
+    analyzer = BainPathAnalyzer(calculator=RandomCalculator())
     result = analyzer.calculate(bcc_fe, is_relaxed=True)
     assert "c_a_list" in result
     assert "energy_list" in result
@@ -51,7 +48,7 @@ def test_calculate_accepts_ase_atoms(ase_bcc_fe) -> None:
     """calculate() accepts ase.Atoms in addition to pymatgen Structure."""
     from materialsframework.calculators.random import RandomCalculator
 
-    analyzer = BainPathAnalyzer(start=0.9, stop=1.1, step=0.1, calculator=RandomCalculator())
+    analyzer = BainPathAnalyzer(calculator=RandomCalculator())
     result = analyzer.calculate(ase_bcc_fe, is_relaxed=True)
     assert "c_a_list" in result
 
