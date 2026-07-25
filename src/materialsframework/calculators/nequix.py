@@ -34,7 +34,7 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
         model_path: str | None = None,
         capacity_multiplier: float = 1.1,  # Only for jax backend
         backend: str = "jax",
-        use_kernel: bool = True,
+        use_kernel: bool = False,
         use_compile: bool = False,  # Only for torch backend
         **kwargs: Any,
     ) -> None:
@@ -45,7 +45,7 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
             model_path (str, optional): The path to the Nequix model to use. Defaults to None.
             capacity_multiplier (float, optional): The multiplier to use for calculating properties. Defaults to 1.1.
             backend (str, optional): The backend to use for calculations. Defaults to "jax".
-            use_kernel (bool, optional): Whether to use the kernel for calculations. Defaults to True.
+            use_kernel (bool, optional): Whether to use the OpenEquivariance kernel for calculations. Defaults to False.
             use_compile (bool, optional): Whether to use compilation for calculations (only applicable for the torch backend). Defaults to False.
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
