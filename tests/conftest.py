@@ -28,6 +28,14 @@ def fcc_ni() -> Structure:
 
 
 @pytest.fixture(scope="session")
+def primitive_bcc_fe() -> Structure:
+    """1-atom primitive (rhombohedral) BCC Fe cell, not aligned with Cartesian axes."""
+    a = 2.87
+    lattice = Lattice([[-a / 2, a / 2, a / 2], [a / 2, -a / 2, a / 2], [a / 2, a / 2, -a / 2]])
+    return Structure(lattice, ["Fe"], [[0, 0, 0]])
+
+
+@pytest.fixture(scope="session")
 def l10_feni() -> Structure:
     """2-atom L1_0 FeNi primitive cell (P4/mmm)."""
     return Structure(
