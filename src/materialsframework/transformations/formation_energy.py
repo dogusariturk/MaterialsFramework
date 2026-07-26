@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -37,7 +38,7 @@ class FormationEnergyTransformation:
     candidates with the same MLIP and selects the lowest-energy phase as the elemental reference.
     """
 
-    def apply_transformation(self, structure: Atoms | Structure) -> list[tuple[list[Structure], int]]:
+    def apply_transformation(self, structure: Atoms | Structure) -> list[tuple[str, list[Structure], int]]:
         """Apply the transformation to generate elemental reference structures.
 
         For each element present in ``structure``, either its known experimental ground-state
@@ -50,19 +51,16 @@ class FormationEnergyTransformation:
                 determines which elemental references are generated.
 
         Returns:
-            list[tuple[list[Structure], int]]: A list of ``(candidates, n_atoms)`` tuples, where ``candidates``
-                is a list of one or more candidate pymatgen ``Structure`` references and ``n_atoms`` is the
-                count of that element in the compound.
+            list[tuple[str, list[Structure], int]]: A list of ``(element, candidates, n_atoms)`` tuples, where
+                ``candidates`` is a list of one or more candidate pymatgen ``Structure`` references for ``element``
+                and ``n_atoms`` is the count of that element in the compound.
         """
-        pure_structures: list[tuple[list[Structure], int]] = []
-
         structure = to_structure(structure)
 
-        for element, num in structure.composition.get_el_amt_dict().items():
-            candidates = self._reference_candidates(element)
-            pure_structures.append((candidates, int(num)))
-
-        return pure_structures
+        return [
+            (element, self._reference_candidates(element), round(num))
+            for element, num in structure.composition.get_el_amt_dict().items()
+        ]
 
     def _reference_candidates(self, element: str) -> list[Structure]:
         """Return the candidate reference structure(s) for a single element.
@@ -119,6 +117,12 @@ class FormationEnergyTransformation:
         Returns:
             list[Structure]: Candidate pymatgen ``Structure`` references to relax and compare.
         """
+        warnings.warn(
+            f"No tabulated experimental ground state for {element}; using a guessed high-symmetry "
+            "candidate as the elemental reference instead.",
+            stacklevel=3,
+        )
+
         fallback_radius = 1.4
 
         r = float(Element(element).atomic_radius or fallback_radius)

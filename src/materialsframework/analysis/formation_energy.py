@@ -10,9 +10,7 @@ from typing import TYPE_CHECKING
 
 from materialsframework.analysis.base import BaseAnalyzer
 from materialsframework.analysis.utils import require_properties
-from materialsframework.transformations.formation_energy import (
-    FormationEnergyTransformation,
-)
+from materialsframework.transformations.formation_energy import FormationEnergyTransformation
 from materialsframework.utils import lazy_property, to_structure
 
 if TYPE_CHECKING:
@@ -46,15 +44,21 @@ class FormationEnergyAnalyzer(BaseAnalyzer):
         """
         super().__init__(calculator)
         self._formation_energy_transformation = formation_energy_transformation
+        self._pure_reference_cache: dict[str, dict[str, float | bool | Structure]] = {}
 
     @require_properties("energy")
-    def calculate(self, structure: Atoms | Structure, is_relaxed: bool = False) -> dict[str, float]:
+    def calculate(
+        self, structure: Atoms | Structure, is_relaxed: bool = False
+    ) -> dict[str, float | dict[str, dict[str, float | bool | Structure]]]:
         """Calculates the formation energy of the given structure.
 
         For elemental references, each element's known experimental ground-state structure
         (see `FormationEnergyTransformation`) is relaxed with the same calculator. For the
         few elements whose ground state can't be constructed directly, several candidate
-        crystal structures are relaxed instead and the lowest energy per atom is used.
+        crystal structures are relaxed instead and the lowest energy per atom is used. Each
+        element's reference energy is cached on this analyzer instance, so calling `calculate()`
+        again (even on a different structure) reuses it instead of relaxing it again; construct
+        a new analyzer to force fresh relaxations.
 
         Args:
             structure (Atoms | Structure): The structure for which the formation energy is calculated.
@@ -64,28 +68,41 @@ class FormationEnergyAnalyzer(BaseAnalyzer):
         Returns:
             dict[str, float]: Dictionary with keys:
                 - ``formation_energy``: Formation energy per atom (eV/atom).
+                - ``elemental_references``: Per-element dict of ``{"structure": Structure, "energy_per_atom": float,
+                    "is_guessed": bool}``, where ``is_guessed`` is ``True`` if the element has no known experimental
+                    ground state and a guessed high-symmetry candidate was used instead.
         """
         structure = to_structure(structure)
 
-        if len(structure.elements) < 2:
+        if len(structure.composition.get_el_amt_dict()) < 2:
             raise ValueError("The structure must contain at least two different elements to calculate formation energy.")
 
         if is_relaxed:
             compound_energy = self.calculator.calculate(structure)["energy"]
         else:
             result = self.calculator.relax(structure)
-            compound_energy = result["energy"]
-            structure = result["final_structure"]
+            structure, compound_energy = result["final_structure"], result["energy"]
 
         pure_structures = self.formation_energy_transformation.apply_transformation(structure)
 
-        pure_energies = sum(
-            num * min(self.calculator.relax(candidate)["energy"] / candidate.num_sites for candidate in candidates)
-            for candidates, num in pure_structures
-        )
+        elemental_references: dict[str, dict[str, float | bool | Structure]] = {}
+        pure_energies = 0.0
+        for element, candidates, num in pure_structures:
+            if (reference := self._pure_reference_cache.get(element)) is None:
+                relaxed = [self.calculator.relax(candidate) for candidate in candidates]
+                energies_per_atom = [result["energy"] / result["final_structure"].num_sites for result in relaxed]
+                best_index = energies_per_atom.index(min(energies_per_atom))
+                reference = self._pure_reference_cache[element] = {
+                    "structure": relaxed[best_index]["final_structure"],
+                    "energy_per_atom": energies_per_atom[best_index],
+                    "is_guessed": len(candidates) > 1,
+                }
+            elemental_references[element] = reference
+            pure_energies += num * reference["energy_per_atom"]
 
         return {
             "formation_energy": (compound_energy - pure_energies) / structure.num_sites,
+            "elemental_references": elemental_references,
         }
 
     @lazy_property("_formation_energy_transformation")
