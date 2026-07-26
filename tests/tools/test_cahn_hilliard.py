@@ -43,9 +43,9 @@ def test_simulation_grid_phi_initialised_to_zero() -> None:
 
 
 def test_simulation_grid_laplace_factor() -> None:
-    """laplace_factor equals 1 / (3 * dx^2)."""
+    """laplace_factor equals 1 / (4 * dx^2)."""
     grid = SimulationGrid(nx=11, lx=1.0)
-    expected = 1.0 / (3.0 * grid.dx**2)
+    expected = 1.0 / (4.0 * grid.dx**2)
     assert grid.laplace_factor == pytest.approx(expected)
 
 
