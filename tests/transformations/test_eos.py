@@ -22,6 +22,13 @@ def test_custom_params() -> None:
     assert len(t._strains) == 5
 
 
+@pytest.mark.parametrize("num", [0, 1, 2])
+def test_num_below_minimum_raises(num) -> None:
+    """A `num` below 3 raises a clear ValueError instead of failing later during EOS fitting."""
+    with pytest.raises(ValueError, match="num must be at least 3"):
+        EOSTransformation(num=num)
+
+
 def test_apply_transformation_populates_structures(bcc_fe) -> None:
     """apply_transformation() returns structures with num entries."""
     t = EOSTransformation(start=-0.02, stop=0.02, num=4)

@@ -37,7 +37,14 @@ class EOSTransformation:
         Note:
             The `start` and `stop` parameters define the range of strains to apply, while `num` determines how many
             evenly spaced strain values will be generated within that range.
+
+        Raises:
+            ValueError: If `num` is less than 3, since fitting an equation of state requires at least 3
+                energy-volume points.
         """
+        if num < 3:
+            raise ValueError(f"num must be at least 3 to fit an equation of state, got {num}.")
+
         self._strains = np.linspace(start, stop, num)
 
     def apply_transformation(self, structure: Structure) -> list[Structure]:
