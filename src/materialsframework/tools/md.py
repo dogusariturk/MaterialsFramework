@@ -161,7 +161,7 @@ class BaseMDCalculator(ABC):
             temperature_K=self.temperature,
             externalstress=self.pressure * 1.01325 * units.bar,
             ttime=self.ttime * units.fs,
-            pfactor=self.pfactor * units.fs,
+            pfactor=self.pfactor * units.fs**2,
         )
 
     def _initialize_nvt_nose_hoover(self, ase_atoms: Atoms) -> NPT:
