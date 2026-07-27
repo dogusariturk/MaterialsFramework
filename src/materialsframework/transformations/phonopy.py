@@ -33,7 +33,7 @@ class PhonopyDisplacementTransformation:
         structure: Structure,
         distance: float = 0.01,
         supercell_matrix: list | None = None,
-        primitive_matrix: list | None = None,
+        primitive_matrix: list | str | None = "auto",
         log_level: int = 0,
         **kwargs: Any,
     ) -> dict[str, Any]:
@@ -44,7 +44,9 @@ class PhonopyDisplacementTransformation:
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.01.
             supercell_matrix (list, optional): The supercell matrix to generate supercells for phonon calculations.
                 Defaults to a 2x2x2 supercell.
-            primitive_matrix (list, optional): The primitive matrix to generate the primitive cell. Defaults to None.
+            primitive_matrix (list | str, optional): The primitive matrix to generate the primitive cell. Defaults
+                to "auto", which detects the primitive cell from crystal symmetry. Pass "P" to use the input
+                structure as is (identity transformation).
             log_level (int, optional): The log level for Phonopy. Defaults to 0.
             **kwargs: Additional keyword arguments for the `Phonopy.generate_displacement` method.
 

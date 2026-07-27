@@ -116,16 +116,27 @@ class PhonopyAnalyzer(BaseAnalyzer):
 
         # DOS
         phonon.run_total_dos(sigma=sigma, freq_min=freq_min, freq_max=freq_max, freq_pitch=freq_pitch)
-        total_dos = phonon.get_total_dos_dict()
+        total_dos = {
+            "frequency_points": phonon.total_dos.frequency_points,
+            "total_dos": phonon.total_dos.dos,
+        }
 
         # Thermal Properties
         phonon.run_thermal_properties(t_min=t_min, t_max=t_max, t_step=t_step)
-        thermal_properties = phonon.get_thermal_properties_dict()
+        thermal_properties = {
+            "temperatures": phonon.thermal_properties.temperatures,
+            "free_energy": phonon.thermal_properties.free_energy,
+            "entropy": phonon.thermal_properties.entropy,
+            "heat_capacity": phonon.thermal_properties.heat_capacity,
+        }
 
         # PDOS
         phonon.run_mesh(mesh=pdos_mesh, is_mesh_symmetry=False, with_eigenvectors=True)
         phonon.run_projected_dos()
-        projected_dos = phonon.get_projected_dos_dict()
+        projected_dos = {
+            "frequency_points": phonon.projected_dos.frequency_points,
+            "projected_dos": phonon.projected_dos.projected_dos,
+        }
 
         return {
             "total_dos": total_dos,
