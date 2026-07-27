@@ -1,9 +1,10 @@
 """This module provides the `BaseMDCalculator` class for Molecular Dynamics simulations.
 
-`BaseMDCalculator` sets up and runs MD simulations with different ensembles, including NVE,
-NVT (Nose-Hoover), NVT (Langevin), NVT (Andersen), NVT (Bussi), NPT (Nose-Hoover), NPT
-(Berendsen), and Inhomogeneous NPT (Berendsen). It handles advanced MD settings such as velocity
-initialization, pressure control, and symmetry constraints.
+`BaseMDCalculator` sets up and runs MD simulations under NVE, six NVT thermostats (Nose-Hoover,
+Langevin, Andersen, Bussi, Berendsen, and a Nose-Hoover chain), and six NPT/barostat variants
+(Nose-Hoover, isotropic MTK, MTK, masked MTK, Berendsen, and inhomogeneous Berendsen). It handles
+velocity initialization, pressure control, and symmetry constraints so each calculator subclass
+only has to supply an ASE `Calculator`.
 """
 
 from __future__ import annotations
@@ -18,7 +19,9 @@ from ase.md.andersen import Andersen
 from ase.md.bussi import Bussi
 from ase.md.langevin import Langevin
 from ase.md.melchionna import MelchionnaNPT
+from ase.md.nose_hoover_chain import MTKNPT, IsotropicMTKNPT, MaskedMTKNPT, NoseHooverChainNVT
 from ase.md.nptberendsen import Inhomogeneous_NPTBerendsen, NPTBerendsen
+from ase.md.nvtberendsen import NVTBerendsen
 from ase.md.velocitydistribution import (
     Stationary,
     ZeroRotation,
@@ -43,9 +46,11 @@ __email__ = "dogu.sariturk@gmail.com"
 class BaseMDCalculator(ABC):
     """A calculator class for performing Molecular Dynamics (MD) simulations using universal potentials.
 
-    Supports NVE, NVT (Nose-Hoover), and NPT (Nose-Hoover) ensembles, with customizable
-    parameters for temperature, pressure, and timestep. Also applies constraints such as
-    fixing symmetry and initializing velocities before a simulation starts.
+    Supports NVE, several NVT thermostats (Nose-Hoover, Langevin, Andersen, Bussi, Berendsen, and
+    a Nose-Hoover chain), and several NPT barostats (Nose-Hoover, MTK and its isotropic/masked
+    variants, and Berendsen and its inhomogeneous variant), with customizable parameters for
+    temperature, pressure, and timestep. Also applies constraints such as fixing symmetry and
+    initializing velocities before a simulation starts.
     """
 
     def __init__(
@@ -56,7 +61,12 @@ class BaseMDCalculator(ABC):
             "langevin",
             "andersen",
             "bussi",
+            "nvt_berendsen",
+            "nose_hoover_chain_nvt",
             "npt_nose_hoover",
+            "isotropic_mtk_npt",
+            "mtk_npt",
+            "masked_mtk_npt",
             "npt_berendsen",
             "inhomogeneous_npt_berendsen",
         ] = "nve",
@@ -81,8 +91,10 @@ class BaseMDCalculator(ABC):
         """Initializes the `BaseMDCalculator` with the specified parameters for running MD simulations.
 
         Args:
-            ensemble (Literal["nve", "nvt_nose_hoover", "npt_nose_hoover"], optional): The ensemble to use in the
-                simulation. Defaults to "nve".
+            ensemble (str, optional): The MD ensemble to run, one of "nve", "nvt_nose_hoover", "langevin",
+                "andersen", "bussi", "nvt_berendsen", "nose_hoover_chain_nvt", "npt_nose_hoover",
+                "isotropic_mtk_npt", "mtk_npt", "masked_mtk_npt", "npt_berendsen", or
+                "inhomogeneous_npt_berendsen". Defaults to "nve".
             timestep (float, optional): The timestep for the MD simulation in femtoseconds (fs). Defaults to 1.0 fs.
             temperature (int, optional): The temperature in Kelvin (K) for the MD simulation. Defaults to 300 K.
             pressure (float, optional): The pressure in atmospheres (atm) for the NPT ensemble. Defaults to 1 atm.
@@ -95,7 +107,7 @@ class BaseMDCalculator(ABC):
             taup (float, optional): Time constant for Berendsen pressure coupling in fs. Defaults to 1e3 fs.
             compressibility (float, optional): Compressibility for the NPT ensemble in 1/bar. Defaults to 5e-7 1/bar.
             mask (tuple[int, int, int], optional): Specifies which axes participate in the barostat for the Inhomogeneous NPT
-                Berendsen ensemble. Defaults to (1, 1, 1).
+                Berendsen and masked MTK NPT ensembles. Defaults to (1, 1, 1).
             stationary (bool, optional): Whether to set the center-of-mass motion to zero. Defaults to True.
             zero_rotation (bool, optional): Whether to set the total angular momentum to zero. Defaults to True.
             logfile (str | None, optional): The file to log simulation output. If None, no logging occurs. Defaults to None.
@@ -113,13 +125,19 @@ class BaseMDCalculator(ABC):
             "langevin",
             "andersen",
             "bussi",
+            "nvt_berendsen",
+            "nose_hoover_chain_nvt",
             "npt_nose_hoover",
+            "isotropic_mtk_npt",
+            "mtk_npt",
+            "masked_mtk_npt",
             "npt_berendsen",
             "inhomogeneous_npt_berendsen",
         ]:
             raise ValueError(
-                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'langevin', 'andersen', 'bussi', "
-                "'npt_nose_hoover', 'npt_berendsen', or 'inhomogeneous_npt_berendsen'."
+                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'langevin', 'andersen', 'bussi', 'nvt_berendsen', "
+                "'nose_hoover_chain_nvt', 'npt_nose_hoover', 'isotropic_mtk_npt', 'mtk_npt', 'masked_mtk_npt', "
+                "'npt_berendsen', or 'inhomogeneous_npt_berendsen'."
             )
 
         self.ensemble: str = ensemble
@@ -262,6 +280,93 @@ class BaseMDCalculator(ABC):
             timestep=self.timestep * units.fs,
         )
 
+    def _initialize_nvt_berendsen(self, ase_atoms: Atoms) -> NVTBerendsen:
+        """Initializes the NVT Berendsen ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            NVTBerendsen: The initialized NVTBerendsen dynamics object.
+        """
+        return NVTBerendsen(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            taut=self.taut * units.fs,
+        )
+
+    def _initialize_nose_hoover_chain_nvt(self, ase_atoms: Atoms) -> NoseHooverChainNVT:
+        """Initializes the Nose-Hoover chain NVT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            NoseHooverChainNVT: The initialized NoseHooverChainNVT dynamics object.
+        """
+        return NoseHooverChainNVT(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            tdamp=self.ttime * units.fs,
+        )
+
+    def _initialize_isotropic_mtk_npt(self, ase_atoms: Atoms) -> IsotropicMTKNPT:
+        """Initializes the isotropic MTK NPT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            IsotropicMTKNPT: The initialized IsotropicMTKNPT dynamics object.
+        """
+        return IsotropicMTKNPT(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            pressure_au=self.pressure * 1.01325 * units.bar,
+            tdamp=self.ttime * units.fs,
+            pdamp=self.taup * units.fs,
+        )
+
+    def _initialize_mtk_npt(self, ase_atoms: Atoms) -> MTKNPT:
+        """Initializes the (anisotropic) MTK NPT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            MTKNPT: The initialized MTKNPT dynamics object.
+        """
+        return MTKNPT(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            pressure_au=self.pressure * 1.01325 * units.bar,
+            tdamp=self.ttime * units.fs,
+            pdamp=self.taup * units.fs,
+        )
+
+    def _initialize_masked_mtk_npt(self, ase_atoms: Atoms) -> MaskedMTKNPT:
+        """Initializes the masked MTK NPT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            MaskedMTKNPT: The initialized MaskedMTKNPT dynamics object.
+        """
+        return MaskedMTKNPT(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            pressure_au=self.pressure * 1.01325 * units.bar,
+            tdamp=self.ttime * units.fs,
+            pdamp=self.taup * units.fs,
+            mask=(bool(self.mask[0]), bool(self.mask[1]), bool(self.mask[2])),
+        )
+
     def _initialize_npt_berendsen(self, ase_atoms: Atoms) -> NPTBerendsen:
         """Initializes the NPT Berendsen ensemble for MD simulations.
 
@@ -330,22 +435,22 @@ class BaseMDCalculator(ABC):
 
         ase_atoms.calc = self.calculator
 
-        if self.ensemble.lower() == "npt_nose_hoover":
-            dyn = self._initialize_npt_nose_hoover(ase_atoms)
-        elif self.ensemble.lower() == "nvt_nose_hoover":
-            dyn = self._initialize_nvt_nose_hoover(ase_atoms)
-        elif self.ensemble.lower() == "langevin":
-            dyn = self._initialize_langevin(ase_atoms)
-        elif self.ensemble.lower() == "andersen":
-            dyn = self._initialize_andersen(ase_atoms)
-        elif self.ensemble.lower() == "bussi":
-            dyn = self._initialize_bussi(ase_atoms)
-        elif self.ensemble.lower() == "nve":
-            dyn = self._initialize_nve(ase_atoms)
-        elif self.ensemble.lower() == "npt_berendsen":
-            dyn = self._initialize_npt_berendsen(ase_atoms)
-        elif self.ensemble.lower() == "inhomogeneous_npt_berendsen":
-            dyn = self._initialize_inhomogeneous_npt_berendsen(ase_atoms)
+        ensemble_initializers = {
+            "nve": self._initialize_nve,
+            "nvt_nose_hoover": self._initialize_nvt_nose_hoover,
+            "langevin": self._initialize_langevin,
+            "andersen": self._initialize_andersen,
+            "bussi": self._initialize_bussi,
+            "nvt_berendsen": self._initialize_nvt_berendsen,
+            "nose_hoover_chain_nvt": self._initialize_nose_hoover_chain_nvt,
+            "npt_nose_hoover": self._initialize_npt_nose_hoover,
+            "isotropic_mtk_npt": self._initialize_isotropic_mtk_npt,
+            "mtk_npt": self._initialize_mtk_npt,
+            "masked_mtk_npt": self._initialize_masked_mtk_npt,
+            "npt_berendsen": self._initialize_npt_berendsen,
+            "inhomogeneous_npt_berendsen": self._initialize_inhomogeneous_npt_berendsen,
+        }
+        dyn = ensemble_initializers[self.ensemble.lower()](ase_atoms)
 
         if self.logfile:
             self._initialize_logger(dyn, ase_atoms, self.logfile)
