@@ -1,9 +1,9 @@
 """This module provides the `BaseMDCalculator` class for Molecular Dynamics simulations.
 
 `BaseMDCalculator` sets up and runs MD simulations with different ensembles, including NVE,
-NVT (Nose-Hoover), NVT (Langevin), NPT (Nose-Hoover), NPT (Berendsen), and Inhomogeneous NPT
-(Berendsen). It handles advanced MD settings such as velocity initialization, pressure control,
-and symmetry constraints.
+NVT (Nose-Hoover), NVT (Langevin), NVT (Andersen), NVT (Bussi), NPT (Nose-Hoover), NPT
+(Berendsen), and Inhomogeneous NPT (Berendsen). It handles advanced MD settings such as velocity
+initialization, pressure control, and symmetry constraints.
 """
 
 from __future__ import annotations
@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 from ase import units
 from ase.md import MDLogger, VelocityVerlet
+from ase.md.andersen import Andersen
+from ase.md.bussi import Bussi
 from ase.md.langevin import Langevin
 from ase.md.melchionna import MelchionnaNPT
 from ase.md.nptberendsen import Inhomogeneous_NPTBerendsen, NPTBerendsen
@@ -52,6 +54,8 @@ class BaseMDCalculator(ABC):
             "nve",
             "nvt_nose_hoover",
             "langevin",
+            "andersen",
+            "bussi",
             "npt_nose_hoover",
             "npt_berendsen",
             "inhomogeneous_npt_berendsen",
@@ -62,6 +66,7 @@ class BaseMDCalculator(ABC):
         ttime: float = 10.0,  # fs
         pfactor: float = 75.0**2.0,  # fs ** 2
         friction: float = 0.01,  # fs^-1
+        andersen_prob: float = 1e-2,
         taut: float = 0.5e3,  # fs
         taup: float = 1e3,  # fs
         compressibility: float = 5e-7,  # 1/bar
@@ -84,7 +89,9 @@ class BaseMDCalculator(ABC):
             ttime (float, optional): The time constant for temperature control in femtoseconds (fs). Defaults to 10.0 fs.
             pfactor (float, optional): Pressure factor for the NPT ensemble in fs^2. Defaults to 75.0^2 fs^2.
             friction (float, optional): Friction coefficient for the Langevin thermostat, in fs^-1. Defaults to 0.01 fs^-1.
-            taut (float, optional): Time constant for Berendsen temperature coupling in fs. Defaults to 0.5e3 fs.
+            andersen_prob (float, optional): Collision probability per step for the Andersen thermostat, typically between
+                1e-4 and 1e-1. Defaults to 1e-2.
+            taut (float, optional): Time constant for Berendsen or Bussi temperature coupling in fs. Defaults to 0.5e3 fs.
             taup (float, optional): Time constant for Berendsen pressure coupling in fs. Defaults to 1e3 fs.
             compressibility (float, optional): Compressibility for the NPT ensemble in 1/bar. Defaults to 5e-7 1/bar.
             mask (tuple[int, int, int], optional): Specifies which axes participate in the barostat for the Inhomogeneous NPT
@@ -104,13 +111,15 @@ class BaseMDCalculator(ABC):
             "nve",
             "nvt_nose_hoover",
             "langevin",
+            "andersen",
+            "bussi",
             "npt_nose_hoover",
             "npt_berendsen",
             "inhomogeneous_npt_berendsen",
         ]:
             raise ValueError(
-                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'langevin', 'npt_nose_hoover', 'npt_berendsen', "
-                "or 'inhomogeneous_npt_berendsen'."
+                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'langevin', 'andersen', 'bussi', "
+                "'npt_nose_hoover', 'npt_berendsen', or 'inhomogeneous_npt_berendsen'."
             )
 
         self.ensemble: str = ensemble
@@ -119,6 +128,7 @@ class BaseMDCalculator(ABC):
         self.pressure: float = pressure
         self.pfactor: float = pfactor
         self.friction: float = friction
+        self.andersen_prob: float = andersen_prob
         self.taut: float = taut
         self.taup: float = taup
         self.compressibility: float = compressibility
@@ -204,6 +214,38 @@ class BaseMDCalculator(ABC):
             temperature_K=self.temperature,
             friction=self.friction / units.fs,
             fixcm=False,
+        )
+
+    def _initialize_andersen(self, ase_atoms: Atoms) -> Andersen:
+        """Initializes the Andersen NVT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            Andersen: The initialized Andersen dynamics object.
+        """
+        return Andersen(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            andersen_prob=self.andersen_prob,
+        )
+
+    def _initialize_bussi(self, ase_atoms: Atoms) -> Bussi:
+        """Initializes the Bussi NVT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            Bussi: The initialized Bussi dynamics object.
+        """
+        return Bussi(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            taut=self.taut * units.fs,
         )
 
     def _initialize_nve(self, ase_atoms: Atoms) -> VelocityVerlet:
@@ -294,6 +336,10 @@ class BaseMDCalculator(ABC):
             dyn = self._initialize_nvt_nose_hoover(ase_atoms)
         elif self.ensemble.lower() == "langevin":
             dyn = self._initialize_langevin(ase_atoms)
+        elif self.ensemble.lower() == "andersen":
+            dyn = self._initialize_andersen(ase_atoms)
+        elif self.ensemble.lower() == "bussi":
+            dyn = self._initialize_bussi(ase_atoms)
         elif self.ensemble.lower() == "nve":
             dyn = self._initialize_nve(ase_atoms)
         elif self.ensemble.lower() == "npt_berendsen":
