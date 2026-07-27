@@ -7,33 +7,23 @@ import pytest
 from materialsframework.transformations.cte import CTETransformation
 
 _PAIR_COUNT = 2
-_TEST_STEPS = 50
 
 
-def test_default_params() -> None:
-    """CTETransformation stores defaults."""
-    transformation = CTETransformation()
-    assert transformation.ensemble == "npt_berendsen"
-    assert transformation.pressure == pytest.approx(1.0)
+def test_apply_transformation_returns_one_structure_per_temperature(bcc_fe) -> None:
+    """apply_transformation() returns one structure copy per temperature, keyed by temperature."""
+    transformation = CTETransformation(temperatures=[300.0, 400.0])
+    result = transformation.apply_transformation(bcc_fe)
 
-
-def test_apply_transformation_returns_tasks_and_structures(bcc_fe) -> None:
-    """apply_transformation() returns one task and one structure per temperature."""
-    transformation = CTETransformation()
-    result = transformation.apply_transformation(bcc_fe, temperatures=[300.0, 400.0], steps=_TEST_STEPS)
-
-    assert len(result["tasks"]) == _PAIR_COUNT
-    assert len(result["structures"]) == _PAIR_COUNT
-    assert result["tasks"][0]["temperature"] == pytest.approx(300.0)
-    assert result["tasks"][1]["temperature"] == pytest.approx(400.0)
-    assert result["tasks"][0]["steps"] == _TEST_STEPS
+    assert len(result) == _PAIR_COUNT
+    assert set(result) == {300.0, 400.0}
+    assert result[300.0] is not result[400.0]
 
 
 def test_apply_transformation_accepts_ase_atoms(ase_bcc_fe) -> None:
     """apply_transformation() accepts ase.Atoms input."""
-    transformation = CTETransformation()
-    result = transformation.apply_transformation(ase_bcc_fe, temperatures=[300.0, 350.0], steps=3)
-    assert len(result["tasks"]) == _PAIR_COUNT
+    transformation = CTETransformation(temperatures=[300.0, 350.0])
+    result = transformation.apply_transformation(ase_bcc_fe)
+    assert len(result) == _PAIR_COUNT
 
 
 @pytest.mark.parametrize(
@@ -46,15 +36,7 @@ def test_apply_transformation_accepts_ase_atoms(ase_bcc_fe) -> None:
         "300,400",
     ],
 )
-def test_apply_transformation_validates_temperatures(bcc_fe, temperatures) -> None:  # noqa: ANN001
-    """apply_transformation() raises ValueError for invalid temperature inputs."""
-    transformation = CTETransformation()
+def test_init_validates_temperatures(temperatures) -> None:  # noqa: ANN001
+    """CTETransformation raises ValueError for invalid temperature inputs at construction time."""
     with pytest.raises(ValueError):
-        transformation.apply_transformation(bcc_fe, temperatures=temperatures, steps=3)
-
-
-def test_apply_transformation_requires_positive_steps(bcc_fe) -> None:
-    """apply_transformation() rejects non-positive MD step counts."""
-    transformation = CTETransformation()
-    with pytest.raises(ValueError, match="steps must be a positive integer"):
-        transformation.apply_transformation(bcc_fe, temperatures=[300.0, 400.0], steps=0)
+        CTETransformation(temperatures=temperatures)
