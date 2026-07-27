@@ -21,10 +21,9 @@ if TYPE_CHECKING:
     from typing import Literal
 
     from ase import Atoms
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
     from phono3py import Phono3py
-    from phono3py.conductivity.direct_solution import ConductivityLBTE
-    from phono3py.conductivity.rta import ConductivityRTA
+    from phono3py.conductivity.calculators import LBTECalculator, RTACalculator
     from pymatgen.core import Structure
 
     from materialsframework.tools.calculator import BaseCalculator
@@ -68,13 +67,13 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         mesh: ArrayLike | float | None = None,
         is_lbte: bool = False,
         is_isotope: bool = False,
-        conductivity_type: Literal["wigner", "kubo"] | None = None,
+        transport_type: Literal["SMM19", "NJC23", "IBDB19"] | None = None,
         boundary_mfp: float | None = None,
         t_min: float = 0,
         t_max: float = 1000,
         t_step: float = 10,
         log_level: Literal[0, 1, 2] = 0,
-    ) -> dict[str, ConductivityRTA | ConductivityLBTE]:
+    ) -> dict[str, RTACalculator | LBTECalculator | NDArray | None]:
         """Calculates the phonon properties of the given structure, including thermal conductivity.
 
         This method generates displaced supercells using Phono3py, calculates the forces using the provided calculator,
@@ -90,7 +89,10 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             mesh (ArrayLike | float, optional): The mesh numbers for phonon calculations. Defaults to [20, 20, 20].
             is_lbte (bool, optional): Whether to use the Linearized Boltzmann Transport Equation (LBTE). Defaults to False.
             is_isotope (bool, optional): Whether to include isotope scattering in the calculations. Defaults to False.
-            conductivity_type (Literal["wigner", "kubo"], optional): The type of conductivity calculation to perform. Defaults to None.
+            transport_type (Literal["SMM19", "NJC23", "IBDB19"], optional): The inter-band transport formulation to
+                use on top of the standard (intra-band) RTA/LBTE solution: "SMM19" (Simoncelli-Marzari-Mauri Wigner
+                transport equation), "NJC23" (Green-Kubo), or "IBDB19" (quasi-harmonic Green-Kubo). Defaults to None,
+                which uses the standard formulation.
             boundary_mfp (float, optional): Mean free path in micrometre to calculate simple boundary scattering
                 contribution to thermal conductivity. None ignores this contribution.
             t_min (float, optional): The minimum temperature for thermal conductivity calculations. Defaults to 0.
@@ -99,8 +101,10 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             log_level (Literal[0, 1, 2], optional): The log level for Phono3py. Defaults to 0.
 
         Returns:
-            dict[str, ConductivityRTA | ConductivityLBTE]: Dictionary with key:
+            dict[str, RTACalculator | LBTECalculator | NDArray | None]: Dictionary with keys:
                 - ``thermal_conductivity``: Thermal conductivity object (RTA or LBTE).
+                - ``kappa``: Lattice thermal conductivity tensor, shape (sigmas, temperatures, 6), where the last
+                  axis holds the independent tensor components (xx, yy, zz, yz, xz, xy).
 
         Raises:
             ValueError: If the calculator object does not have the 'forces' property implemented.
@@ -131,13 +135,13 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         phonon.run_thermal_conductivity(
             is_LBTE=is_lbte,
             is_isotope=is_isotope,
-            conductivity_type=conductivity_type,
+            transport_type=transport_type,
             boundary_mfp=boundary_mfp,
             temperatures=np.arange(t_min, t_max + t_step, t_step),
         )
-        thermal_conductivity: ConductivityRTA | ConductivityLBTE = phonon.thermal_conductivity
+        thermal_conductivity: RTACalculator | LBTECalculator = phonon.thermal_conductivity
 
-        return {"thermal_conductivity": thermal_conductivity}
+        return {"thermal_conductivity": thermal_conductivity, "kappa": thermal_conductivity.kappa}
 
     @lazy_property("_phono3py_transformation")
     def phono3py_transformation(self) -> Phono3pyDisplacementTransformation:
