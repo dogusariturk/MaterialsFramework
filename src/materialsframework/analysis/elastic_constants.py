@@ -15,6 +15,7 @@ from pymatgen.analysis.elasticity import ElasticTensor
 
 from materialsframework.analysis.base import BaseAnalyzer
 from materialsframework.analysis.utils import require_properties
+from materialsframework.constants import EV_A3_TO_GPA
 from materialsframework.tools import elastic
 from materialsframework.transformations.elastic_constants import (
     ElasticConstantsDeformationTransformation,
@@ -31,8 +32,6 @@ if TYPE_CHECKING:
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
-
-EV_A3_TO_GPA: float = 160.21766208
 
 
 class ElasticConstantsAnalyzer(BaseAnalyzer):

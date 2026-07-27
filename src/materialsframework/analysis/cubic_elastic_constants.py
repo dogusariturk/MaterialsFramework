@@ -16,6 +16,7 @@ from pymatgen.analysis.eos import EOS
 
 from materialsframework.analysis.base import BaseAnalyzer
 from materialsframework.analysis.utils import require_properties
+from materialsframework.constants import EV_A3_TO_GPA
 from materialsframework.transformations.cubic_elastic_constants import (
     CubicElasticConstantsDeformationTransformation,
 )
@@ -31,8 +32,6 @@ if TYPE_CHECKING:
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
-
-EV_A3_TO_GPA: float = 160.21766208
 
 
 class CubicElasticConstantsAnalyzer(BaseAnalyzer):
