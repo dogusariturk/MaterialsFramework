@@ -53,16 +53,16 @@ class PhonopyAnalyzer(BaseAnalyzer):
         is_relaxed: bool = False,
         distance: float = 0.01,
         supercell_matrix: list | None = None,
-        primitive_matrix: list | None = None,
+        primitive_matrix: list | str | None = None,
         mesh: ArrayLike | float | None = None,
         pdos_mesh: ArrayLike | float | None = None,
         sigma: float | None = None,
         freq_min: float | None = None,
         freq_max: float | None = None,
         freq_pitch: float | None = None,
-        t_min: float | None = 0,
-        t_max: float | None = 1000,
-        t_step: float | None = 10,
+        t_min: float = 0,
+        t_max: float = 1000,
+        t_step: float = 10,
         log_level: int = 0,
     ) -> dict[str, dict]:
         """Calculates the phonon properties of the given structure.
@@ -75,7 +75,9 @@ class PhonopyAnalyzer(BaseAnalyzer):
             is_relaxed (bool, optional): Whether the input structure is already relaxed. Defaults to False.
             distance (float, optional): The distance to displace atoms for force calculations. Defaults to 0.01.
             supercell_matrix (list, optional): The supercell matrix for generating supercells. Defaults to None.
-            primitive_matrix (list, optional): The primitive matrix for generating the primitive cell. Defaults to None.
+            primitive_matrix (list | str, optional): The primitive matrix for generating the primitive cell. Defaults
+                to None, which the underlying transformation resolves the same as "auto" (symmetry-detected
+                primitive cell). Pass "P" to use the input structure as is (identity transformation).
             mesh (ArrayLike | float, optional): The mesh numbers for phonon calculations. Defaults to [20, 20, 20].
             pdos_mesh (ArrayLike | float, optional): The mesh numbers for projected DOS calculations. Defaults to [10, 10, 10].
             sigma (float, optional): The smearing width for the total DOS calculation. Defaults to None.

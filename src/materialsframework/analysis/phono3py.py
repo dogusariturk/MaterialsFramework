@@ -69,6 +69,7 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         is_isotope: bool = False,
         transport_type: Literal["SMM19", "NJC23", "IBDB19"] | None = None,
         boundary_mfp: float | None = None,
+        gv_delta_q: float | None = None,
         t_min: float = 0,
         t_max: float = 1000,
         t_step: float = 10,
@@ -95,6 +96,10 @@ class Phono3pyAnalyzer(BaseAnalyzer):
                 which uses the standard formulation.
             boundary_mfp (float, optional): Mean free path in micrometre to calculate simple boundary scattering
                 contribution to thermal conductivity. None ignores this contribution.
+            gv_delta_q (float, optional): Q-distance in 1/Angstrom for the central finite-difference group-velocity
+                scheme. Defaults to None, which selects the analytical derivative of the dynamical matrix (phono3py's
+                default since v4.1.0). Pass 1e-5 to reproduce the finite-difference behavior of phono3py v4.0.x and
+                earlier.
             t_min (float, optional): The minimum temperature for thermal conductivity calculations. Defaults to 0.
             t_max (float, optional): The maximum temperature for thermal conductivity calculations. Defaults to 1000.
             t_step (float, optional): The step size for temperature increments. Defaults to 10.
@@ -137,6 +142,7 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             is_isotope=is_isotope,
             transport_type=transport_type,
             boundary_mfp=boundary_mfp,
+            gv_delta_q=gv_delta_q,
             temperatures=np.arange(t_min, t_max + t_step, t_step),
         )
         thermal_conductivity: RTACalculator | LBTECalculator = phonon.thermal_conductivity

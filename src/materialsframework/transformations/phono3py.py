@@ -52,7 +52,9 @@ class Phono3pyDisplacementTransformation:
             phonon_supercell_matrix (list, optional): The supercell matrix for second-order force constant
                 calculations. Defaults to a 3x3x3 supercell.
             log_level (int, optional): The log level for Phono3py. Defaults to 0.
-            **kwargs: Additional keyword arguments for the `Phono3py.generate_displacement` method.
+            **kwargs: Additional keyword arguments for `Phono3py.generate_displacements` and
+                `Phono3py.generate_fc2_displacements` (e.g. `is_diagonal`, `fc2_is_diagonal`, `is_plusminus`,
+                `number_of_snapshots`, `random_seed`, `max_distance`). See `_get_displaced_structures` for details.
 
         Returns:
             dict[str, Phono3py | list[Structure]]: Dictionary with keys:
@@ -102,6 +104,8 @@ class Phono3pyDisplacementTransformation:
         distance: float = 0.03,
         is_plusminus: bool | str = "auto",
         is_diagonal: bool = True,
+        fc2_is_diagonal: bool = False,
+        **kwargs: Any,
     ) -> tuple[list[Structure], list[Structure]]:
         """Generate displaced structures using Phono3py.
 
@@ -110,7 +114,15 @@ class Phono3pyDisplacementTransformation:
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.03.
             is_plusminus (bool | str, optional): Whether to generate both positive and negative displacements.
                 Defaults to "auto".
-            is_diagonal (bool, optional): Whether to only displace atoms along diagonal directions. Defaults to True.
+            is_diagonal (bool, optional): Whether the third-order (fc3) displacements may be taken off-axis.
+                Defaults to True, matching `Phono3py.generate_displacements`'s own default.
+            fc2_is_diagonal (bool, optional): Whether the second-order (fc2/phonon) displacements may be taken
+                off-axis. Defaults to False, matching `Phono3py.generate_fc2_displacements`'s own default.
+            **kwargs: Additional keyword arguments forwarded to both `Phono3py.generate_displacements` and
+                `Phono3py.generate_fc2_displacements` (e.g. `number_of_snapshots`, `random_seed`, `max_distance`
+                for phono3py's random-displacement mode). Options accepted by only one of the two methods
+                (e.g. `cutoff_pair_distance`, `number_estimation_factor`, both fc3-only) will raise if passed,
+                since they are forwarded identically to both calls.
 
         Returns:
             tuple[list[Structure], list[Structure]]: Two lists of displaced structures for phonon (second-order) and third-order
@@ -118,12 +130,12 @@ class Phono3pyDisplacementTransformation:
         """
         from pymatgen.io.phonopy import get_pmg_structure
 
-        phonon.generate_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
+        phonon.generate_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal, **kwargs)
 
         displaced_supercells = phonon.supercells_with_displacements
         displaced_structures = [get_pmg_structure(cell) for cell in displaced_supercells if cell is not None]
 
-        phonon.generate_fc2_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=is_diagonal)
+        phonon.generate_fc2_displacements(distance=distance, is_plusminus=is_plusminus, is_diagonal=fc2_is_diagonal, **kwargs)
 
         displaced_phonon_supercells = phonon.phonon_supercells_with_displacements
         displaced_phonon_structures = [get_pmg_structure(cell) for cell in displaced_phonon_supercells if cell is not None]
