@@ -33,6 +33,7 @@ _TRANSFORMATION_MAP: dict[str, tuple[str, str]] = {
         "FormationEnergyTransformation",
     ),
     "HSolubilityTransformation": ("materialsframework.transformations.h_solubility", "HSolubilityTransformation"),
+    "NEBTransformation": ("materialsframework.transformations.neb", "NEBTransformation"),
     "Phono3pyDisplacementTransformation": (
         "materialsframework.transformations.phono3py",
         "Phono3pyDisplacementTransformation",
