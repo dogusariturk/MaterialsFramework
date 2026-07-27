@@ -103,6 +103,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
                 - ``voigt_reuss_hill_shear_modulus``: Voigt-Reuss-Hill shear modulus in GPa.
                 - ``poisson_ratio``: Poisson ratio.
                 - ``pugh_ratio``: Pugh ratio.
+                - ``chen_vickers_hardness``: Chen-Vickers hardness in GPa.
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
@@ -133,12 +134,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         elastic_tensor = self._build_elastic_tensor(cij, cij_order, structure)
 
         pugh_ratio = elastic_tensor.g_vrh / elastic_tensor.k_vrh
-
-        chen_vickers_hardness = (
-            2.0 * pugh_ratio**2 * elastic_tensor.g_vrh - 3.0
-            if pugh_ratio >= 1.071
-            else 2.0 * pugh_ratio ** (-0.5) * elastic_tensor.g_vrh - 3.0
-        )
+        chen_vickers_hardness = 2.0 * (pugh_ratio**2 * elastic_tensor.g_vrh) ** 0.585 - 3.0
 
         return {
             **dict(zip(cij_order, cij, strict=False)),

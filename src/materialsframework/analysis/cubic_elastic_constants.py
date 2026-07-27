@@ -97,6 +97,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
                 - ``voigt_reuss_hill_shear_modulus``: Voigt-Reuss-Hill shear modulus in GPa.
                 - ``poisson_ratio``: Poisson ratio.
                 - ``pugh_ratio``: Pugh ratio (G_VRH / K_VRH).
+                - ``chen_vickers_hardness``: Chen-Vickers hardness in GPa.
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' property implemented.
@@ -106,10 +107,11 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         initial_volume: float = structure.volume
 
         distorted = self.cubic_transformation.apply_transformation(structure=structure)
+        reference_energy: float = self.calculator.calculate(structure=structure)["energy"]
 
-        bulk_modulus = self._get_bulk_modulus(distorted["uniform"])
-        tetragonal_shear_modulus = self._get_tetragonal_shear_modulus(distorted["orthorhombic"], initial_volume)
-        shear_modulus = self._get_shear_modulus(distorted["monoclinic"], initial_volume)
+        bulk_modulus = self._get_bulk_modulus(distorted["uniform"], reference_energy)
+        tetragonal_shear_modulus = self._get_tetragonal_shear_modulus(distorted["orthorhombic"], initial_volume, reference_energy)
+        shear_modulus = self._get_shear_modulus(distorted["monoclinic"], initial_volume, reference_energy)
 
         c11 = bulk_modulus + (4 / 3 * tetragonal_shear_modulus)
         c12 = bulk_modulus - (2 / 3 * tetragonal_shear_modulus)
@@ -117,12 +119,7 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
 
         elastic_tensor = self._build_cubic_elastic_tensor(c11, c12, c44)
         pugh_ratio = elastic_tensor.g_vrh / elastic_tensor.k_vrh
-
-        chen_vickers_hardness = (
-            2.0 * pugh_ratio**2 * elastic_tensor.g_vrh - 3.0
-            if pugh_ratio >= 1.071
-            else 2.0 * pugh_ratio ** (-0.5) * elastic_tensor.g_vrh - 3.0
-        )
+        chen_vickers_hardness = 2.0 * (pugh_ratio**2 * elastic_tensor.g_vrh) ** 0.585 - 3.0
 
         return {
             "C11": c11,
@@ -177,25 +174,30 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
         fit_coefficients = np.polynomial.polynomial.polyfit(deltas, energies, degree)
         return fit_coefficients[2]
 
-    def _get_bulk_modulus(self, uniform_distorted_structures: dict[float, Structure]) -> float:
+    def _get_bulk_modulus(self, uniform_distorted_structures: dict[float, Structure], reference_energy: float) -> float:
         """Calculates the bulk modulus using equation of state (EOS) fitting.
 
         Args:
             uniform_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to uniformly
                 distorted structures.
+            reference_energy (float): The energy of the undeformed (delta=0) structure, reused instead of
+                recomputing it for the delta=0 entry.
 
         Returns:
             float: The bulk modulus in GPa.
         """
-        deformed_structures = list(uniform_distorted_structures.values())
-        volumes = [deformed_structure.volume for deformed_structure in deformed_structures]
+        volumes = [deformed_structure.volume for deformed_structure in uniform_distorted_structures.values()]
         energies = [
-            self.calculator.calculate(structure=deformed_structure)["energy"] for deformed_structure in deformed_structures
+            reference_energy if delta == 0 else self.calculator.calculate(structure=deformed_structure)["energy"]
+            for delta, deformed_structure in uniform_distorted_structures.items()
         ]
         return self._fit_eos(volumes, energies)
 
     def _get_tetragonal_shear_modulus(
-        self, orthorhombic_distorted_structures: dict[float, Structure], initial_volume: float
+        self,
+        orthorhombic_distorted_structures: dict[float, Structure],
+        initial_volume: float,
+        reference_energy: float,
     ) -> float:
         """Calculates the tetragonal shear modulus from orthorhombic distortions.
 
@@ -203,32 +205,41 @@ class CubicElasticConstantsAnalyzer(BaseAnalyzer):
             orthorhombic_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to
                 orthorhombically distorted structures.
             initial_volume (float): The initial volume of the undeformed structure.
+            reference_energy (float): The energy of the undeformed (delta=0) structure, reused instead of
+                recomputing it for the delta=0 entry.
 
         Returns:
             float: The tetragonal shear modulus in GPa.
         """
         deltas = list(orthorhombic_distorted_structures.keys())
         energies = [
-            self.calculator.calculate(structure=deformed_structure)["energy"]
-            for deformed_structure in orthorhombic_distorted_structures.values()
+            reference_energy if delta == 0 else self.calculator.calculate(structure=deformed_structure)["energy"]
+            for delta, deformed_structure in orthorhombic_distorted_structures.items()
         ]
         return EV_A3_TO_GPA * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 
-    def _get_shear_modulus(self, monoclinic_distorted_structures: dict[float, Structure], initial_volume: float) -> float:
+    def _get_shear_modulus(
+        self,
+        monoclinic_distorted_structures: dict[float, Structure],
+        initial_volume: float,
+        reference_energy: float,
+    ) -> float:
         """Calculates the shear modulus from monoclinic distortions.
 
         Args:
             monoclinic_distorted_structures (dict[float, Structure]): Dictionary mapping delta values to
                 monoclinically distorted structures.
             initial_volume (float): The initial volume of the undeformed structure.
+            reference_energy (float): The energy of the undeformed (delta=0) structure, reused instead of
+                recomputing it for the delta=0 entry.
 
         Returns:
             float: The shear modulus in GPa.
         """
         deltas = list(monoclinic_distorted_structures.keys())
         energies = [
-            self.calculator.calculate(structure=deformed_structure)["energy"]
-            for deformed_structure in monoclinic_distorted_structures.values()
+            reference_energy if delta == 0 else self.calculator.calculate(structure=deformed_structure)["energy"]
+            for delta, deformed_structure in monoclinic_distorted_structures.items()
         ]
         return EV_A3_TO_GPA * (self._fit_poly(deltas, energies) / (2 * initial_volume))
 

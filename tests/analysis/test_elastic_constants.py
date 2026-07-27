@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import pytest
 from ase import Atoms
 from ase.cell import Cell
@@ -81,6 +83,7 @@ def test_calculate_returns_moduli(result) -> None:
         "voigt_reuss_hill_shear_modulus",
         "poisson_ratio",
         "pugh_ratio",
+        "chen_vickers_hardness",
     ):
         assert key in result
 
@@ -89,3 +92,18 @@ def test_calculate_returns_moduli(result) -> None:
 def test_bulk_modulus_positive(result) -> None:
     """Voigt bulk modulus should be positive for BCC Fe."""
     assert result["voigt_bulk_modulus"] > 0
+
+
+@pytest.mark.integration
+def test_chen_vickers_hardness_matches_formula(result) -> None:
+    """chen_vickers_hardness follows Hv = 2 * (k^2 * G)^0.585 - 3 for the returned Pugh ratio and G_VRH.
+
+    The Chen model is only defined for a positive k^2 * G; for a mechanically unstable fit (negative
+    shear modulus) it legitimately evaluates to NaN, so that case is asserted explicitly rather than
+    compared with pytest.approx (which treats NaN as never equal by default).
+    """
+    base = result["pugh_ratio"] ** 2 * result["voigt_reuss_hill_shear_modulus"]
+    if base < 0:
+        assert math.isnan(result["chen_vickers_hardness"])
+    else:
+        assert result["chen_vickers_hardness"] == pytest.approx(2.0 * base**0.585 - 3.0)
