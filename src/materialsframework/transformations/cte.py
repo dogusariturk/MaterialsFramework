@@ -1,13 +1,13 @@
-"""Generates structures and tasks for coefficient of thermal expansion (CTE) workflows.
+"""Generates per-temperature structure copies for coefficient of thermal expansion (CTE) workflows.
 
-Prepares per-temperature structure/task inputs consumed by MD sampling to estimate the
-volumetric CTE from temperature-dependent equilibrium volumes.
+Prepares the per-temperature structure inputs consumed by MD sampling to estimate the volumetric
+CTE from temperature-dependent equilibrium volumes.
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -22,65 +22,30 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class CTETransformation:
-    """Build per-temperature structure/task inputs for CTE analysis."""
+    """Copies the input structure once per requested temperature for CTE analysis."""
 
-    def __init__(
-        self,
-        ensemble: str = "npt_berendsen",
-        pressure: float = 1.0,
-    ) -> None:
-        """Initialize the transformation object.
+    def __init__(self, temperatures: Sequence[float]) -> None:
+        """Initializes the transformation object.
 
         Args:
-            ensemble (str, optional): Requested MD ensemble label. Defaults to "npt_berendsen".
-            pressure (float, optional): Target pressure value in atm. Defaults to 1.0.
-        """
-        self.ensemble = ensemble
-        self.pressure = pressure
+            temperatures (Sequence[float]): Target temperatures in Kelvin.
 
-    def apply_transformation(
-        self,
-        structure: Structure | Atoms,
-        temperatures: Sequence[float],
-        steps: int = 10000,
-    ) -> dict[str, Any]:
-        """Prepare structures and task metadata for each target temperature.
+        Raises:
+            ValueError: If temperatures are empty, non-numeric, non-finite, or non-positive.
+        """
+        self._temperatures = self._validate_temperatures(temperatures)
+
+    def apply_transformation(self, structure: Structure | Atoms) -> dict[float, Structure]:
+        """Generate one structure copy per target temperature.
 
         Args:
             structure (Structure | Atoms): Input structure for MD sampling.
-            temperatures (Sequence[float]): Target temperatures in Kelvin.
-            steps (int, optional): Number of MD steps per temperature. Defaults to 10000.
-
-        Raises:
-            ValueError: If temperatures are invalid or steps is non-positive.
 
         Returns:
-            Dictionary with keys:
-                - ``structures``: Mapping of temperature (K) to a copy of the input structure.
-                - ``tasks``: Per-temperature MD task metadata (temperature, steps, ensemble, pressure).
+            dict[float, Structure]: Mapping of temperature (K) to a copy of the input structure.
         """
-        validated_temperatures = self._validate_temperatures(temperatures)
-        if steps <= 0:
-            raise ValueError("steps must be a positive integer.")
-
         structure = to_structure(structure)
-
-        structures: dict[float, Structure] = {}
-        tasks: list[dict[str, Any]] = []
-
-        for temperature in validated_temperatures:
-            temperature_value = float(temperature)
-            structures[temperature_value] = structure.copy()
-            tasks.append(
-                {
-                    "temperature": temperature_value,
-                    "steps": int(steps),
-                    "ensemble": self.ensemble,
-                    "pressure": float(self.pressure),
-                }
-            )
-
-        return {"structures": structures, "tasks": tasks}
+        return {temperature: structure.copy() for temperature in self._temperatures}
 
     @staticmethod
     def _validate_temperatures(temperatures: Sequence[float]) -> list[float]:
