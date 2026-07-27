@@ -27,10 +27,9 @@ from ase.md.velocitydistribution import (
     ZeroRotation,
     thermalize_momenta,
 )
-from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.tools.trajectory import TrajectoryObserver
-from materialsframework.utils import to_atoms
+from materialsframework.utils import to_atoms, to_structure
 
 if TYPE_CHECKING:
     from typing import Any
@@ -157,7 +156,6 @@ class BaseMDCalculator(ABC):
         self.logfile: str | None = logfile
         self.loginterval: int = loginterval
         self.interval: int = interval
-        self.ase_adaptor = AseAtomsAdaptor()
 
         super().__init__(**kwargs)
 
@@ -468,7 +466,7 @@ class BaseMDCalculator(ABC):
             "stresses": trajectory.stresses,
             "temperature": trajectory.temperatures,
             "velocities": trajectory.velocities,
-            "final_structure": self.ase_adaptor.get_structure(dyn.atoms),
+            "final_structure": to_structure(dyn.atoms),
         }
 
     def _initialize_logger(self, dyn, ase_atoms, logfile: str) -> None:

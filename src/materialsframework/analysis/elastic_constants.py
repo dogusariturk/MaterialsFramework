@@ -19,7 +19,7 @@ from materialsframework.tools import elastic
 from materialsframework.transformations.elastic_constants import (
     ElasticConstantsDeformationTransformation,
 )
-from materialsframework.utils import lazy_property
+from materialsframework.utils import lazy_property, to_atoms
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -109,7 +109,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
             ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
         """
         structure = self._ensure_relaxed(structure, is_relaxed)
-        structure = structure.to_ase_atoms(msonable=False)
+        structure = to_atoms(structure)
 
         prev_relax_cell = self.calculator.relax_cell
         self.calculator.relax_cell = False

@@ -17,10 +17,9 @@ from ase.constraints import FixAtoms, FixSymmetry
 from ase.filters import FrechetCellFilter
 from ase.optimize import BFGS, FIRE, LBFGS, BFGSLineSearch, LBFGSLineSearch, MDMin
 from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
-from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.tools.trajectory import TrajectoryObserver
-from materialsframework.utils import to_atoms
+from materialsframework.utils import to_atoms, to_structure
 
 if TYPE_CHECKING:
     from typing import Any
@@ -74,7 +73,6 @@ class BaseCalculator(ABC):
         fix_atoms (bool): Whether to fix the positions of atoms during relaxation.
         hydrostatic_strain (bool): Whether to apply hydrostatic strain during relaxation.
         sym_prec (float): Symmetry precision used when applying symmetry constraints.
-        ase_adaptor (AseAtomsAdaptor): Pymatgen-ASE converter for structure handling.
         traj_file (str or None): Path to the trajectory file where the relaxation path will be saved.
         interval (int): Frequency of recording trajectory steps.
         verbose (bool): If True, prints detailed output during relaxation.
@@ -146,7 +144,6 @@ class BaseCalculator(ABC):
         self.fix_atoms = fix_atoms
         self.hydrostatic_strain = hydrostatic_strain
         self.sym_prec = symprec
-        self.ase_adaptor = AseAtomsAdaptor()
         self.traj_file = traj_file
         self.interval = interval
         self.verbose = verbose
@@ -242,7 +239,7 @@ class BaseCalculator(ABC):
             atoms = atoms.atoms
 
         out_dict = {
-            "final_structure": self.ase_adaptor.get_structure(atoms),
+            "final_structure": to_structure(atoms),
             "trajectory": obs,
         }
 
@@ -287,7 +284,7 @@ class BaseCalculator(ABC):
         )
 
         out_dict = {
-            "final_structure": self.ase_adaptor.get_structure(atoms),
+            "final_structure": to_structure(atoms),
         }
 
         out_dict.update({prop: self.calculator.results[prop] for prop in self.AVAILABLE_PROPERTIES})

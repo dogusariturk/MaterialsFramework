@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from pymatgen.io.ase import AseAtomsAdaptor
 
 from materialsframework.transformations.h_solubility import HSolubilityTransformation
+from materialsframework.utils import to_atoms
 
 
 def test_init() -> None:
@@ -31,7 +31,7 @@ def test_apply_transformation_returns_octahedral_and_tetrahedral(bcc_fe) -> None
 
 def test_apply_transformation_accepts_ase_atoms(bcc_fe) -> None:
     """apply_transformation accepts ASE Atoms inputs."""
-    ase_bcc_fe = AseAtomsAdaptor.get_atoms(bcc_fe)
+    ase_bcc_fe = to_atoms(bcc_fe)
     t = HSolubilityTransformation()
     result = t.apply_transformation(ase_bcc_fe, site_types=("octahedral",))
 

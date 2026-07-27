@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from pymatgen.core import Structure
 
 from materialsframework.tools import elastic
+from materialsframework.utils import to_atoms
 
 if TYPE_CHECKING:
     from ase import Atoms
@@ -41,6 +42,6 @@ class ElasticConstantsDeformationTransformation:
             list[Atoms]: The distorted structures generated from the deformation transformation.
         """
         if isinstance(structure, Structure):
-            structure = structure.to_ase_atoms()
+            structure = to_atoms(structure)
 
         return elastic.get_elementary_deformations(cryst=structure, n=self.num_deform, d=self.max_deform)

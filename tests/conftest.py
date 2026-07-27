@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 import pytest
 from pymatgen.core import Lattice, Structure
 
+from materialsframework.utils import to_atoms
+
 if TYPE_CHECKING:
     from ase import Atoms
 
@@ -48,10 +50,10 @@ def l10_feni() -> Structure:
 @pytest.fixture(scope="session")
 def ase_bcc_fe(bcc_fe) -> Atoms:
     """ASE Atoms version of the BCC Fe structure."""
-    return bcc_fe.to_ase_atoms(msonable=False)
+    return to_atoms(bcc_fe)
 
 
 @pytest.fixture(scope="session")
 def ase_l10_feni(l10_feni) -> Atoms:
     """ASE Atoms version of the L1_0 FeNi structure."""
-    return l10_feni.to_ase_atoms(msonable=False)
+    return to_atoms(l10_feni)

@@ -115,15 +115,18 @@ def to_structure(structure: Atoms | Structure) -> Structure:
     return structure
 
 
-def to_atoms(structure: Atoms | Structure | Molecule) -> Atoms:
+def to_atoms(structure: Atoms | Structure | Molecule, msonable: bool = False) -> Atoms:
     """Converts a pymatgen `Structure`/`Molecule` input to `ase.Atoms`, copying an `Atoms` input unchanged.
 
     Args:
         structure (Atoms | Structure | Molecule): The input structure.
+        msonable (bool, optional): Whether the returned `Atoms` should be an MSONable `MSONAtoms`
+            instance instead of a plain `ase.Atoms`. Ignored if `structure` is already `Atoms`.
+            Defaults to False.
 
     Returns:
         Atoms: The structure as an `ase.Atoms` object.
     """
     if isinstance(structure, Atoms):
         return structure.copy()
-    return AseAtomsAdaptor().get_atoms(structure)
+    return AseAtomsAdaptor().get_atoms(structure, msonable=msonable)  # ty: ignore[invalid-return-type]

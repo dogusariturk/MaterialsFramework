@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Literal
 
 from ase.db.sqlite import SQLite3Database
 
-from materialsframework.utils import default_calculator, requires
+from materialsframework.utils import default_calculator, requires, to_atoms
 
 if TYPE_CHECKING:
     from ase import Atoms
@@ -141,7 +141,7 @@ class ClusterExpansion:
                 result = self.calculator.calculate(structure) if self.is_relaxed else self.calculator.relax(structure)
 
                 self.structure_container.add_structure(
-                    structure=result["final_structure"].to_ase_atoms(msonable=False),
+                    structure=to_atoms(result["final_structure"]),
                     properties={prop: result.get(prop) for prop in properties},
                 )
 
