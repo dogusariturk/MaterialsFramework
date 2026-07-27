@@ -24,6 +24,7 @@ _ANALYZER_MAP: dict[str, tuple[str, str]] = {
     "NEBAnalyzer": ("materialsframework.analysis.neb", "NEBAnalyzer"),
     "Phono3pyAnalyzer": ("materialsframework.analysis.phono3py", "Phono3pyAnalyzer"),
     "PhonopyAnalyzer": ("materialsframework.analysis.phonopy", "PhonopyAnalyzer"),
+    "SurfaceAnalyzer": ("materialsframework.analysis.surface", "SurfaceAnalyzer"),
     "USFEAnalyzer": ("materialsframework.analysis.usfe", "USFEAnalyzer"),
 }
 

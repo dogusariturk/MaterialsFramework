@@ -42,6 +42,7 @@ _TRANSFORMATION_MAP: dict[str, tuple[str, str]] = {
         "materialsframework.transformations.phonopy",
         "PhonopyDisplacementTransformation",
     ),
+    "SurfaceTransformation": ("materialsframework.transformations.surface", "SurfaceTransformation"),
     "USFETransformation": ("materialsframework.transformations.usfe", "USFETransformation"),
 }
 
