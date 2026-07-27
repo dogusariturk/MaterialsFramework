@@ -1,6 +1,6 @@
 # Molecular Dynamics
 
-The `run()` method on any calculator performs molecular dynamics using ASE integrators. Four ensembles are supported: NVE, NVT (Nosé–Hoover), NPT (Nosé–Hoover / Berendsen), and inhomogeneous NPT Berendsen.
+The `run()` method on any calculator performs molecular dynamics using ASE integrators. Five ensembles are supported: NVE, NVT (Nosé–Hoover / Langevin), NPT (Nosé–Hoover / Berendsen), and inhomogeneous NPT Berendsen.
 
 ## Basic NVT Example
 
@@ -28,9 +28,10 @@ print(res["total_energy"])
 |-----------------|-------------|
 | `"nve"` | Microcanonical (constant N, V, E) |
 | `"nvt_nose_hoover"` | Canonical via Nosé–Hoover thermostat |
+| `"langevin"` | Canonical via Langevin (friction + stochastic force) thermostat |
 | `"npt_nose_hoover"` | Isothermal-isobaric via Nosé–Hoover |
 | `"npt_berendsen"` | NPT with Berendsen barostat |
-| `"npt_inhomogeneous_berendsen"` | Inhomogeneous NPT Berendsen |
+| `"inhomogeneous_npt_berendsen"` | Inhomogeneous NPT Berendsen |
 
 ```python
 # NPT example

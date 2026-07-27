@@ -1,9 +1,9 @@
 """This module provides the `BaseMDCalculator` class for Molecular Dynamics simulations.
 
 `BaseMDCalculator` sets up and runs MD simulations with different ensembles, including NVE,
-NVT (Nose-Hoover), NPT (Nose-Hoover), NPT (Berendsen), and Inhomogeneous NPT (Berendsen). It
-handles advanced MD settings such as velocity initialization, pressure control, and symmetry
-constraints.
+NVT (Nose-Hoover), NVT (Langevin), NPT (Nose-Hoover), NPT (Berendsen), and Inhomogeneous NPT
+(Berendsen). It handles advanced MD settings such as velocity initialization, pressure control,
+and symmetry constraints.
 """
 
 from __future__ import annotations
@@ -14,7 +14,8 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 from ase import units
 from ase.md import MDLogger, VelocityVerlet
-from ase.md.npt import NPT
+from ase.md.langevin import Langevin
+from ase.md.melchionna import MelchionnaNPT
 from ase.md.nptberendsen import Inhomogeneous_NPTBerendsen, NPTBerendsen
 from ase.md.velocitydistribution import (
     Stationary,
@@ -50,6 +51,7 @@ class BaseMDCalculator(ABC):
         ensemble: Literal[
             "nve",
             "nvt_nose_hoover",
+            "langevin",
             "npt_nose_hoover",
             "npt_berendsen",
             "inhomogeneous_npt_berendsen",
@@ -59,6 +61,7 @@ class BaseMDCalculator(ABC):
         pressure: float = 1,  # atm
         ttime: float = 10.0,  # fs
         pfactor: float = 75.0**2.0,  # fs ** 2
+        friction: float = 0.01,  # fs^-1
         taut: float = 0.5e3,  # fs
         taup: float = 1e3,  # fs
         compressibility: float = 5e-7,  # 1/bar
@@ -80,6 +83,7 @@ class BaseMDCalculator(ABC):
             pressure (float, optional): The pressure in atmospheres (atm) for the NPT ensemble. Defaults to 1 atm.
             ttime (float, optional): The time constant for temperature control in femtoseconds (fs). Defaults to 10.0 fs.
             pfactor (float, optional): Pressure factor for the NPT ensemble in fs^2. Defaults to 75.0^2 fs^2.
+            friction (float, optional): Friction coefficient for the Langevin thermostat, in fs^-1. Defaults to 0.01 fs^-1.
             taut (float, optional): Time constant for Berendsen temperature coupling in fs. Defaults to 0.5e3 fs.
             taup (float, optional): Time constant for Berendsen pressure coupling in fs. Defaults to 1e3 fs.
             compressibility (float, optional): Compressibility for the NPT ensemble in 1/bar. Defaults to 5e-7 1/bar.
@@ -99,12 +103,14 @@ class BaseMDCalculator(ABC):
         if ensemble not in [
             "nve",
             "nvt_nose_hoover",
+            "langevin",
             "npt_nose_hoover",
             "npt_berendsen",
             "inhomogeneous_npt_berendsen",
         ]:
             raise ValueError(
-                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'npt_nose_hoover', 'npt_berendsen', or 'inhomogeneous_npt_berendsen'."
+                "Ensemble must be one of 'nve', 'nvt_nose_hoover', 'langevin', 'npt_nose_hoover', 'npt_berendsen', "
+                "or 'inhomogeneous_npt_berendsen'."
             )
 
         self.ensemble: str = ensemble
@@ -112,6 +118,7 @@ class BaseMDCalculator(ABC):
         self.temperature: float = temperature
         self.pressure: float = pressure
         self.pfactor: float = pfactor
+        self.friction: float = friction
         self.taut: float = taut
         self.taup: float = taup
         self.compressibility: float = compressibility
@@ -145,17 +152,17 @@ class BaseMDCalculator(ABC):
             "Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance."
         )
 
-    def _initialize_npt_nose_hoover(self, ase_atoms: Atoms) -> NPT:
+    def _initialize_npt_nose_hoover(self, ase_atoms: Atoms) -> MelchionnaNPT:
         """Initializes the NPT Nose-Hoover ensemble for MD simulations.
 
         Args:
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
 
         Returns:
-            NPT: The initialized NPT dynamics object.
+            MelchionnaNPT: The initialized NPT dynamics object.
         """
         self._upper_triangular_cell(ase_atoms)
-        return NPT(
+        return MelchionnaNPT(
             atoms=ase_atoms,
             timestep=self.timestep * units.fs,
             temperature_K=self.temperature,
@@ -164,22 +171,39 @@ class BaseMDCalculator(ABC):
             pfactor=self.pfactor * units.fs**2,
         )
 
-    def _initialize_nvt_nose_hoover(self, ase_atoms: Atoms) -> NPT:
+    def _initialize_nvt_nose_hoover(self, ase_atoms: Atoms) -> MelchionnaNPT:
         """Initializes the NVT Nose-Hoover ensemble for MD simulations.
 
         Args:
             ase_atoms (Atoms): The ASE atoms object used in the simulation.
 
         Returns:
-            NPT: The initialized NPT dynamics object.
+            MelchionnaNPT: The initialized NPT dynamics object.
         """
         self._upper_triangular_cell(ase_atoms)
-        return NPT(
+        return MelchionnaNPT(
             atoms=ase_atoms,
             timestep=self.timestep * units.fs,
             temperature_K=self.temperature,
             ttime=self.ttime * units.fs,
             pfactor=None,
+        )
+
+    def _initialize_langevin(self, ase_atoms: Atoms) -> Langevin:
+        """Initializes the Langevin NVT ensemble for MD simulations.
+
+        Args:
+            ase_atoms (Atoms): The ASE atoms object used in the simulation.
+
+        Returns:
+            Langevin: The initialized Langevin dynamics object.
+        """
+        return Langevin(
+            atoms=ase_atoms,
+            timestep=self.timestep * units.fs,
+            temperature_K=self.temperature,
+            friction=self.friction / units.fs,
+            fixcm=False,
         )
 
     def _initialize_nve(self, ase_atoms: Atoms) -> VelocityVerlet:
@@ -268,6 +292,8 @@ class BaseMDCalculator(ABC):
             dyn = self._initialize_npt_nose_hoover(ase_atoms)
         elif self.ensemble.lower() == "nvt_nose_hoover":
             dyn = self._initialize_nvt_nose_hoover(ase_atoms)
+        elif self.ensemble.lower() == "langevin":
+            dyn = self._initialize_langevin(ase_atoms)
         elif self.ensemble.lower() == "nve":
             dyn = self._initialize_nve(ase_atoms)
         elif self.ensemble.lower() == "npt_berendsen":
@@ -320,7 +346,7 @@ class BaseMDCalculator(ABC):
         Note:
             This method is adapted from the matgl code.
         """
-        if not NPT._isuppertriangular(atoms.get_cell()):
+        if not MelchionnaNPT._isuppertriangular(atoms.get_cell()):
             a, b, c, alpha, beta, gamma = atoms.cell.cellpar()
             angles = np.radians((alpha, beta, gamma))
             sin_a, sin_b, _sin_g = np.sin(angles)
