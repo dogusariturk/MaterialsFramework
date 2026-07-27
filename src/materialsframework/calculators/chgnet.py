@@ -43,7 +43,7 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
 
         Args:
             model (str, optional): The CHGNet model to use. Defaults to "0.3.0".
-            stress_weight (float, optional): Conversion factor for stress from GPa to eV/Å³. Defaults to 1 / 160.21766208.
+            stress_weight (float, optional): Conversion factor for stress from GPa to eV/A^3. Defaults to 1 / 160.21766208.
             include_magmoms (bool, optional): Whether to include magnetic moments in the model. Defaults to False.
             on_isolated_atoms (Literal["ignore", "warn", "error"], optional): Behavior when isolated atoms are
                 detected. Defaults to "warn".

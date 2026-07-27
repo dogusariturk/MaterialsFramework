@@ -21,7 +21,7 @@ class EquFlashCalculator(BaseCalculator, BaseMDCalculator):
     EquFlash and EquFlashV2 are the MLFF architectures shipped by the `GGNN` package, built on `fairchem-core`
     with e3nn Clebsch-Gordan tensor products accelerated via cuequivariance/FlashTP. `GGNN` publishes pretrained
     checkpoints ("equflash-OAM", "equflash-OMat24", "equflashv2-OAM", "equflashv2-OMat24") that must be downloaded
-    manually and passed as `model` — see https://github.com/SamsungDS/GGNN#checkpoints for download links.
+    manually and passed as `model`. See https://github.com/SamsungDS/GGNN#checkpoints for download links.
 
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",

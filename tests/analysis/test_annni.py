@@ -13,7 +13,7 @@ from materialsframework.transformations.annni import ANNNIStackingFaultTransform
 class _SmallANNNITransformation(ANNNIStackingFaultTransformation):
     """ANNNI transformation that always uses minimal supercells for fast testing.
 
-    fcc_prim (2,1,1) → 2 atoms; hcp (1,1,1) → 2 atoms; dhcp (1,1,1) → 4 atoms.
+    fcc_prim (2,1,1) gives 2 atoms; hcp (1,1,1) gives 2 atoms; dhcp (1,1,1) gives 4 atoms.
     All sizes are large enough to accommodate a binary 50/50 composition.
     """
 

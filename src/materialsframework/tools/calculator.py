@@ -43,7 +43,7 @@ class OPTIMIZERS(Enum):
         bfgs (BFGS): BFGS optimization method.
         bfgslinesearch (BFGSLineSearch): BFGS with line search optimization.
         fire (FIRE): Fast Inertial Relaxation Engine (FIRE) optimizer.
-        lbfgs (LBFGS): Limited-memory Broyden–Fletcher–Goldfarb–Shanno optimizer.
+        lbfgs (LBFGS): Limited-memory Broyden-Fletcher-Goldfarb-Shanno optimizer.
         lbfgslinesearch (LBFGSLineSearch): LBFGS with line search optimization.
         mdmin (MDMin): Molecular dynamics minimization.
         scipyfminbfgs (SciPyFminBFGS): BFGS optimization using SciPy.

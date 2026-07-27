@@ -247,7 +247,7 @@ class BaseMDCalculator(ABC):
                 - ``total_energy``: Total energies at each recorded MD step (eV).
                 - ``potential_energy``: Potential energies at each recorded MD step (eV).
                 - ``kinetic_energy``: Kinetic energies at each recorded MD step (eV).
-                - ``forces``: Force arrays at each recorded MD step (eV/Å).
+                - ``forces``: Force arrays at each recorded MD step (eV/A).
                 - ``stresses``: Stress tensors at each recorded MD step.
                 - ``temperature``: Temperatures at each recorded MD step (K).
                 - ``velocities``: Velocity arrays at each recorded MD step.

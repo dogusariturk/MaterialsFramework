@@ -80,10 +80,10 @@ class EOSAnalyzer(BaseAnalyzer):
                 - ``volumes``: Volume for each deformed structure.
                 - ``energies``: Potential energy for each deformed structure.
                 - ``e0``: Minimum energy from EOS fit.
-                - ``b0``: Bulk modulus in eV/Å³.
+                - ``b0``: Bulk modulus in eV/A^3.
                 - ``b0_GPa``: Bulk modulus in GPa.
                 - ``b1``: Pressure derivative of bulk modulus.
-                - ``v0``: Equilibrium volume in Å³.
+                - ``v0``: Equilibrium volume in A^3.
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' property implemented.

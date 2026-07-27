@@ -17,7 +17,7 @@ from materialsframework.tools.cahn_hilliard import SimulationGrid
 
 
 def test_simulation_grid_default_shape() -> None:
-    """Default SimulationGrid has 128×128 phi field."""
+    """Default SimulationGrid has 128x128 phi field."""
     grid = SimulationGrid()
     assert grid.phi.shape == (128, 128)
 

@@ -56,7 +56,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         "triclinic": [],
     }
 
-    SPECIAL = {"hexagonal", "trigonal"}  # need C66 = ½(C11–C12)
+    SPECIAL = {"hexagonal", "trigonal"}  # need C66 = 1/2(C11-C12)
 
     def __init__(
         self,

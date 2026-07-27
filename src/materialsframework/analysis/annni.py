@@ -61,8 +61,8 @@ class ANNNIStackingFaultAnalyzer(BaseAnalyzer):
 
         Returns:
             dict[str, float]: Dictionary with keys:
-                - ``isfe``: Intrinsic stacking fault energy (eV/Å²).
-                - ``esfe``: Extrinsic stacking fault energy (eV/Å²).
+                - ``isfe``: Intrinsic stacking fault energy (eV/A^2).
+                - ``esfe``: Extrinsic stacking fault energy (eV/A^2).
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' property implemented.

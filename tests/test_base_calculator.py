@@ -44,7 +44,7 @@ def test_relax_returns_final_structure(calc: RandomCalculator, bcc_fe: Structure
 
 
 def test_default_fmax() -> None:
-    """Default fmax is 0.1 eV/Å."""
+    """Default fmax is 0.1 eV/A."""
     calc = RandomCalculator()
     assert calc.fmax == pytest.approx(0.1)
 

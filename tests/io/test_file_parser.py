@@ -15,11 +15,6 @@ def parser() -> FileParser:
     return FileParser()
 
 
-# ---------------------------------------------------------------------------
-# Initialisation
-# ---------------------------------------------------------------------------
-
-
 def test_element_list_starts_with_hydrogen(parser: FileParser) -> None:
     """Element list starts with H (Z=1)."""
     assert parser._element_list[0] == "H"
@@ -33,11 +28,6 @@ def test_element_list_ends_with_no102(parser: FileParser) -> None:
 def test_element_list_length(parser: FileParser) -> None:
     """Element list contains exactly 102 symbols."""
     assert len(parser._element_list) == 102
-
-
-# ---------------------------------------------------------------------------
-# _process_dataframe
-# ---------------------------------------------------------------------------
 
 
 def test_process_dataframe_adds_composition_column(parser: FileParser) -> None:
@@ -93,11 +83,6 @@ def test_process_dataframe_no_element_columns_gives_only_composition(parser: Fil
     result = parser._process_dataframe(df)
     assert list(result.columns) == ["Composition"]
     assert len(result) == 1
-
-
-# ---------------------------------------------------------------------------
-# parse — CSV
-# ---------------------------------------------------------------------------
 
 
 def test_parse_csv(parser: FileParser, tmp_path) -> None:

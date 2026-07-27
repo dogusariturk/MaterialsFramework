@@ -1,6 +1,6 @@
 """Integration tests for MEGNetCalculator.
 
-MEGNetCalculator predicts formation energy only — it does not support
+MEGNetCalculator predicts formation energy only. It does not support
 relax() or calculate() in the same way as force-field calculators.
 """
 

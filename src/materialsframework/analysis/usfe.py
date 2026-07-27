@@ -66,9 +66,7 @@ class USFEAnalyzer(BaseAnalyzer):
 
     @require_properties("energy")
     def calculate(
-            self,
-            structure: Structure | Atoms,
-            is_relaxed: bool = False
+        self, structure: Structure | Atoms, is_relaxed: bool = False
     ) -> dict[str, str | int | float | list[dict[str, float]]]:
         """Calculates GSFE curve and USFE for a given structure.
 
@@ -79,7 +77,7 @@ class USFEAnalyzer(BaseAnalyzer):
         Returns:
             dict[str, str | int | float | list[dict[str, float]]]: Dictionary with keys:
                 - ``gsfe_curve``: GSFE samples for each displacement step.
-                - ``usfe_mJ_m2``: Maximum GSFE value (unstable stacking fault energy) in mJ/m².
+                - ``usfe_mJ_m2``: Maximum GSFE value (unstable stacking fault energy) in mJ/m^2.
                 - ``usfe_displacement_frac``: Displacement fraction at the USFE peak.
                 - ``slip_plane``: Slip plane used for displacement.
                 - ``num_steps``: Number of displacement steps used in the scan.
