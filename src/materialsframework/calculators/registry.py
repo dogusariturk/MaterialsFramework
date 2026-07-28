@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 from materialsframework._registry import make_registry
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
@@ -24,7 +26,7 @@ def list_calculators() -> list[str]:
     return _list_calculators()
 
 
-def get_calculator(name: str, **kwargs) -> BaseCalculator:
+def get_calculator(name: str, **kwargs: Any) -> BaseCalculator:
     """Instantiate a calculator by its registered name.
 
     Args:

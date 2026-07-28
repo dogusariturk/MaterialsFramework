@@ -11,6 +11,7 @@ from pymatgen.io.ase import AseAtomsAdaptor
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Any
 
     from pymatgen.core import Molecule, Structure
 
@@ -20,7 +21,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-def default_calculator(**kwargs) -> BaseCalculator:
+def default_calculator(**kwargs: Any) -> BaseCalculator:
     """Returns a new `M3GNetCalculator` instance, the shared default calculator across the framework.
 
     Args:

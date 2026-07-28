@@ -35,7 +35,7 @@ def make_registry(group: str, label: str) -> tuple[Callable[[], list[str]], Call
     def list_x() -> list[str]:
         return sorted(ep.name for ep in entry_points(group=group))
 
-    def get_x(name: str, **kwargs) -> Any:
+    def get_x(name: str, **kwargs: Any) -> Any:
         eps = {ep.name: ep for ep in entry_points(group=group)}
         if name not in eps:
             raise ValueError(f"Unknown {label} {name!r}. Available: {', '.join(sorted(eps))}")

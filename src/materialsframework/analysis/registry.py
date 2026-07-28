@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 from materialsframework._registry import make_registry
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from materialsframework.analysis.base import BaseAnalyzer
 
 __author__ = "Doguhan Sariturk"
@@ -24,7 +26,7 @@ def list_analyzers() -> list[str]:
     return _list_analyzers()
 
 
-def get_analyzer(name: str, **kwargs) -> BaseAnalyzer:
+def get_analyzer(name: str, **kwargs: Any) -> BaseAnalyzer:
     """Instantiate an analyzer by its registered name.
 
     Args:

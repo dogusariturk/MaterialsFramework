@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING
 from materialsframework.utils import default_calculator, lazy_property, to_structure
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from ase import Atoms
     from pymatgen.core import Structure
 
@@ -72,7 +74,7 @@ class BaseAnalyzer(ABC):
         return structure
 
     @abstractmethod
-    def calculate(self, *args, **kwargs) -> dict:
+    def calculate(self, *args: Any, **kwargs: Any) -> dict:
         """Runs the analysis and returns its results.
 
         Returns:

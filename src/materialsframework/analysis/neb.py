@@ -8,7 +8,7 @@ climbing image, and periodic boundary conditions.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from ase.mep import NEB, NEBTools
 
@@ -96,7 +96,7 @@ class NEBAnalyzer(BaseAnalyzer):
         initial_structure: Structure | Atoms,
         final_structure: Structure | Atoms,
         is_relaxed: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> dict[str, list[Structure] | list[float] | float | bool]:
         """Calculates the minimum energy path (MEP) between two structures.
 
@@ -164,7 +164,7 @@ class NEBAnalyzer(BaseAnalyzer):
             "converged": converged,
         }
 
-    def _run_optimizer(self, **kwargs) -> bool:
+    def _run_optimizer(self, **kwargs: Any) -> bool:
         """Runs the calculator's optimizer on `self.neb` until convergence or the step limit.
 
         Args:

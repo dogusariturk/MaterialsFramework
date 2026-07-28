@@ -24,7 +24,7 @@ def list_tools() -> list[str]:
     return _list_tools()
 
 
-def get_tool(name: str, **kwargs) -> Any:
+def get_tool(name: str, **kwargs: Any) -> Any:
     """Instantiate a tool by its registered name.
 
     Args:

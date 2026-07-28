@@ -24,7 +24,7 @@ def list_transformations() -> list[str]:
     return _list_transformations()
 
 
-def get_transformation(name: str, **kwargs) -> Any:
+def get_transformation(name: str, **kwargs: Any) -> Any:
     """Instantiate a transformation by its registered name.
 
     Args:

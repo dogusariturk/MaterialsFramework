@@ -76,7 +76,7 @@ class PhonopyDisplacementTransformation:
         return {"phonon": phonon, "displaced_structures": displaced_structures, "displacements": displacements}
 
     @requires("phonopy", extra="phonopy")
-    def _get_displaced_structures(self, phonon: Phonopy, distance: float = 0.01, **kwargs) -> list[Structure]:
+    def _get_displaced_structures(self, phonon: Phonopy, distance: float = 0.01, **kwargs: Any) -> list[Structure]:
         """Generate displaced structures using Phonopy.
 
         Args:
