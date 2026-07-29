@@ -4,10 +4,11 @@ version = "0.12.0"
 description = "A modular Python framework for deploying, benchmarking, and experimenting with machine learning interatomic potentials (MLIPs)"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 authors = [
     { name = "Doguhan Sariturk", email = "doguhan.sariturk@gmail.com" },
 ]
-license = { text = "GPL-3.0-or-later" }
 classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
@@ -17,6 +18,7 @@ classifiers = [
 dependencies = [
     "ase>=3.27.0",
     "numpy>=1.24.0",
+    "openpyxl>=3.1.5",
     "pandas>=2.0.0",
     "pymatgen>=2025.10.7",
     "scipy>=1.15.0,<1.17.0",
@@ -37,30 +39,31 @@ docs = [
 ]
 plots     = ["matplotlib>=3.9.0"]
 phonopy   = ["phonopy>=3.1.0"]
-phono3py  = ["phono3py>=3.28.0"]
+phono3py  = ["phono3py>=4.0.0"]
 sqsgen    = ["sqsgenerator>=0.5.4"]
-calphad   = ["pycalphad>=0.11.1", "pandarallel>=1.6.5"]
+calphad   = ["pycalphad>=0.11.1"]
 ce        = ["icet>=3.2", "trainstation>=1.2"]
 alignn    = ["alignn>=2025.4.1"]
-alphanet  = ["alphanet @ git+https://github.com/zmyybc/AlphaNet.git@v0.1.2"]
+allegro   = ["nequip-allegro>=0.8.3"]
+alphanet  = ["msc-alphanet>=0.1.3"]
 chgnet    = ["chgnet>=0.4.2"]
 deepmd    = ["deepmd-kit[torch]>=3.1.2"]
-eqnorm    = ["eqnorm @ git+https://github.com/yzchen08/eqnorm.git@57527db44fee9fab3fb5775dd860ca4bbe014f44"]
+eqnorm    = ["eqnorm>=0.1.1"]
 eqv2      = ["fairchem-core>=1.10.0,<2.0"]
-esen      = ["fairchem-core>=1.10.0,<2.0"]
-gptff     = ["gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git@4cef93a9aa573c86c6bb9100d3d48978ad616429"]
+esen      = ["fairchem-core>=2.0.0"]
 grace     = ["tensorpotential>=0.5.7"]
-hienet    = ["hienet @ git+https://github.com/divelab/AIRS.git@579c13340e3f2699e73bc67444d563dabd015d6c#subdirectory=OpenMat/HIENet"]
+hienet    = ["hienet>=1.0.1"]
 mace      = ["mace-torch>=0.3.15"]
 matgl     = ["matgl>=2.0.0"]
+matris    = ["matris>=0.0.1"]
 mattersim = ["mattersim>=1.2.1"]
 nequip    = ["nequip>=0.17.0"]
 nequix    = ["nequix>=0.4.3"]
 newtonnet = ["newtonnet>=2.0.0"]
 orb       = ["orb-models>=0.5.5"]
 petmad    = ["upet>=0.2.1"]
-posegnn   = []
 sevennet  = ["sevenn>=0.12.0"]
+tace      = ["TACE>=0.1.0"]
 uma       = ["fairchem-core>=2.0.0"]
 
 [project.urls]
@@ -69,65 +72,43 @@ Issues = "https://github.com/dogusariturk/MaterialsFramework/issues"
 Repository = "https://github.com/dogusariturk/MaterialsFramework.git"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.11.33,<0.12.0"]
+build-backend = "uv_build"
 
 [tool.uv]
 environments = [
   "sys_platform == 'linux' and platform_machine == 'x86_64' and implementation_name == 'cpython'",
+  "sys_platform == 'linux' and platform_machine == 'aarch64' and implementation_name == 'cpython'",
+  "sys_platform == 'darwin' and platform_machine == 'arm64' and implementation_name == 'cpython'",
 ]
 fork-strategy = "fewest"
 
 conflicts = [
+  [{ extra = "alphanet" }, { extra = "deepmd"    }],
+  [{ extra = "alphanet" }, { extra = "eqv2"      }],
+  [{ extra = "alphanet" }, { extra = "esen"      }],
+  [{ extra = "alphanet" }, { extra = "matris"    }],
+  [{ extra = "alphanet" }, { extra = "mattersim" }],
+  [{ extra = "alphanet" }, { extra = "uma"       }],
   [{ extra = "mace" }, { extra = "eqv2"      }],
   [{ extra = "mace" }, { extra = "esen"      }],
   [{ extra = "mace" }, { extra = "uma"       }],
   [{ extra = "mace" }, { extra = "nequip"    }],
   [{ extra = "mace" }, { extra = "sevennet"  }],
   [{ extra = "mace" }, { extra = "eqnorm"    }],
-  [{ extra = "mace" }, { extra = "nequix"    }],
-  [{ extra = "deepmd" }, { extra = "mace"    }],
   [{ extra = "deepmd" }, { extra = "eqv2"    }],
-  [{ extra = "deepmd" }, { extra = "esen"    }],
-  [{ extra = "deepmd" }, { extra = "uma"     }],
+  [{ extra = "eqnorm" }, { extra = "eqv2"    }],
   [{ extra = "orb" }, { extra = "eqv2"       }],
-  [{ extra = "orb" }, { extra = "esen"       }],
-  [{ extra = "orb" }, { extra = "uma"        }],
   [{ extra = "uma" }, { extra = "eqv2"       }],
-  [{ extra = "uma" }, { extra = "esen"       }],
-  [{ extra = "alignn" }, { extra = "mace"      }],
-  [{ extra = "alignn" }, { extra = "eqv2"      }],
-  [{ extra = "alignn" }, { extra = "esen"      }],
-  [{ extra = "alignn" }, { extra = "uma"       }],
-  [{ extra = "alignn" }, { extra = "orb"       }],
-  [{ extra = "alignn" }, { extra = "deepmd"    }],
-  [{ extra = "alignn" }, { extra = "chgnet"    }],
-  [{ extra = "alignn" }, { extra = "sevennet"  }],
-  [{ extra = "alignn" }, { extra = "nequip"    }],
-  [{ extra = "alignn" }, { extra = "nequix"    }],
-  [{ extra = "alignn" }, { extra = "petmad"    }],
-  [{ extra = "petmad" }, { extra = "eqv2"      }],
-  [{ extra = "petmad" }, { extra = "esen"      }],
-  [{ extra = "alignn" }, { extra = "mattersim" }],
+  [{ extra = "esen" }, { extra = "eqv2"      }],
   [{ extra = "mattersim" }, { extra = "mace"     }],
   [{ extra = "mattersim" }, { extra = "eqv2"     }],
-  [{ extra = "mattersim" }, { extra = "esen"     }],
-  [{ extra = "mattersim" }, { extra = "uma"      }],
-  [{ extra = "mattersim" }, { extra = "deepmd"   }],
-  [{ extra = "mattersim" }, { extra = "chgnet"   }],
-  [{ extra = "mattersim" }, { extra = "sevennet" }],
-  [{ extra = "mattersim" }, { extra = "nequip"   }],
-  [{ extra = "newtonnet" }, { extra = "eqv2"      }],
-  [{ extra = "newtonnet" }, { extra = "esen"      }],
   [{ extra = "newtonnet" }, { extra = "uma"       }],
-  [{ extra = "newtonnet" }, { extra = "mace"      }],
-  [{ extra = "newtonnet" }, { extra = "orb"       }],
-  [{ extra = "newtonnet" }, { extra = "deepmd"    }],
+  [{ extra = "newtonnet" }, { extra = "esen"      }],
   [{ extra = "newtonnet" }, { extra = "mattersim" }],
-  [{ extra = "newtonnet" }, { extra = "chgnet"    }],
-  [{ extra = "newtonnet" }, { extra = "sevennet"  }],
-  [{ extra = "newtonnet" }, { extra = "nequip"    }],
-  [{ extra = "newtonnet" }, { extra = "eqnorm"    }],
+  [{ extra = "eqv2" }, { extra = "matris"       }],
+  [{ extra = "newtonnet" }, { extra = "matris"    }],
+  [{ extra = "mace" }, { extra = "allegro"       }],
 ]
 
 override-dependencies = ["tensorflow<2.20"]
@@ -136,17 +117,8 @@ override-dependencies = ["tensorflow<2.20"]
 torch-scatter = ["torch"]
 torch-cluster = ["torch"]
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/materialsframework"]
-
-[tool.hatch.build.targets.sdist]
-include = ["src/materialsframework", "pyproject.toml", "README.md", "LICENSE"]
-
 [tool.ruff]
-line-length = 130
+line-length = 140
 
 [tool.ruff.lint]
 select = [
@@ -185,6 +157,9 @@ pydocstyle.convention = "google"
 [tool.ruff.format]
 docstring-code-format = true
 
+[tool.ty.rules]
+possibly-unresolved-reference = "warn"
+
 [tool.ty.environment]
 python-version = "3.12"
 
@@ -198,10 +173,12 @@ markers = [
 
 [project.entry-points."materialsframework.calculators"]
 alignn      = "materialsframework.calculators.alignn:AlignnCalculator"
+allegro     = "materialsframework.calculators.allegro:AllegroCalculator"
 alphanet    = "materialsframework.calculators.alphanet:AlphaNetCalculator"
 chgnet      = "materialsframework.calculators.chgnet:CHGNetCalculator"
 deepmd      = "materialsframework.calculators.deepmd:DeePMDCalculator"
 eqnorm      = "materialsframework.calculators.eqnorm:EqnormCalculator"
+equflash    = "materialsframework.calculators.equflash:EquFlashCalculator"
 eqv2        = "materialsframework.calculators.eqv2:EqV2Calculator"
 esen        = "materialsframework.calculators.esen:eSENCalculator"
 gptff       = "materialsframework.calculators.gptff:GPTFFCalculator"
@@ -209,6 +186,7 @@ grace       = "materialsframework.calculators.grace:GraceCalculator"
 hienet      = "materialsframework.calculators.hienet:HIENetCalculator"
 m3gnet      = "materialsframework.calculators.m3gnet:M3GNetCalculator"
 mace        = "materialsframework.calculators.mace:MACECalculator"
+matris      = "materialsframework.calculators.matris:MatRISCalculator"
 mattersim   = "materialsframework.calculators.mattersim:MatterSimCalculator"
 megnet      = "materialsframework.calculators.megnet:MEGNetCalculator"
 nequip      = "materialsframework.calculators.nequip:NequIPCalculator"
@@ -219,6 +197,7 @@ petmad      = "materialsframework.calculators.petmad:PetMadCalculator"
 posegnn     = "materialsframework.calculators.posegnn:PosEGNNCalculator"
 random      = "materialsframework.calculators.random:RandomCalculator"
 sevennet    = "materialsframework.calculators.sevennet:SevenNetCalculator"
+tace        = "materialsframework.calculators.tace:TACECalculator"
 uma         = "materialsframework.calculators.uma:UMACalculator"
 vasp        = "materialsframework.calculators.vasp:VASPCalculator"
 
@@ -231,8 +210,11 @@ elastic_constants = "materialsframework.analysis.elastic_constants:ElasticConsta
 eos              = "materialsframework.analysis.eos:EOSAnalyzer"
 formation_energy = "materialsframework.analysis.formation_energy:FormationEnergyAnalyzer"
 h_solubility     = "materialsframework.analysis.h_solubility:HSolubilityAnalyzer"
+neb              = "materialsframework.analysis.neb:NEBAnalyzer"
 phono3py         = "materialsframework.analysis.phono3py:Phono3pyAnalyzer"
 phonopy          = "materialsframework.analysis.phonopy:PhonopyAnalyzer"
+sbe              = "materialsframework.analysis.sbe:SBEAnalyzer"
+surface          = "materialsframework.analysis.surface:SurfaceAnalyzer"
 usfe             = "materialsframework.analysis.usfe:USFEAnalyzer"
 
 [project.entry-points."materialsframework.transformations"]
@@ -244,17 +226,21 @@ elastic_constants = "materialsframework.transformations.elastic_constants:Elasti
 eos              = "materialsframework.transformations.eos:EOSTransformation"
 formation_energy = "materialsframework.transformations.formation_energy:FormationEnergyTransformation"
 h_solubility     = "materialsframework.transformations.h_solubility:HSolubilityTransformation"
+neb              = "materialsframework.transformations.neb:NEBTransformation"
 phono3py         = "materialsframework.transformations.phono3py:Phono3pyDisplacementTransformation"
 phonopy          = "materialsframework.transformations.phonopy:PhonopyDisplacementTransformation"
+sbe              = "materialsframework.transformations.sbe:SBETransformation"
+surface          = "materialsframework.transformations.surface:SurfaceTransformation"
 usfe             = "materialsframework.transformations.usfe:USFETransformation"
 
 [project.entry-points."materialsframework.tools"]
-bond_lattice_parameter = "materialsframework.tools.bond_lattice_parameter:BondLatticeParameter"
-cluster_expansion      = "materialsframework.tools.cluster_expansion:ClusterExpansion"
-material_parameters    = "materialsframework.tools.cahn_hilliard:MaterialParameters"
-phase_field_model      = "materialsframework.tools.cahn_hilliard:PhaseFieldModel"
-simulation_grid        = "materialsframework.tools.cahn_hilliard:SimulationGrid"
-sqs2tdb                = "materialsframework.tools.sqs2tdb:Sqs2tdb"
-sqsgen                 = "materialsframework.tools.sqsgen:SqsGenerator"
-stability_map          = "materialsframework.tools.stability_map:StabilityMap"
-trajectory_observer    = "materialsframework.tools.trajectory:TrajectoryObserver"
+bond_lattice_parameter   = "materialsframework.tools.bond_lattice_parameter:BondLatticeParameter"
+cluster_expansion        = "materialsframework.tools.cluster_expansion:ClusterExpansion"
+coherent_stability_map   = "materialsframework.tools.stability_map:CoherentStabilityMap"
+material_parameters      = "materialsframework.tools.cahn_hilliard:MaterialParameters"
+phase_field_model        = "materialsframework.tools.cahn_hilliard:PhaseFieldModel"
+simulation_grid          = "materialsframework.tools.cahn_hilliard:SimulationGrid"
+sqs2tdb                  = "materialsframework.tools.sqs2tdb:Sqs2tdb"
+sqsgen                   = "materialsframework.tools.sqsgen:SqsGenerator"
+stability_map            = "materialsframework.tools.stability_map:StabilityMap"
+trajectory_observer      = "materialsframework.tools.trajectory:TrajectoryObserver"
