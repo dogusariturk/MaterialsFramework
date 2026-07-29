@@ -15,6 +15,7 @@ __email__ = "dogu.sariturk@gmail.com"
 _TOOLS_MAP: dict[str, tuple[str, str]] = {
     "BondLatticeParameter": ("materialsframework.tools.bond_lattice_parameter", "BondLatticeParameter"),
     "ClusterExpansion": ("materialsframework.tools.cluster_expansion", "ClusterExpansion"),
+    "CoherentStabilityMap": ("materialsframework.tools.stability_map", "CoherentStabilityMap"),
     "MaterialParameters": ("materialsframework.tools.cahn_hilliard", "MaterialParameters"),
     "PhaseFieldModel": ("materialsframework.tools.cahn_hilliard", "PhaseFieldModel"),
     "SimulationGrid": ("materialsframework.tools.cahn_hilliard", "SimulationGrid"),
