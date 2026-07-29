@@ -8,13 +8,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from pymatgen.core import Molecule, Structure
-
 from materialsframework.tools.calculator import BaseCalculator
+from materialsframework.utils import to_atoms, to_structure
 
 if TYPE_CHECKING:
     from ase import Atoms
-    from ase.calculators.calculator import Calculator
+    from ase.calculators.vasp import Vasp
+    from pymatgen.core import Molecule, Structure
 
 
 __author__ = "Doguhan Sariturk"
@@ -138,14 +138,14 @@ class VASPCalculator(BaseCalculator):
         }
         self._vasp_extra: dict[str, Any] = kwargs
 
-        self._calculator: Calculator | None = None
+        self._calculator: Vasp | None = None
 
     @property
-    def calculator(self) -> Calculator:
+    def calculator(self) -> Vasp:
         """Lazily construct and return the ASE `Vasp` calculator configured with stored options.
 
         Returns:
-            Calculator: Configured `ase.calculators.vasp.Vasp` instance.
+            Vasp: Configured `ase.calculators.vasp.Vasp` instance.
         """
         if self._calculator is None:
             from ase.calculators.vasp import Vasp
@@ -166,15 +166,13 @@ class VASPCalculator(BaseCalculator):
         Returns:
             dict: Dictionary containing the final structure and computed properties listed in AVAILABLE_PROPERTIES.
         """
-        atoms = structure.copy()
+        atoms = to_atoms(structure)
 
-        if isinstance(atoms, (Structure, Molecule)):
-            atoms = self.ase_adaptor.get_atoms(atoms)
+        calculator = self.calculator
+        calculator.set(**calc_params)
+        atoms.calc = calculator
 
-        self.calculator.set(**calc_params)
-        atoms.calc = self.calculator
-
-        self.calculator.calculate(
+        calculator.calculate(
             atoms=atoms,
             properties=self.AVAILABLE_PROPERTIES,
             system_changes=[
@@ -187,13 +185,13 @@ class VASPCalculator(BaseCalculator):
             ],
         )
 
-        self.calculator.converged = self._calculator.converged
+        self.converged = calculator.converged
 
         out_dict = {
-            "final_structure": self.ase_adaptor.get_structure(atoms),
+            "final_structure": to_structure(atoms),
         }
 
-        out_dict.update({prop: self.calculator.results[prop] for prop in self.__class__.AVAILABLE_PROPERTIES})
+        out_dict.update({prop: calculator.results[prop] for prop in self.__class__.AVAILABLE_PROPERTIES})
 
         return out_dict
 
