@@ -111,7 +111,7 @@ conflicts = [
   [{ extra = "mace" }, { extra = "allegro"       }],
 ]
 
-override-dependencies = ["tensorflow<2.20", "setuptools<81"]
+override-dependencies = ["tensorflow<2.20", "tf-keras<2.20", "setuptools<81"]
 
 [tool.uv.extra-build-dependencies]
 torch-scatter = ["torch"]
