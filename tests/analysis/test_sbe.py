@@ -168,9 +168,7 @@ def test_best_surface_energy_is_the_global_minimum(result) -> None:
 @pytest.mark.integration
 def test_best_miller_index_owns_the_best_surface_energy(result) -> None:
     """best_miller_index has at least one termination whose surface_energy equals best_surface_energy."""
-    best_gammas = [
-        entry["surface_energy"] for entry in result["surface_energies"] if entry["miller_index"] == result["best_miller_index"]
-    ]
+    best_gammas = [entry["surface_energy"] for entry in result["surface_energies"] if entry["miller_index"] == result["best_miller_index"]]
 
     assert min(best_gammas) == pytest.approx(result["best_surface_energy"])
 

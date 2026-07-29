@@ -71,8 +71,7 @@ class BainPathAnalyzer(BaseAnalyzer):
 
         c_a_list = list(displaced_structures.keys())
         energy_list = [
-            self.calculator.calculate(structure=deformed_structure)["energy"]
-            for deformed_structure in displaced_structures.values()
+            self.calculator.calculate(structure=deformed_structure)["energy"] for deformed_structure in displaced_structures.values()
         ]
 
         return {"c_a_list": c_a_list, "energy_list": energy_list}

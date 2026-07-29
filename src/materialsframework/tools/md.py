@@ -174,9 +174,7 @@ class BaseMDCalculator(ABC):
             Calculator: An ASE Calculator instance configured for the specific
             molecular dynamics task.
         """
-        raise NotImplementedError(
-            "Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance."
-        )
+        raise NotImplementedError("Subclasses must implement the 'calculator' property to return a valid ASE Calculator instance.")
 
     def _initialize_npt_nose_hoover(self, ase_atoms: Atoms) -> MelchionnaNPT:
         """Initializes the NPT Nose-Hoover ensemble for MD simulations.

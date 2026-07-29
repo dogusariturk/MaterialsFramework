@@ -174,14 +174,11 @@ class Phono3pyAnalyzer(BaseAnalyzer):
             phonon_supercells_with_displacements (list[Structure]): Displaced supercells for phonon (second-order)
                 force constants.
         """
-        forces = [
-            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements
-        ]
+        forces = [self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in supercells_with_displacements]
         phonon.forces = np.array(forces)
 
         phonon_forces = [
-            self.calculator.calculate(displaced_structure)["forces"]
-            for displaced_structure in phonon_supercells_with_displacements
+            self.calculator.calculate(displaced_structure)["forces"] for displaced_structure in phonon_supercells_with_displacements
         ]
         phonon.phonon_forces = np.array(phonon_forces)
 

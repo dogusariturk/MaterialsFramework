@@ -109,11 +109,7 @@ class VASPCalculator(BaseCalculator):
                       and any remaining to `ase.calculators.vasp.Vasp`. Common VASP/INCAR/KPOINTS options exposed for convenience.
                       Any of these left as None are simply not written—VASP defaults apply. (ASE will only write non-None INCAR keys.)
         """
-        basecalculator_kwargs = {
-            key: kwargs.pop(key)
-            for key in BaseCalculator.__init__.__annotations__
-            if key in kwargs
-        }
+        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
 
         # BaseCalculator specific attributes
         BaseCalculator.__init__(self, **basecalculator_kwargs)
@@ -154,9 +150,7 @@ class VASPCalculator(BaseCalculator):
         if self._calculator is None:
             from ase.calculators.vasp import Vasp
 
-            vasp_kwargs: dict[str, Any] = {
-                k: v for k, v in self._vasp_core.items() if v is not None
-            }
+            vasp_kwargs: dict[str, Any] = {k: v for k, v in self._vasp_core.items() if v is not None}
             vasp_kwargs.update(self._vasp_extra)
 
             self._calculator = Vasp(**vasp_kwargs)
@@ -199,12 +193,7 @@ class VASPCalculator(BaseCalculator):
             "final_structure": self.ase_adaptor.get_structure(atoms),
         }
 
-        out_dict.update(
-            {
-                prop: self.calculator.results[prop]
-                for prop in self.__class__.AVAILABLE_PROPERTIES
-            }
-        )
+        out_dict.update({prop: self.calculator.results[prop] for prop in self.__class__.AVAILABLE_PROPERTIES})
 
         return out_dict
 

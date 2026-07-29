@@ -118,22 +118,16 @@ class SBEAnalyzer(BaseAnalyzer):
         bulk_energy_per_atom = self.calculator.calculate(structure)["energy"] / structure.num_sites
 
         slabs = self.sbe_transformation.apply_transformation(structure)
-        surface_energies, slab_structures, best_miller_index, best_surface_energy = self._screen_miller_indices(
-            slabs, bulk_energy_per_atom
-        )
+        surface_energies, slab_structures, best_miller_index, best_surface_energy = self._screen_miller_indices(slabs, bulk_energy_per_atom)
         if best_miller_index is None:
             raise ValueError("No slabs were generated for the given structure and parameters.")
 
-        isolated_atom_energies = {
-            element.symbol: self._isolated_atom_energy(element.symbol) for element in structure.composition.elements
-        }
+        isolated_atom_energies = {element.symbol: self._isolated_atom_energy(element.symbol) for element in structure.composition.elements}
 
         # termination_index is assigned in encounter order, so filtering preserves it without an explicit sort.
         best_slabs = [entry for entry in slab_structures if entry["miller_index"] == best_miller_index]
         termination_payloads = [
-            self._evaluate_termination(
-                entry["miller_index"], entry["termination_index"], entry["relaxed_slab"], isolated_atom_energies
-            )
+            self._evaluate_termination(entry["miller_index"], entry["termination_index"], entry["relaxed_slab"], isolated_atom_energies)
             for entry in best_slabs
         ]
 

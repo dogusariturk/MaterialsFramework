@@ -87,9 +87,7 @@ class SqsGenerator:
         lattice = self._get_lattice(composition=composition, crystal_structure=crystal_structure.lower())
         coords = self._get_coords(crystal_structure=crystal_structure.lower())
         multiplier = self._get_multiplier(crystal_structure=crystal_structure.lower())
-        sqs_composition = self._determine_composition(
-            supercell_size=supercell_size, composition=composition, multiplier=multiplier
-        )
+        sqs_composition = self._determine_composition(supercell_size=supercell_size, composition=composition, multiplier=multiplier)
 
         if shell_weights is None:
             shell_weights = {1: 1.0} if supercell_size == (1, 1, 1) else {1: 1.0, 2: 0.5}
@@ -141,12 +139,8 @@ class SqsGenerator:
         avg_radius = np.sum([el.atomic_radius * amt for (el, amt) in composition.fractional_composition.items()])
 
         lattice_creators = {
-            "hcp": lambda: Lattice.hexagonal(
-                a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0)
-            ).get_niggli_reduced_lattice(),
-            "dhcp": lambda: Lattice.hexagonal(
-                a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2
-            ).get_niggli_reduced_lattice(),
+            "hcp": lambda: Lattice.hexagonal(a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0)).get_niggli_reduced_lattice(),
+            "dhcp": lambda: Lattice.hexagonal(a=avg_radius * 2, c=avg_radius * 2 * np.sqrt(8.0 / 3.0) * 2).get_niggli_reduced_lattice(),
             "fcc_prim": lambda: Lattice(
                 matrix=[
                     [0, avg_radius * np.sqrt(2), avg_radius * np.sqrt(2)],
@@ -229,9 +223,7 @@ class SqsGenerator:
 
         return multiplier_creators[crystal_structure]
 
-    def _determine_composition(
-        self, supercell_size: tuple[int, int, int], composition: Composition, multiplier: int
-    ) -> dict[str, int]:
+    def _determine_composition(self, supercell_size: tuple[int, int, int], composition: Composition, multiplier: int) -> dict[str, int]:
         """Determines the composition of the supercell.
 
         Rounds each element's fractional share to the nearest atom count, then assigns any

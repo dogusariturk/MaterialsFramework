@@ -263,22 +263,17 @@ class Sqs2tdb:
                 res["final_structure"],
             )
 
-        # Write energy
         (subdir / "energy").write_text(f"{energy:.6f}")
 
-        # Write CONTCAR
         final_structure.to(filename=str(subdir / "CONTCAR"), fmt="poscar")
 
-        # Write str_relax.out
         with (subdir / "str_relax.out").open("w") as f:
             f.write("\n".join(" ".join(map(str, row)) for row in final_structure.lattice.matrix))
             f.write("\n1 0 0\n0 1 0\n0 0 1\n")
             f.write("\n".join(" ".join(map(str, site.frac_coords)) + " " + site.species_string for site in final_structure))
 
-        # Write forces.out
         np.savetxt(str(subdir / "force.out"), forces, fmt="%.7e")
 
-        # Write stress.out in Voigt notation
         if stresses.shape == (6,):
             from ase.stress import voigt_6_to_full_3x3_stress
 

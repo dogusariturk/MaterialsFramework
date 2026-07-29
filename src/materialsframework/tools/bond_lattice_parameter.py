@@ -428,9 +428,7 @@ class BondLatticeParameter:
         """
         if not self.bonds:
             raise ValueError("No bond data available. Run calculate() first or load from CSV via from_csv().")
-        d_bar = sum(
-            composition[ei] * composition[ej] * self.bonds[self._bond_key(ei, ej)] for ei in composition for ej in composition
-        )
+        d_bar = sum(composition[ei] * composition[ej] * self.bonds[self._bond_key(ei, ej)] for ei in composition for ej in composition)
         return self._d_to_a(d_bar)
 
     def vegard(self, composition: dict[str, float]) -> float:

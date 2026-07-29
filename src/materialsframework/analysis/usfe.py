@@ -64,9 +64,7 @@ class USFEAnalyzer(BaseAnalyzer):
         self._usfe_transformation = usfe_transformation
 
     @require_properties("energy")
-    def calculate(
-        self, structure: Structure | Atoms, is_relaxed: bool = False
-    ) -> dict[str, str | int | float | list[dict[str, float]]]:
+    def calculate(self, structure: Structure | Atoms, is_relaxed: bool = False) -> dict[str, str | int | float | list[dict[str, float]]]:
         """Calculates GSFE curve and USFE for a given structure.
 
         Args:

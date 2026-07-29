@@ -58,8 +58,7 @@ class FormationEnergyTransformation:
         structure = to_structure(structure)
 
         return [
-            (element, self._reference_candidates(element), round(num))
-            for element, num in structure.composition.get_el_amt_dict().items()
+            (element, self._reference_candidates(element), round(num)) for element, num in structure.composition.get_el_amt_dict().items()
         ]
 
     def _reference_candidates(self, element: str) -> list[Structure]:
