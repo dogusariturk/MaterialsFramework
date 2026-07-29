@@ -78,6 +78,9 @@ class SqsGenerator:
         Raises:
             ValueError: If the crystal structure is invalid.
         """
+        from sqsgenerator import optimize, parse_config
+        from sqsgenerator.core import LogLevel
+
         if isinstance(composition, str):
             composition = Composition(composition)
 
@@ -103,9 +106,6 @@ class SqsGenerator:
             "composition": sqs_composition,
             "iteration_mode": self._mode,
         }
-
-        from sqsgenerator import optimize, parse_config
-        from sqsgenerator.core import LogLevel
 
         _log_level_map = {
             "trace": LogLevel.trace,
@@ -234,6 +234,10 @@ class SqsGenerator:
     ) -> dict[str, int]:
         """Determines the composition of the supercell.
 
+        Rounds each element's fractional share to the nearest atom count, then assigns any
+        leftover atoms (from independent rounding not summing exactly) to the largest-share
+        element, so the counts always add up to the exact number of sites in the supercell.
+
         Args:
             supercell_size (tuple[int, int, int]): The size of the supercell.
             composition (Composition): The composition of the supercell.
@@ -245,7 +249,15 @@ class SqsGenerator:
         """
         result = multiplier * reduce(operator.mul, supercell_size)
 
-        return {el: int(round(amt, 5) * result) for el, amt in composition.fractional_composition.as_reduced_dict().items()}
+        fractions = composition.fractional_composition.as_reduced_dict()
+        counts = {el: round(amt * result) for el, amt in fractions.items()}
+
+        shortfall = result - sum(counts.values())
+        if shortfall:
+            largest = max(fractions, key=fractions.get)
+            counts[largest] += shortfall
+
+        return counts
 
     @staticmethod
     @requires("sqsgenerator", extra="sqsgen")
