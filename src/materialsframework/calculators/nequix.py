@@ -72,7 +72,7 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
 
         return NequixCalculator(
             model_name=self.model,
-            model_path=self.model_path,  # ty: ignore[invalid-argument-type]
+            model_path=self.model_path,
             capacity_multiplier=self.capacity_multiplier,
             backend=self.backend,
             use_kernel=self.use_kernel,

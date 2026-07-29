@@ -308,9 +308,12 @@ class Sqs2tdb:
 
     def _copy_sqs(self) -> None:
         """Copy SQS from the database to the current directory and calculate energies."""
+        assert self.species is not None
+        assert self.lattices is not None
         species_str = ",".join(self.species)
+        lattices = self.lattices
 
-        for lattice in self.lattices:
+        for lattice in lattices:
             lattice_path = Path(lattice)
 
             for _ in range(2):
@@ -372,6 +375,7 @@ class Sqs2tdb:
 
         This should be run inside the relevant lattice directory.
         """
+        assert self.lattices is not None
         for lattice in self.lattices:
             args = ["-fit", f"-Tl={self.t_min}", f"-Tu={self.t_max}"]
             if self.bv:

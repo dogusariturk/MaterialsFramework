@@ -69,7 +69,7 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         )
 
         model = pretrained.ORB_PRETRAINED_MODELS[self.model]
-        potential, atoms_adapter = model(device=self.device, precision=self.precision)  # ty:ignore[unknown-argument]
+        potential, atoms_adapter = model(device=self.device, precision=self.precision)
 
         return ORBASECalculator(
             potential,
