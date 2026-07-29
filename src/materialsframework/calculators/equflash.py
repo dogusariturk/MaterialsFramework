@@ -51,7 +51,6 @@ class EquFlashCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # EquFlash specific attributes
         self.model = model
         self.device = device
         self.seed = seed
@@ -60,7 +59,15 @@ class EquFlashCalculator(BaseCalculator, BaseMDCalculator):
         self._calculator = None
 
     @lazy_property("_calculator")
-    @requires("GGNN", hint='pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"')
+    @requires(
+        "GGNN",
+        "fairchem",
+        hint=(
+            'pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git" installs no dependencies at all. '
+            "GGNN's own requirements.txt omits fairchem-core despite hard-importing it. "
+            "See docs for the verified dependency set."
+        ),
+    )
     def calculator(self) -> Calculator:
         """Lazily builds the ASE Calculator object for the EquFlash potential, using the settings from initialization.
 
