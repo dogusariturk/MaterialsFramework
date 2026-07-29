@@ -1,6 +1,12 @@
-"""Integration tests for UMACalculator."""
+"""Integration tests for UMACalculator.
+
+UMACalculator downloads its checkpoint from the gated "facebook/UMA" Hugging Face repo.
+Set the HF_TOKEN env var to an access token authorized for that repo before running these tests.
+"""
 
 from __future__ import annotations
+
+import os
 
 import numpy as np
 import pytest
@@ -9,10 +15,14 @@ pytest.importorskip("fairchem.core")
 
 from materialsframework.calculators.uma import UMACalculator
 
+_MISSING = not os.environ.get("HF_TOKEN")
+
 
 @pytest.fixture(scope="module")
 def calc() -> UMACalculator:
-    """UMACalculator with default model."""
+    """UMACalculator with default model, skipped if HF_TOKEN is unset."""
+    if _MISSING:
+        pytest.skip("HF_TOKEN not set; cannot download the gated facebook/UMA checkpoint")
     return UMACalculator()
 
 

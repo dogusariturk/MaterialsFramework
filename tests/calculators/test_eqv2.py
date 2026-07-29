@@ -1,6 +1,12 @@
-"""Integration tests for EqV2Calculator."""
+"""Integration tests for EqV2Calculator.
+
+EqV2Calculator downloads its checkpoint from the gated "facebook/OMAT24" Hugging Face repo.
+Set the HF_TOKEN env var to an access token authorized for that repo before running these tests.
+"""
 
 from __future__ import annotations
+
+import os
 
 import numpy as np
 import pytest
@@ -9,10 +15,14 @@ pytest.importorskip("fairchem.core")
 
 from materialsframework.calculators.eqv2 import EqV2Calculator
 
+_MISSING = not os.environ.get("HF_TOKEN")
+
 
 @pytest.fixture(scope="module")
 def calc() -> EqV2Calculator:
-    """EqV2Calculator with default model."""
+    """EqV2Calculator with default model, skipped if HF_TOKEN is unset."""
+    if _MISSING:
+        pytest.skip("HF_TOKEN not set; cannot download the gated facebook/OMAT24 checkpoint")
     return EqV2Calculator()
 
 
