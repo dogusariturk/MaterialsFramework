@@ -1,5 +1,6 @@
 site_name: MaterialsFramework
 site_description: A modular Python framework for ML interatomic potentials
+site_author: Doguhan Sariturk
 site_url: https://dogusariturk.github.io/MaterialsFramework/
 repo_url: https://github.com/dogusariturk/MaterialsFramework
 repo_name: dogusariturk/MaterialsFramework
@@ -7,30 +8,47 @@ repo_name: dogusariturk/MaterialsFramework
 theme:
   name: material
   palette:
-    - scheme: default
-      primary: indigo
-      accent: indigo
+    - media: "(prefers-color-scheme)"
+      scheme: slate
+      primary: blue grey
+      accent: cyan
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: cyan
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-    - scheme: slate
-      primary: indigo
-      accent: indigo
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: cyan
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Switch to system preference
   features:
-    - navigation.tabs
-    - navigation.tabs.sticky
-    - navigation.sections
-    - navigation.expand
-    - navigation.top
-    - navigation.footer
-    - search.suggest
-    - search.highlight
+    - content.tooltips
     - content.code.copy
     - content.code.annotate
+    - navigation.footer
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.indexes
+    - search.highlight
+    - search.suggest
+    - search.share
+    - toc.integrate
     - toc.follow
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
   - search
@@ -42,7 +60,7 @@ plugins:
             inherited_members: false
             members_order: source
             merge_init_into_class: true
-            parameter_headings: true
+            parameter_headings: false
             separate_signature: true
             show_bases: false
             show_root_full_path: false
@@ -58,11 +76,15 @@ markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
+  - footnotes
+  - def_list
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
@@ -71,28 +93,84 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
   - Home: index.md
-  - Getting Started:
-    - getting-started/index.md
-    - Installation: getting-started/installation.md
-    - MLIP Conflicts: getting-started/mlip-conflicts.md
-    - Quick Start: getting-started/quickstart.md
-  - User Guide:
-    - user-guide/index.md
-    - Geometry Optimization: user-guide/relaxation.md
-    - Molecular Dynamics: user-guide/md.md
-    - Property Analysis: user-guide/analysis.md
+  - Overview: overview.md
+  - Installation: installation.md
+  - MLIP Conflicts: mlip-conflicts.md
+  - Quick Start: quickstart.md
+  - Usage:
+    - usage/index.md
+    - Single-Point Calculation: usage/calculate.md
+    - Geometry Optimization: usage/relaxation.md
+    - Molecular Dynamics: usage/md.md
+    - Analyzers:
+      - usage/analysis/index.md
+      - ANNNI Stacking Faults: usage/analysis/annni.md
+      - Bain Path: usage/analysis/bain.md
+      - Coefficient of Thermal Expansion: usage/analysis/cte.md
+      - Cubic Elastic Constants: usage/analysis/cubic_elastic.md
+      - Elastic Constants: usage/analysis/elastic.md
+      - Equation of State: usage/analysis/eos.md
+      - Formation Energy: usage/analysis/formation_energy.md
+      - H-Solubility: usage/analysis/h_solubility.md
+      - Nudged Elastic Band: usage/analysis/neb.md
+      - Phonopy: usage/analysis/phonopy.md
+      - Phono3py: usage/analysis/phono3py.md
+      - Surface Binding Energy: usage/analysis/sbe.md
+      - Surface Energy: usage/analysis/surface.md
+      - Unstable Stacking Fault Energy: usage/analysis/usfe.md
+    - Tools:
+      - usage/tools/index.md
+      - Bond Lattice Parameter: usage/tools/bond_lattice_parameter.md
+      - Phase Field Model: usage/tools/cahn_hilliard.md
+      - Cluster Expansion: usage/tools/cluster_expansion.md
+      - PhaseForge: usage/tools/sqs2tdb.md
+      - SQS Generator: usage/tools/sqsgen.md
+      - StabilityMap: usage/tools/stability_map.md
+      - TrajectoryObserver: usage/tools/trajectory.md
+  - Theory:
+    - theory/index.md
+    - Calculators: theory/calculators/base.md
+    - Analyzers:
+      - theory/analysis/index.md
+      - ANNNI Stacking Faults: theory/analysis/annni.md
+      - Bain Path: theory/analysis/bain.md
+      - Coefficient of Thermal Expansion: theory/analysis/cte.md
+      - Cubic Elastic Constants: theory/analysis/cubic_elastic.md
+      - Elastic Constants: theory/analysis/elastic.md
+      - Equation of State: theory/analysis/eos.md
+      - Formation Energy: theory/analysis/formation_energy.md
+      - H-Solubility: theory/analysis/h_solubility.md
+      - Nudged Elastic Band: theory/analysis/neb.md
+      - Phonopy: theory/analysis/phonopy.md
+      - Phono3py: theory/analysis/phono3py.md
+      - Surface Binding Energy: theory/analysis/sbe.md
+      - Surface Energy: theory/analysis/surface.md
+      - Unstable Stacking Fault Energy: theory/analysis/usfe.md
+    - Tools:
+      - theory/tools/index.md
+      - Bond Lattice Parameter: theory/tools/bond_lattice_parameter.md
+      - Phase Field Model: theory/tools/cahn_hilliard.md
+      - Cluster Expansion: theory/tools/cluster_expansion.md
+      - PhaseForge: theory/tools/sqs2tdb.md
+      - SQS Generator: theory/tools/sqsgen.md
+      - StabilityMap: theory/tools/stability_map.md
   - API Reference:
     - Calculators:
       - api/calculators/index.md
       - Base Classes: api/calculators/base.md
       - ALIGNN: api/calculators/alignn.md
+      - Allegro: api/calculators/allegro.md
       - AlphaNet: api/calculators/alphanet.md
       - CHGNet: api/calculators/chgnet.md
       - DeePMD: api/calculators/deepmd.md
       - EqNorm: api/calculators/eqnorm.md
+      - EquFlash: api/calculators/equflash.md
       - EquiformerV2: api/calculators/eqv2.md
       - eSEN: api/calculators/esen.md
       - GPTFF: api/calculators/gptff.md
@@ -100,6 +178,7 @@ nav:
       - HIENet: api/calculators/hienet.md
       - M3GNet: api/calculators/m3gnet.md
       - MACE: api/calculators/mace.md
+      - MatRIS: api/calculators/matris.md
       - MatterSim: api/calculators/mattersim.md
       - MEGNet: api/calculators/megnet.md
       - NequIP: api/calculators/nequip.md
@@ -110,34 +189,41 @@ nav:
       - PosEGNN: api/calculators/posegnn.md
       - Random: api/calculators/random.md
       - SevenNet: api/calculators/sevennet.md
+      - TACE: api/calculators/tace.md
       - UMA: api/calculators/uma.md
       - VASP: api/calculators/vasp.md
-    - Analysis:
+    - Analyzers:
       - api/analysis/index.md
       - ANNNI Stacking Faults: api/analysis/annni.md
       - Bain Path: api/analysis/bain.md
+      - Coefficient of Thermal Expansion: api/analysis/cte.md
       - Cubic Elastic Constants: api/analysis/cubic_elastic.md
       - Elastic Constants: api/analysis/elastic.md
-      - CTE: api/analysis/cte.md
       - Equation of State: api/analysis/eos.md
       - Formation Energy: api/analysis/formation_energy.md
-      - H Solubility: api/analysis/h_solubility.md
-      - Phono3py: api/analysis/phono3py.md
+      - H-Solubility: api/analysis/h_solubility.md
+      - Nudged Elastic Band: api/analysis/neb.md
       - Phonopy: api/analysis/phonopy.md
-      - USFE: api/analysis/usfe.md
+      - Phono3py: api/analysis/phono3py.md
+      - Surface Binding Energy: api/analysis/sbe.md
+      - Surface Energy: api/analysis/surface.md
+      - Unstable Stacking Fault Energy: api/analysis/usfe.md
     - Transformations:
       - api/transformations/index.md
       - ANNNI Stacking Faults: api/transformations/annni.md
       - Bain Displacement: api/transformations/bain.md
       - Cubic Elastic Deformation: api/transformations/cubic_elastic.md
       - Elastic Deformation: api/transformations/elastic.md
-      - CTE: api/transformations/cte.md
+      - Coefficient of Thermal Expansion: api/transformations/cte.md
       - EOS Deformation: api/transformations/eos.md
       - Formation Energy: api/transformations/formation_energy.md
-      - H Solubility: api/transformations/h_solubility.md
-      - Phono3py Displacement: api/transformations/phono3py.md
+      - H-Solubility: api/transformations/h_solubility.md
+      - Nudged Elastic Band: api/transformations/neb.md
       - Phonopy Displacement: api/transformations/phonopy.md
-      - USFE: api/transformations/usfe.md
+      - Phono3py Displacement: api/transformations/phono3py.md
+      - Surface Binding Energy: api/transformations/sbe.md
+      - Surface Energy: api/transformations/surface.md
+      - Unstable Stacking Fault Energy: api/transformations/usfe.md
     - Tools:
       - api/tools/index.md
       - BaseCalculator: api/tools/base_calculator.md
@@ -145,9 +231,8 @@ nav:
       - TrajectoryObserver: api/tools/trajectory.md
       - StabilityMap: api/tools/stability_map.md
       - Phase Field Model: api/tools/cahn_hilliard.md
-      - SQS to TDB: api/tools/sqs2tdb.md
+      - PhaseForge: api/tools/sqs2tdb.md
       - SQS Generator: api/tools/sqsgen.md
       - Cluster Expansion: api/tools/cluster_expansion.md
-      - Elastic Utilities: api/tools/elastic.md
       - Bond Lattice Parameter: api/tools/bond_lattice_parameter.md
     - IO: api/io.md
