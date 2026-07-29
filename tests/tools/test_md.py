@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 import warnings
 
+import numpy as np
 import pytest
 from ase.build import bulk
 from ase.calculators.emt import EMT
@@ -160,6 +161,30 @@ def test_masked_mtk_npt_mask_is_a_boolean_tuple(cu_atoms) -> None:
 
     assert dyn.mask == (True, True, False)
     assert all(isinstance(value, bool) for value in dyn.mask)
+
+
+def test_run_thermalizes_when_no_velocities_set(cu_atoms) -> None:
+    """run() draws initial velocities from a Maxwell-Boltzmann distribution when none are set."""
+    atoms = cu_atoms.copy()
+    assert "momenta" not in atoms.arrays
+
+    calc = _EMTMDCalculator(ensemble="nve", timestep=1.0, temperature=300, stationary=False, zero_rotation=False)
+    result = calc.run(atoms, steps=0)
+
+    assert result["velocities"][0].any()
+
+
+def test_run_respects_preset_velocities(cu_atoms) -> None:
+    """run() keeps velocities already set on the input instead of overwriting them via `thermalize_momenta`."""
+    atoms = cu_atoms.copy()
+    preset_velocities = np.zeros((len(atoms), 3))
+    preset_velocities[0] = [123.456, 0.0, 0.0]
+    atoms.set_velocities(preset_velocities)
+
+    calc = _EMTMDCalculator(ensemble="nve", timestep=1.0, temperature=300, stationary=False, zero_rotation=False)
+    result = calc.run(atoms, steps=0)
+
+    assert result["velocities"][0] == pytest.approx(preset_velocities)
 
 
 def test_init_stores_new_ensemble_parameters() -> None:
