@@ -1,16 +1,15 @@
-"""
-This module contains utility functions for MaterialsFramework.
-"""
-import numpy as np
+"""This module contains utility functions for MaterialsFramework."""
+
 from itertools import combinations_with_replacement, permutations
+
+import numpy as np
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
 def generate_compositions(num_elements=5, step=12.5):
-    """
-    Generate all unique compositions of a given number of elements that sum to 100.
+    """Generate all unique compositions of a given number of elements that sum to 100.
 
     Args:
         num_elements (int): Number of elements in the composition.
@@ -21,8 +20,9 @@ def generate_compositions(num_elements=5, step=12.5):
     """
     composition_set = set()
 
-    results = [combo for combo in combinations_with_replacement(np.arange(0, 100 + step, step), num_elements)
-               if round(sum(combo), 10) == 100]
+    results = [
+        combo for combo in combinations_with_replacement(np.arange(0, 100 + step, step), num_elements) if round(sum(combo), 10) == 100
+    ]
 
     for result in results:
         composition_set.update(permutations(result))

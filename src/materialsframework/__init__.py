@@ -1,1 +1,3 @@
-__version__ = "0.12.0"
+"""MaterialsFramework: A modular framework for ML interatomic potentials."""
+
+__version__ = "1.0.0"

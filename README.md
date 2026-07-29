@@ -2,238 +2,268 @@
 
 # MaterialsFramework
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15731044.svg)](https://doi.org/10.5281/zenodo.15731044)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/license/gpl-3-0)
-[![Python](https://img.shields.io/badge/python-3.11+-brightgreen.svg)](https://www.python.org/)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](https://spdx.org/licenses/GPL-3.0-or-later.html)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Platforms](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey)
 
-<p>
-  A modular and extensible framework for deploying, benchmarking, and experimenting with state-of-the-art machine learning potentials in materials science.
-</p>
+[![Tests](https://github.com/dogusariturk/MaterialsFramework/actions/workflows/tests.yml/badge.svg)](https://github.com/dogusariturk/MaterialsFramework/actions/workflows/tests.yml)
+[![Lint](https://github.com/dogusariturk/MaterialsFramework/actions/workflows/lint.yml/badge.svg)](https://github.com/dogusariturk/MaterialsFramework/actions/workflows/lint.yml)
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15731044.svg)](https://doi.org/10.5281/zenodo.15731044)
+
+`MaterialsFramework` provides a single, uniform API for 20+ machine learning interatomic potentials (MLIPs), covering single-point calculations, structure relaxation, and molecular dynamics, plus the property analyzers and structure-generation tools that build on them. Swapping one MLIP for another, or for the licensed `VASPCalculator`, means changing one line of code.
 
 <p>
   <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=bug">Report a Bug</a> |
-  <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=enhancement">Request a Feature</a>
+  <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=enhancement">Request a Feature</a> |
+  <a href="https://dogusariturk.github.io/MaterialsFramework">Documentation</a>
 </p>
 
 </div>
 
 ---
 
-## Getting Started
+## Key Features
 
-Follow the steps below to get a local copy of the project up and running.
+- Run single-point calculations and structure relaxations across 20+ ML interatomic potentials through one shared `BaseCalculator` interface, or swap in the licensed `VASPCalculator` without changing calling code
+- Accept `ase.Atoms`, `pymatgen.Structure`, and `pymatgen.Molecule` interchangeably as calculator input
+- Run molecular dynamics (NVE, NVT/NPT Nose-Hoover, NPT/Inhomogeneous-NPT Berendsen) on any calculator that supports it
+- Compute formation energy, elastic constants, phonons, stacking faults, surface/binding energies, and reaction barriers with 14 property analyzers, each paired with a transformation that generates the structures it needs
+- Generate special quasirandom structures, cluster expansion models, phase-field simulations, and stability maps with the built-in tools
+- Look up calculators, analyzers, transformations, and tools by name, without importing every MLIP backend at once
 
+---
 
-### Prerequisites
+## Supported MLIPs
 
-This project uses `conda` for managing dependencies. Several `environment.yml` files are provided to support different model groups.
+| MLIP      | Extra       | Package            | API                                      | Repository                                                         | Paper                                                       |
+|-----------|-------------|--------------------|------------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
+| ALIGNN    | `alignn`    | `alignn`           | [API](docs/api/calculators/alignn.md)    | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
+| Allegro   | `allegro`   | `nequip-allegro`   | [API](docs/api/calculators/allegro.md)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
+| AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](docs/api/calculators/alphanet.md)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
+| CHGNet    | `chgnet`    | `chgnet`           | [API](docs/api/calculators/chgnet.md)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
+| DeePMD    | `deepmd`    | `deepmd-kit`       | [API](docs/api/calculators/deepmd.md)    | [Repo](https://github.com/deepmodeling/deepmd-kit)                 | [Paper](https://arxiv.org/abs/2506.01686)                   |
+| EqNorm    | `eqnorm`    | `eqnorm`           | [API](docs/api/calculators/eqnorm.md)    | [Repo](https://github.com/yzchen08/eqnorm)                         | N/A                                                         |
+| EquFlash  | N/A         | `GGNN` (git-only)  | [API](docs/api/calculators/equflash.md)  | [Repo](https://github.com/SamsungDS/GGNN)                          | N/A                                                         |
+| EqV2      | `eqv2`      | `fairchem-core`    | [API](docs/api/calculators/eqv2.md)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2306.12059)                   |
+| eSEN      | `esen`      | `fairchem-core`    | [API](docs/api/calculators/esen.md)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2502.12147)                   |
+| GPTFF     | N/A         | `gptff` (git-only) | [API](docs/api/calculators/gptff.md)     | [Repo](https://github.com/atomly-materials-research-lab/GPTFF)     | [Paper](https://doi.org/10.1016/j.scib.2024.08.039)         |
+| GRACE     | `grace`     | `tensorpotential`  | [API](docs/api/calculators/grace.md)     | [Repo](https://github.com/ICAMS/grace-tensorpotential)             | [Paper](https://arxiv.org/abs/2508.17936)                   |
+| HIENet    | `hienet`    | `hienet`           | [API](docs/api/calculators/hienet.md)    | [Repo](https://github.com/divelab/AIRS/tree/main/OpenMat/HIENet)   | [Paper](https://arxiv.org/abs/2503.05771)                   |
+| M3GNet    | `matgl`     | `matgl`            | [API](docs/api/calculators/m3gnet.md)    | [Repo](https://github.com/materialsvirtuallab/m3gnet)              | [Paper](https://arxiv.org/abs/2202.02450)                   |
+| MACE      | `mace`      | `mace-torch`       | [API](docs/api/calculators/mace.md)      | [Repo](https://github.com/ACEsuit/mace)                            | [Paper](https://arxiv.org/abs/2401.00096)                   |
+| MatRIS    | `matris`    | `matris`           | [API](docs/api/calculators/matris.md)    | [Repo](https://github.com/HPC-AI-Team/MatRIS)                      | [Paper](https://arxiv.org/abs/2603.02002)                   |
+| MatterSim | `mattersim` | `mattersim`        | [API](docs/api/calculators/mattersim.md) | [Repo](https://github.com/microsoft/mattersim)                     | [Paper](https://arxiv.org/abs/2405.04967)                   |
+| MEGNet    | `matgl`     | `matgl`            | [API](docs/api/calculators/megnet.md)    | [Repo](https://github.com/materialsvirtuallab/megnet)              | [Paper](https://arxiv.org/abs/1812.05055)                   |
+| NequIP    | `nequip`    | `nequip`           | [API](docs/api/calculators/nequip.md)    | [Repo](https://github.com/mir-group/nequip)                        | [Paper](https://arxiv.org/abs/2504.16068)                   |
+| Nequix    | `nequix`    | `nequix`           | [API](docs/api/calculators/nequix.md)    | [Repo](https://github.com/atomicarchitects/nequix)                 | [Paper](https://arxiv.org/abs/2508.16067)                   |
+| NewtonNet | `newtonnet` | `newtonnet`        | [API](docs/api/calculators/newtonnet.md) | [Repo](https://github.com/THGLab/NewtonNet)                        | [Paper](https://doi.org/10.1039/D2DD00008C)                 |
+| ORB       | `orb`       | `orb-models`       | [API](docs/api/calculators/orb.md)       | [Repo](https://github.com/orbital-materials/orb-models)            | [Paper](https://arxiv.org/abs/2504.06231)                   |
+| PetMad    | `petmad`    | `upet`             | [API](docs/api/calculators/petmad.md)    | [Repo](https://github.com/lab-cosmo/upet)                          | [Paper](https://www.nature.com/articles/s41467-025-65662-7) |
+| PosEGNN   | N/A         | N/A                | [API](docs/api/calculators/posegnn.md)   | [Repo](https://github.com/IBM/materials/tree/main/models/pos_egnn) | N/A                                                         |
+| SevenNet  | `sevennet`  | `sevenn`           | [API](docs/api/calculators/sevennet.md)  | [Repo](https://github.com/MDIL-SNU/SevenNet)                       | [Paper](https://arxiv.org/abs/2510.11241)                   |
+| TACE      | `tace`      | `TACE`             | [API](docs/api/calculators/tace.md)      | [Repo](https://github.com/xvzemin/tace)                            | [Paper](https://arxiv.org/abs/2509.14961)                   |
+| UMA       | `uma`       | `fairchem-core`    | [API](docs/api/calculators/uma.md)       | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2506.23971)                   |
 
-| Environment File          | Supported Models                                                                                                                       |
-|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `environment.yml`         | M3GNet / MEGNet                                                                                                                        |
-| `main-environment.yml`    | AlphaNet, CHGNet, DeepMD, Eqnorm, EqV2 / eSEN, GPTFF, GRACE, HIENet, M3GNet / MEGNet, MatterSim, NewtonNet, PET-MAD, PosEGNN, SevenNet |
-| `orb-uma-environment.yml` | ORB, UMA                                                                                                                               |
-| `mace-environment.yml`    | MACE                                                                                                                                   |
-| `alignn-environment.yml`  | ALIGNN-FF                                                                                                                              |                                                                                               |
+Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VASPCalculator` (external licensed VASP backend).
 
- ### Installation
+> [!WARNING]
+> **PosEGNN** has no installable package on any public index. Clone the repository and add the module directory to `PYTHONPATH` manually:
+> ```bash
+> git clone --depth 1 https://github.com/IBM/materials.git
+> export PYTHONPATH="$PWD/materials/models/pos_egnn:$PYTHONPATH"
+> ```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/dogusariturk/MaterialsFramework.git
+> [!WARNING]
+> **GPTFF** is only installable from its upstream git repository:
+> ```bash
+> uv pip install "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git"
+> ```
 
-2.  **Navigate into the project directory:**
-    ```sh
-    cd MaterialsFramework
-    ```
-3.  **Create a conda environment from the desired file:**
-    ```sh
-    conda env create -f <environment_file.yml>
-    ```
-4.  **Activate the environment:**
-    ```sh
-    conda activate <environment_name>
-    ```
-5.  **Install the framework in editable mode:**
-    ```sh
-    pip install -e .
-    ```
+> [!WARNING]
+> **EquFlash** is only installable from its upstream git repository, and the bare install below leaves
+> `fairchem-core` missing, so `EquFlashCalculator().calculator` raises `ModuleNotFoundError`. See
+> [installation](docs/installation.md) for the CPU-only dependency set that's confirmed to work.
+> ```bash
+> uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
+> ```
 
-## Modules
+---
 
-Below are the main modules and classes for analysis and tools:
+## Property Analyzers
 
-### `analysis`
+| Analyzer                        | Description                                                                  |
+|---------------------------------|------------------------------------------------------------------------------|
+| `ANNNIStackingFaultAnalyzer`    | ANNNI-based intrinsic and extrinsic stacking fault energies                  |
+| `BainPathAnalyzer`              | Energy along the FCC-to-BCC Bain transformation path                         |
+| `CTEAnalyzer`                   | Coefficient of thermal expansion from NPT-MD volume trends                   |
+| `CubicElasticConstantsAnalyzer` | Cubic elastic constants and derived moduli (B, G, E, ν)                      |
+| `ElasticConstantsAnalyzer`      | Full elastic tensor and Voigt-Reuss-Hill averages                            |
+| `EOSAnalyzer`                   | Equation-of-state curve fitting from E-V data                                |
+| `FormationEnergyAnalyzer`       | Formation energy per atom                                                    |
+| `HSolubilityAnalyzer`           | Hydrogen insertion and solution energies                                     |
+| `NEBAnalyzer`                   | Nudged elastic band minimum energy path and reaction barrier                 |
+| `PhonopyAnalyzer`               | Phonon DOS, band structure, and thermal properties                           |
+| `Phono3pyAnalyzer`              | Anharmonic force constants and lattice thermal conductivity                  |
+| `SBEAnalyzer`                   | Surface binding energies, a first-principles proxy for sputtering resistance |
+| `SurfaceAnalyzer`               | Slab surface energies for a given Miller index                               |
+| `USFEAnalyzer`                  | Generalized stacking fault energy curves and unstable SFE                    |
 
-- **`ANNNIStackingFaultAnalyzer`**  
-  Tools for simulating and analyzing the Axial Next-Nearest-Neighbor Ising (ANNNI) model, useful for studying magnetic and structural phase transitions.
+---
 
+## Tools
 
-- **`BainPathAnalyzer`**  
-  Implements the Bain transformation, providing utilities to analyze and visualize the transformation path between fcc and bcc crystal structures.
+| Tool                   | Description                                                                             |
+|------------------------|-----------------------------------------------------------------------------------------|
+| `BondLatticeParameter` | Lattice parameter estimation from bond lengths for FCC/BCC/HCP alloys                   |
+| `ClusterExpansion`     | Cluster expansion model construction and fitting                                        |
+| `CoherentStabilityMap` | Stability map generation with a coherent-elastic correction to the Gibbs energy Hessian |
+| `PhaseFieldModel`      | Cahn-Hilliard phase-field simulations                                                   |
+| `Sqs2tdb`              | Converts SQS output files to TDB format for CALPHAD workflows (PhaseForge)              |
+| `SqsGenerator`         | Special quasirandom structure generation                                                |
+| `StabilityMap`         | Composition-temperature stability map generation                                        |
+| `TrajectoryObserver`   | Records energies, forces, stresses, and trajectory frames during relaxation or MD       |
 
+---
 
-- **`CubicElasticConstantsAnalyzer`**
-  Provides methods to calculate cubic elastic constants (C11, C12, C44) and derived properties like Young's modulus, bulk modulus, shear modulus, Poisson's ratio, and Pugh's ratio.
+## Installation
 
-> [!CAUTION]
-> `CubicElasticConstantsAnalyzer` only works with cubic/orthogonal cells. 
+We recommend [uv](https://docs.astral.sh/uv/) for dependency management, though a plain `pip` install also works. Use the `Extra` column in the [Supported MLIPs](#supported-mlips) table above to pick which MLIP extras to add.
 
+### uv
 
-- **`ElasticConstantsAnalyzer`**
-  General tools for calculating elastic constants from stress-strain data, including methods for fitting and extracting Voigt-Reuss-Hill averages.
+```bash
+uv add materialsframework
+```
 
+Add one or more compatible MLIP extras:
 
-- **`EOSAnalyzer`**  
-  Equation of State (EOS) fitting and analysis tools, including routines to fit energy-volume data and extract bulk properties.
+```bash
+# Single MLIP
+uv add "materialsframework[chgnet]"
 
+# Compatible multi-MLIP stack
+uv add "materialsframework[chgnet,matgl,sevennet]"
+```
 
-- **`FormationEnergyAnalyzer`**
-  Computes the formation energy of a material based on its composition and structure. The class can be used to analyze the stability of materials.
+### pip
 
+```bash
+pip install materialsframework
+```
 
-- **`PhonopyAnalyzer`**  
-  Interfaces and helpers for phonon calculations using the Phonopy package, including phonon band structure and density of states analysis.
+Add an MLIP extra the same way:
 
+```bash
+pip install "materialsframework[chgnet]"
+```
 
-- **`Phono3pyAnalyzer`**  
-  Tools for third-order phonon calculations with Phono3py, enabling analysis of lattice thermal conductivity and anharmonic effects.
+See the [installation guide](https://github.com/dogusariturk/MaterialsFramework/blob/main/docs/installation.md) for full setup instructions and [MLIP Conflicts](https://github.com/dogusariturk/MaterialsFramework/blob/main/docs/mlip-conflicts.md) for conflict details.
 
+---
 
-### `tools`
+## Quickstart
 
-- **`ClusterExpansion`**  
-  Provides tools for constructing and analyzing cluster expansions, including fitting methods and validation routines.
+### Calculators
 
+Every calculator except `MEGNetCalculator` accepts `ase.Atoms` or `pymatgen.Structure` and exposes the same `relax()`/`calculate()` interface, regardless of which MLIP backs it.
 
-- **`PhaseFieldModel`**  
-  Implements the Cahn-Hilliard equation for simulating phase separation and microstructure evolution in materials.
+```python
+from ase.build import bulk
+from materialsframework.calculators import MACECalculator
 
+structure = bulk("Cu", crystalstructure="fcc", a=3.6, cubic=True)
+calc = MACECalculator()
 
-- **`Sqs2tdb`**  
-  Converts Special Quasirandom Structures (SQS) data to thermodynamic database (TDB) files for use in thermodynamic modeling.
+result = calc.relax(structure)
+print(result["final_structure"])
+print(result["energy"])
+```
 
+`calculate()` evaluates the same properties on the structure exactly as given, with no relaxation step:
 
-- **`StabilityMap`**
-    Tools for generating stability maps of materials, visualizing phase stability as a function of composition and temperature.
+```python
+result = calc.calculate(structure)
+print(result["energy"])
+print(result["forces"])
+```
 
+### Molecular Dynamics
 
-## Example Workflows
+Calculators that subclass `BaseMDCalculator` add a `run()` method for NVE, NVT/NPT Nose-Hoover, and NPT/Inhomogeneous-NPT Berendsen molecular dynamics.
 
-The following example scripts demonstrate typical use cases:
+```python
+from ase.build import bulk
+from materialsframework.calculators import CHGNetCalculator
 
-- **Geometry Optimization**
-    ```python
-    from ase.build import bulk
-    from materialsframework.calculators import GraceCalculator
-    
-    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
-    
-    calc = GraceCalculator()
-    res = calc.relax(struct)
-    
-    print(res["final_structure"])
-    print(res["forces"])
-    print(res["stress"])
-    ```
+structure = bulk("Fe", crystalstructure="bcc", a=2.87, cubic=True)
+calc = CHGNetCalculator(ensemble="nvt_nose_hoover", temperature=300)
 
-- **Cubic Elastic Constants**  
-    ```python
-    from ase.build import bulk
-    from materialsframework.calculators import GraceCalculator
-    from materialsframework.analysis import CubicElasticConstantsAnalyzer
-    
-    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
-    
-    calc = GraceCalculator()
-    cubic_elastic_constants = CubicElasticConstantsAnalyzer(calculator=calc)
-    res = cubic_elastic_constants.calculate(struct)
-    
-    print(res["c11"])
-    print(res["c12"])
-    print(res["c44"])
-    print(res["youngs_modulus"])
-    print(res["voigt_reuss_hill_bulk_modulus"])
-    print(res["voigt_reuss_hill_shear_modulus"])
-    print(res["poisson_ratio"])
-    print(res["pugh_ratio"])
-    ```
+result = calc.run(structure, steps=1000)
+print(result["final_structure"])
+```
 
-- **Equation Of State Analysis**  
-    ```python
-    from ase.build import bulk
-    from materialsframework.calculators import GraceCalculator
-    from materialsframework.analysis import EOSAnalyzer
-    
-    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
-    
-    calc = GraceCalculator()
-    eos_analyzer = EOSAnalyzer(calculator=calc)
-    res = eos_analyzer.calculate(struct)
-    
-    print(res["e0"])
-    print(res["b0"])
-    print(res["b0_GPa"])
-    print(res["b1"])
-    print(res["v0"])
-    ```
+### Property Analyzers
 
-- **Phonon Calculations**
-    ```python
-    from ase.build import bulk
-    from materialsframework.calculators import GraceCalculator
-    from materialsframework.analysis import PhonopyAnalyzer
-    
-    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
-    
-    calc = GraceCalculator()
-    phonopy_analyzer = PhonopyAnalyzer(calculator=calc)
-    res = phonopy_analyzer.calculate(struct)
-    
-    print(res["total_dos"])
-    print(res["projected_dos"])
-    print(res["thermal_properties"])
-    ```
+Analyzers pair with a transformation of the same name: the transformation generates the structures a calculation needs, and the analyzer orchestrates the calculator calls and combines the results.
 
-- **Molecular Dynamics**
-    ```python
-    from ase.build import bulk
-    from materialsframework.calculators import GraceCalculator
-    
-    struct = bulk(name="Cu", crystalstructure="fcc", a=3.6, cubic=True)
-    
-    calc = GraceCalculator(ensemble="nvt_nose_hoover", verbose=True, temperature=300)
-    res = calc.run(structure=struct, steps=1000)
-    
-    print(res["total_energy"])
-    print(res["potential_energy"])
-    print(res["kinetic_energy"])
-    print(res["temperature"])
-    print(res["final_structure"])
-    ```
+```python
+from ase.build import bulk
+from materialsframework.analysis import FormationEnergyAnalyzer
+from materialsframework.calculators import CHGNetCalculator
 
-## Citing
+structure = bulk("NaCl", crystalstructure="rocksalt", a=5.64)
+analyzer = FormationEnergyAnalyzer(calculator=CHGNetCalculator())
 
-We are currently preparing a preprint for publication. If you use MaterialsFramework in your research, please cite the following:
+result = analyzer.calculate(structure, is_relaxed=True)
+print(result["formation_energy"])
+```
+
+### Tools
+
+Standalone utilities such as special quasirandom structure generation, cluster expansion, and phase-field modeling live in `materialsframework.tools`.
+
+```python
+from materialsframework.tools import SqsGenerator
+
+generator = SqsGenerator(iterations=1000)
+result = generator.generate("Fe0.5Co0.5", crystal_structure="bcc", supercell_size=(2, 2, 2))
+print(result["structure"])
+print(result["objective"])
+```
+
+### Registries
+
+Look up calculators, analyzers, transformations, and tools by name to swap in a new backend without importing every MLIP dependency up front.
+
+```python
+from materialsframework.calculators import get_calculator
+
+calc = get_calculator("chgnet")
+```
+
+---
+
+## License
+
+Distributed under the GPL-3.0-or-later License. See [GPL-3.0](https://github.com/dogusariturk/MaterialsFramework/blob/main/LICENSE) for details.
+
+---
+
+## Citation
+
+If you use MaterialsFramework in your research, please cite:
 
 > Sarıtürk, D., & Arroyave, R. (2025). MaterialsFramework. Zenodo. https://doi.org/10.5281/zenodo.15731044
 
 ```bibtex
 @software{sariturk_2025_15731044,
-  author       = {Sarıtürk, Doğuhan and Arroyave, Raymundo},
-  title        = {MaterialsFramework},
-  month        = jun,
-  year         = 2025,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.15731044},
-  url          = {https://doi.org/10.5281/zenodo.15731044},
+  author    = {Sarıtürk, Doğuhan and Arroyave, Raymundo},
+  title     = {MaterialsFramework},
+  month     = jun,
+  year      = 2025,
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.15731044},
+  url       = {https://doi.org/10.5281/zenodo.15731044},
 }
 ```
-## License
-
-Distributed under the GPLv3 License. See [GPLv3 License](https://opensource.org/license/gpl-3-0) for more information.
-
-## Contact
-
-Doguhan Sariturk - [doguhan.sariturk@gmail.com](mailto:doguhan.sariturk@gmail.com)
-

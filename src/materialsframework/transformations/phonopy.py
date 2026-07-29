@@ -1,19 +1,19 @@
-"""
-This module provides a class to generate distorted structures for Phonopy calculations.
+"""Generates distorted structures for Phonopy calculations.
 
-The `PhonopyDisplacementTransformation` class facilitates the generation of supercells with atomic displacements,
-which are required for calculating force constants and phonon properties using Phonopy. These displaced structures
-are essential for studying vibrational modes, thermal properties, and lattice dynamics in materials.
+Produces supercells with atomic displacements needed to compute force constants and
+phonon properties: vibrational modes, thermal properties, and lattice dynamics.
 """
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from phonopy import Phonopy
-from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
+
+from materialsframework.utils import requires
 
 if TYPE_CHECKING:
+    from phonopy import Phonopy
     from pymatgen.core import Structure
 
 __author__ = "Doguhan Sariturk"
@@ -21,87 +21,77 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class PhonopyDisplacementTransformation:
-    """
-    A class used to generate displaced structures for Phonopy calculations.
+    """Generates displaced structures for Phonopy calculations.
 
-    The `PhonopyDisplacementTransformation` class provides methods to create supercells with atomic
-    displacements, which are necessary for calculating force constants and phonon properties. These
-    supercells can be used in conjunction with Phonopy to calculate phonon spectra, thermal conductivity,
-    and other lattice dynamical properties.
+    Creates supercells with atomic displacements for computing phonon spectra, thermal
+    conductivity, and other lattice-dynamical properties.
     """
 
-    def __init__(self) -> None:
-        """
-        Initializes the `PhonopyDisplacementTransformation` object.
-        """
-        self.phonon: Phonopy | None = None
-        self.displacements: np.ndarray | list | None = None
-        self.displaced_structures: list[Structure] | None = None
-
+    @requires("phonopy", extra="phonopy")
     def apply_transformation(
-            self,
-            structure: Structure,
-            distance: float = 0.01,
-            supercell_matrix: list | None = None,
-            primitive_matrix: list | None = None,
-            log_level: int = 0,
-            **kwargs
-    ) -> None:
-        """
-        Applies the transformation to generate displaced supercells for Phonopy calculations.
-
-        This method generates supercells with atomic displacements for phonon calculations.
-        The resulting supercells are stored in the `displaced_structures` attribute, and the displacement
-        vectors are stored in `displacements`.
+        self,
+        structure: Structure,
+        distance: float = 0.01,
+        supercell_matrix: list | None = None,
+        primitive_matrix: list | str | None = "auto",
+        log_level: int = 0,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Generate displaced supercells for Phonopy calculations.
 
         Args:
             structure (Structure): The input structure to be displaced.
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.01.
             supercell_matrix (list, optional): The supercell matrix to generate supercells for phonon calculations.
-                                               Defaults to a 2x2x2 supercell.
-            primitive_matrix (list, optional): The primitive matrix to generate the primitive cell. Defaults to None.
+                Defaults to a 2x2x2 supercell.
+            primitive_matrix (list | str, optional): The primitive matrix to generate the primitive cell. Defaults
+                to "auto", which detects the primitive cell from crystal symmetry. Pass "P" to use the input
+                structure as is (identity transformation).
             log_level (int, optional): The log level for Phonopy. Defaults to 0.
             **kwargs: Additional keyword arguments for the `Phonopy.generate_displacement` method.
 
-        Note:
-            The generated displaced structures are stored in the `displaced_structures` attribute, and the
-            displacement vectors are stored in `displacements`.
+        Returns:
+            dict[str, Phonopy | list[Structure] | np.ndarray | list]: Dictionary with keys:
+                - ``phonon``: The `Phonopy` object used to generate the displaced structures.
+                - ``displaced_structures``: The list of displaced structures for phonon calculations.
+                - ``displacements``: The displacement vectors used to generate the displaced structures.
         """
-        supercell_matrix = (
-                np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
-        )
+        from phonopy import Phonopy
+        from pymatgen.io.phonopy import get_phonopy_structure
+
+        supercell_matrix_arr = np.diag(supercell_matrix) if supercell_matrix else np.diag([2, 2, 2])
 
         phonopy_structure = get_phonopy_structure(structure)
 
-        self.phonon = Phonopy(unitcell=phonopy_structure,
-                              supercell_matrix=supercell_matrix,
-                              primitive_matrix=primitive_matrix,
-                              log_level=log_level)
+        phonon = Phonopy(
+            unitcell=phonopy_structure,
+            supercell_matrix=supercell_matrix_arr,
+            primitive_matrix=primitive_matrix,
+            log_level=log_level,
+        )
 
-        self.displaced_structures = self._get_displaced_structures(distance=distance, **kwargs)
-        self.displacements = self.phonon.displacements
+        displaced_structures = self._get_displaced_structures(phonon, distance=distance, **kwargs)
+        displacements = phonon.displacements
 
-    def _get_displaced_structures(
-            self,
-            distance: float = 0.01,
-            **kwargs
-    ) -> list[Structure]:
-        """
-        Generates displaced structures using Phonopy.
+        return {"phonon": phonon, "displaced_structures": displaced_structures, "displacements": displacements}
 
-        This method generates supercells with atomic displacements for phonon calculations using Phonopy.
-        The displaced structures are returned as a list of `Structure` objects.
+    @requires("phonopy", extra="phonopy")
+    def _get_displaced_structures(self, phonon: Phonopy, distance: float = 0.01, **kwargs: Any) -> list[Structure]:
+        """Generate displaced structures using Phonopy.
 
         Args:
+            phonon (Phonopy): The `Phonopy` object to generate displaced structures for.
             distance (float, optional): The maximum atomic displacement distance. Defaults to 0.01.
+            **kwargs: Additional keyword arguments for `Phonopy.generate_displacements`.
 
         Returns:
             list[Structure]: A list of displaced structures for phonon calculations.
         """
-        self.phonon.generate_displacements(distance=distance, **kwargs)
+        from pymatgen.io.phonopy import get_pmg_structure
 
-        displaced_supercells = self.phonon.supercells_with_displacements
-        displaced_structures = [get_pmg_structure(cell) for cell in displaced_supercells
-                                if cell is not None]
+        phonon.generate_displacements(distance=distance, **kwargs)
+
+        displaced_supercells = phonon.supercells_with_displacements
+        displaced_structures = [get_pmg_structure(cell) for cell in displaced_supercells if cell is not None]
 
         return displaced_structures

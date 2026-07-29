@@ -1,15 +1,12 @@
-"""
-This module provides a class for performing calculations using the SevenNet potential.
+"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the SevenNet potential."""
 
-The `SevenNetCalculator` class is designed to calculate properties such as potential energy,
-forces, and stresses, and to perform structure relaxation using a specified SevenNet model.
-"""
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -19,15 +16,11 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
-    """
-    A calculator class for performing material property calculations and structure relaxation using the SevenNet potential.
-
-    The `SevenNetCalculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified SevenNet model.
+    """Calculator for material property calculations and structure relaxation using the SevenNet potential.
 
     Attributes:
-        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "energy", "forces", and "stress".
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
+            "forces", and "stress".
 
     References:
         - SevenNet: https://doi.org/10.1021/acs.jctc.4c00190
@@ -37,20 +30,19 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
     AVAILABLE_PROPERTIES = ["energy", "energies", "free_energy", "forces", "stress"]
 
     def __init__(
-            self,
-            model: str = "7net-mf-ompa",
-            modal: Literal["mpa", "omat24"] = "mpa",
-            file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
-            device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
-            **kwargs
+        self,
+        model: str = "7net-omni",
+        modal: str = "mpa",
+        file_type: Literal["checkpoint", "torchscript"] = "checkpoint",
+        device: Literal["cuda", "cpu", "mps", "auto"] = "auto",
+        **kwargs: Any,
     ) -> None:
-        """
-        Initialize a SevenNetCalculator instance with a specified model and calculation settings.
+        """Initialize a SevenNetCalculator instance with a specified model and calculation settings.
 
         Args:
             model (str, optional): The name or the path of the SevenNet model to use. Defaults to '7net-mf-ompa'.
             modal (Literal["mpa", "omat24"], optional): The fidelity of the model to use. Defaults to 'mpa'.
-            file_type (Literal["checkpoint", "torchscript"]): The format of the model file.
+            file_type (Literal["checkpoint", "torchscript"], optional): The format of the model file.
                 Defaults to 'checkpoint'.
             device (Literal["cuda", "cpu", "mps", "auto"], optional): The device to use for calculations. Defaults to "auto".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
@@ -61,14 +53,8 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         Note:
             The remaining values for the arguments are set to the default values for the SevenNet potential.
         """
-        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
-        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+        super().__init__(**kwargs)
 
-        # BaseCalculator and BaseMDCalculator specific attributes
-        BaseCalculator.__init__(self, **basecalculator_kwargs)
-        BaseMDCalculator.__init__(self, **basemd_kwargs)
-
-        # SevenNet specific attributes
         self.model = model
         self.modal = modal
         self.device = device
@@ -76,23 +62,19 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
 
         self._calculator = None
 
-    @property
+    @lazy_property("_calculator")
+    @requires("sevenn", extra="sevennet")
     def calculator(self) -> Calculator:
-        """
-        Returns the ASE calculator associated with this instance.
-
-        If the calculator has not been initialized yet, it will be created
-        using the potential attribute of this instance.
+        """Lazily builds and returns the ASE Calculator object for the SevenNet potential.
 
         Returns:
-            SevenNetCalculator: The ASE calculator associated with this instance.
+            Calculator: The ASE Calculator object configured with the SevenNet potential.
         """
-        if self._calculator is None:
-            from sevenn.calculator import SevenNetCalculator as SevenNetASECalculator
-            self._calculator = SevenNetASECalculator(
-                    model=self.model,
-                    modal=self.modal,
-                    device=self.device,
-                    file_type=self.file_type,
-            )
-        return self._calculator
+        from sevenn.calculator import SevenNetCalculator as SevenNetASECalculator
+
+        return SevenNetASECalculator(
+            model=self.model,
+            modal=self.modal,
+            device=self.device,
+            file_type=self.file_type,
+        )

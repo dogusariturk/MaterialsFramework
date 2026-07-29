@@ -1,62 +1,64 @@
-"""This package provides the calculator classes for the MaterialsFramework.
+"""Calculator package for MaterialsFramework.
 
-The package includes several calculators, each designed to interface with specific machine learning
-potentials and perform material property calculations such as potential energy, forces, and stresses.
-These calculators support advanced material simulations and structure relaxations.
-
-This package serves as a centralized collection of calculator classes to streamline
-the workflow of materials modeling and property prediction within the MaterialsFramework.
+Individual calculator classes are lazily imported on attribute access.
+Use ``get_calculator(name)`` for name-based lookup without triggering imports.
 """
 
-from .alignn import AlignnCalculator
-from .alphanet import AlphaNetCalculator
-from .chgnet import CHGNetCalculator
-from .deepmd import DeePMDCalculator
-from .eqnorm import EqnormCalculator
-from .eqv2 import EqV2Calculator
-from .esen import eSENCalculator
-from .gptff import GPTFFCalculator
-from .grace import GraceCalculator
-from .hienet import HIENetCalculator
-from .m3gnet import M3GNetCalculator
-from .mace import MACECalculator
-from .mattersim import MatterSimCalculator
-from .megnet import MEGNetCalculator
-from .nequip import NequIPCalculator
-from .nequix import NequixCalculator
-from .newtonnet import NewtonNetCalculator
-from .orb import ORBCalculator
-from .petmad import PetMadCalculator
-from .posegnn import PosEGNNCalculator
-from .sevennet import SevenNetCalculator
-from .uma import UMACalculator
-from .vasp import VASPCalculator
+from __future__ import annotations
+
+from materialsframework._registry import lazy_getattr
+from materialsframework.calculators.registry import get_calculator, list_calculators
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
-__all__ = [
-    "AlignnCalculator",
-    "AlphaNetCalculator",
-    "CHGNetCalculator",
-    "DeePMDCalculator",
-    "EqnormCalculator",
-    "EqV2Calculator",
-    "eSENCalculator",
-    "GPTFFCalculator",
-    "GraceCalculator",
-    "HIENetCalculator",
-    "M3GNetCalculator",
-    "MACECalculator",
-    "MatterSimCalculator",
-    "MEGNetCalculator",
-    "NequIPCalculator",
-    "NequixCalculator",
-    "NewtonNetCalculator",
-    "ORBCalculator",
-    "PetMadCalculator",
-    "PosEGNNCalculator",
-    "SevenNetCalculator",
-    "UMACalculator",
-    "VASPCalculator",
-]
+_CALCULATOR_MAP: dict[str, tuple[str, str]] = {
+    "AlignnCalculator": ("materialsframework.calculators.alignn", "AlignnCalculator"),
+    "AllegroCalculator": ("materialsframework.calculators.allegro", "AllegroCalculator"),
+    "AlphaNetCalculator": ("materialsframework.calculators.alphanet", "AlphaNetCalculator"),
+    "CHGNetCalculator": ("materialsframework.calculators.chgnet", "CHGNetCalculator"),
+    "DeePMDCalculator": ("materialsframework.calculators.deepmd", "DeePMDCalculator"),
+    "EqnormCalculator": ("materialsframework.calculators.eqnorm", "EqnormCalculator"),
+    "EquFlashCalculator": ("materialsframework.calculators.equflash", "EquFlashCalculator"),
+    "EqV2Calculator": ("materialsframework.calculators.eqv2", "EqV2Calculator"),
+    "eSENCalculator": ("materialsframework.calculators.esen", "eSENCalculator"),
+    "GPTFFCalculator": ("materialsframework.calculators.gptff", "GPTFFCalculator"),
+    "GraceCalculator": ("materialsframework.calculators.grace", "GraceCalculator"),
+    "HIENetCalculator": ("materialsframework.calculators.hienet", "HIENetCalculator"),
+    "M3GNetCalculator": ("materialsframework.calculators.m3gnet", "M3GNetCalculator"),
+    "MACECalculator": ("materialsframework.calculators.mace", "MACECalculator"),
+    "MatRISCalculator": ("materialsframework.calculators.matris", "MatRISCalculator"),
+    "MatterSimCalculator": ("materialsframework.calculators.mattersim", "MatterSimCalculator"),
+    "MEGNetCalculator": ("materialsframework.calculators.megnet", "MEGNetCalculator"),
+    "NequIPCalculator": ("materialsframework.calculators.nequip", "NequIPCalculator"),
+    "NequixCalculator": ("materialsframework.calculators.nequix", "NequixCalculator"),
+    "NewtonNetCalculator": ("materialsframework.calculators.newtonnet", "NewtonNetCalculator"),
+    "ORBCalculator": ("materialsframework.calculators.orb", "ORBCalculator"),
+    "PetMadCalculator": ("materialsframework.calculators.petmad", "PetMadCalculator"),
+    "PosEGNNCalculator": ("materialsframework.calculators.posegnn", "PosEGNNCalculator"),
+    "RandomCalculator": ("materialsframework.calculators.random", "RandomCalculator"),
+    "SevenNetCalculator": ("materialsframework.calculators.sevennet", "SevenNetCalculator"),
+    "TACECalculator": ("materialsframework.calculators.tace", "TACECalculator"),
+    "UMACalculator": ("materialsframework.calculators.uma", "UMACalculator"),
+    "VASPCalculator": ("materialsframework.calculators.vasp", "VASPCalculator"),
+}
+
+__all__ = [*_CALCULATOR_MAP, "get_calculator", "list_calculators"]  # noqa: PLE0604
+
+
+def __getattr__(name: str) -> type:
+    """Lazily import and return a calculator class by name.
+
+    Enables attribute-style access to calculators (e.g., ``calculators.M3GNetCalculator``)
+    without eagerly importing all sub-modules at package load time.
+
+    Args:
+        name (str): The calculator class name to look up.
+
+    Returns:
+        type: The requested calculator class.
+
+    Raises:
+        AttributeError: If ``name`` is not found in the calculator registry.
+    """
+    return lazy_getattr(name, __name__, _CALCULATOR_MAP)

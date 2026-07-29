@@ -1,10 +1,10 @@
-"""
-This module provides a class for parsing files and extracting compositions of chemical elements.
+"""Parses Excel/CSV files and extracts per-row elemental compositions.
 
-The primary class, `FileParser`, supports reading data from various file formats
-and processing the data to extract compositions of elements based on their presence in the file.
+`FileParser` matches spreadsheet columns against element symbols and builds a
+`pymatgen.core.Composition` for each row.
 """
-import os
+
+from pathlib import Path
 
 import pandas as pd
 from pymatgen.core import Composition, Element
@@ -14,40 +14,25 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class FileParser:
-    """
-    A class for parsing files and extracting compositions of chemical elements.
+    """Parses Excel and CSV files and extracts elemental compositions as pymatgen `Composition` objects."""
 
-    The `FileParser` class supports parsing Excel and CSV files to extract
-    elemental compositions, which are represented using the `Composition` class
-    from Pymatgen.
-    """
     def __init__(self) -> None:
-        """
-        Initializes the FileParser object and prepares a list of element symbols.
-
-        This method sets up the internal list of element symbols (_element_list) corresponding to elements
-        with atomic numbers from 1 to 102, which will be used in the parsing process.
-        """
+        """Builds the internal list of element symbols for atomic numbers 1 through 102."""
         self._element_list: list[str] = [Element.from_Z(i).symbol for i in range(1, 103)]
 
     def parse(self, filename: str) -> pd.DataFrame:
-        """
-        Parses the given file and extracts the compositions of elements.
-
-        This method reads data from the specified file, which can be either an Excel (.xlsx) or
-        CSV (.csv) file. It processes the data to extract compositions of chemical elements
-        based on the presence of element symbols in the columns.
+        """Reads an Excel (.xlsx) or CSV (.csv) file and extracts elemental compositions from its columns.
 
         Args:
-            filename (str): The path to the file to be parsed.
+            filename (str): The path to the file to parse.
 
         Returns:
-            pandas.DataFrame: A DataFrame containing the extracted compositions of elements.
+            pandas.DataFrame: A DataFrame containing the extracted elemental compositions.
 
         Raises:
             ValueError: If the file type is not supported.
         """
-        file_type = os.path.splitext(filename)[1][1:]
+        file_type = Path(filename).suffix[1:]
         if file_type == "xlsx":
             dataframe = pd.read_excel(filename)
         elif file_type == "csv":
@@ -58,12 +43,7 @@ class FileParser:
         return self._process_dataframe(dataframe)
 
     def _process_dataframe(self, dataframe: pd.DataFrame) -> pd.DataFrame:
-        """
-        Processes the given DataFrame by filtering it to include only columns corresponding to element symbols.
-
-        This method filters the input DataFrame to retain only those columns that match
-        the element symbols in `_element_list`. It then creates a new column "Composition"
-        that contains the elemental composition for each row, represented as a `Composition` object.
+        """Keeps only the columns matching `_element_list` and adds a "Composition" column built from them.
 
         Args:
             dataframe (pandas.DataFrame): The input DataFrame containing raw data.
@@ -72,8 +52,6 @@ class FileParser:
             pandas.DataFrame: The processed DataFrame with an additional "Composition" column.
         """
         new_dataframe = dataframe[dataframe.columns.intersection(self._element_list)].copy()
-        new_dataframe["Composition"] = new_dataframe.apply(
-                lambda x: Composition(x.to_dict()), axis=1
-        )
+        new_dataframe["Composition"] = new_dataframe.apply(lambda x: Composition(x.to_dict()), axis=1)
 
         return new_dataframe

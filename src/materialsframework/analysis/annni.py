@@ -1,128 +1,101 @@
-"""
-This module provides a class to perform the second-order ANNNI formulae on a composition
-to calculate intrinsic and extrinsic stacking fault energies.
+"""This module provides a class to compute intrinsic and extrinsic stacking fault energies using the second-order ANNNI formulae.
 
-The `ANNNIStackingFaultAnalyzer` class calculates stacking fault energies, which are essential
-for understanding the stability of certain crystal structures, using the second-order ANNNI (Axial
-Next-Nearest Neighbor Ising) model. The intrinsic and extrinsic stacking fault energies are derived
-based on the energy differences between FCC, HCP, and DHCP structures.
+The `ANNNIStackingFaultAnalyzer` class derives the intrinsic and extrinsic stacking fault energies
+(ISFE and ESFE) from the energy differences between FCC, HCP, and DHCP structures, using the
+second-order ANNNI (Axial Next-Nearest Neighbor Ising) model.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 import numpy as np
 
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
 from materialsframework.transformations.annni import ANNNIStackingFaultTransformation
+from materialsframework.utils import lazy_property
 
 if TYPE_CHECKING:
     from pymatgen.core import Composition
+
     from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class ANNNIStackingFaultAnalyzer:
-    """
-    A class used to calculate intrinsic and extrinsic stacking fault energies using the ANNNI model.
+class ANNNIStackingFaultAnalyzer(BaseAnalyzer):
+    """A class used to calculate intrinsic and extrinsic stacking fault energies using the ANNNI model.
 
-    The `ANNNIStackingFaultAnalyzer` class provides methods to compute the intrinsic and extrinsic stacking
-    fault energies (ISFE and ESFE) based on the second-order ANNNI formulae. The energies are computed by
-    comparing the potential energies of FCC, HCP, and DHCP structures. These energies are important for
-    understanding the material's stacking fault behavior, especially in metallic alloys.
+    The `ANNNIStackingFaultAnalyzer` class compares the potential energies of FCC, HCP, and DHCP
+    structures to compute the intrinsic and extrinsic stacking fault energies (ISFE and ESFE) per the
+    second-order ANNNI formulae.
     """
 
     def __init__(
-            self,
-            calculator: BaseCalculator | None = None,
-            annni_transformation: ANNNIStackingFaultTransformation | None = None
+        self,
+        calculator: BaseCalculator | None = None,
+        annni_transformation: ANNNIStackingFaultTransformation | None = None,
     ) -> None:
-        """
-        Initializes the `ANNNIStackingFaultAnalyzer` object.
+        """Initializes the `ANNNIStackingFaultAnalyzer` object.
 
         Args:
             calculator (BaseCalculator | None, optional): The calculator object used for relaxation and potential energy calculations.
-                                                            Defaults to `M3GNetCalculator`.
-            annni_transformation (ANNNIStackingFaultTransformation | None, optional): The transformation object used to generate stacking
-                                                                                        fault structures. If not provided, a default instance
-                                                                                        is initialized.
+            annni_transformation (ANNNIStackingFaultTransformation | None, optional): The transformation object used
+                to generate stacking fault structures. If not provided, a default instance is initialized.
         """
-        self._calculator = calculator
+        super().__init__(calculator)
         self._annni_transformation = annni_transformation
 
-    def calculate(
-            self,
-            composition: Composition | str
-    ) -> dict[str, float]:
-        """
-        Calculates intrinsic and extrinsic stacking fault energies (ISFE and ESFE) using the second-order ANNNI formulae.
+    @require_properties("energy")
+    def calculate(self, composition: Composition | str) -> dict[str, float]:
+        """Calculates intrinsic and extrinsic stacking fault energies (ISFE and ESFE) using the second-order ANNNI formulae.
 
-        This method calculates the intrinsic and extrinsic stacking fault energies based on the energy differences
-        between FCC, HCP, and DHCP structures. The stacking fault energies are normalized by the area of the FCC
-        unit cell. The final results are returned as a dictionary.
+        The energy differences between FCC, HCP, and DHCP structures are normalized by the area of the
+        FCC unit cell.
 
         Args:
-            composition (Composition | str): The composition of the supercell, either as a `Composition` object
-                                                   or as a string.
+            composition (Composition | str): The composition of the supercell, either as a `Composition` object or as
+                a string.
 
         Returns:
-            dict[str, float]: A dictionary with the following keys:
-                - "isfe": The intrinsic stacking fault energy (ISFE) in eV/Å².
-                - "esfe": The extrinsic stacking fault energy (ESFE) in eV/Å².
+            dict[str, float]: Dictionary with keys:
+                - ``isfe``: Intrinsic stacking fault energy (eV/A^2).
+                - ``esfe``: Extrinsic stacking fault energy (eV/A^2).
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' property implemented.
         """
-        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'energy' property implemented.")
+        structures = self.annni_transformation.apply_transformation(composition=composition)
 
-        self.annni_transformation.apply_transformation(composition=composition)
-
-        fcc_struct = self.annni_transformation.structures["fcc"]
+        fcc_struct = structures["fcc"]
         fcc_result = self.calculator.relax(fcc_struct)
         fcc_energy = fcc_result["energy"] / fcc_result["final_structure"].num_sites
-        fcc_volume = fcc_result["final_structure"].volume
-        a_fcc = np.sqrt(3) / 4 * (fcc_result["final_structure"].lattice.matrix[0][1] * 2) ** 2
+        fcc_vol_per_atom = fcc_result["final_structure"].volume / fcc_result["final_structure"].num_sites
+        a_conv = (4 * fcc_vol_per_atom) ** (1 / 3)
+        a_fcc = np.sqrt(3) / 4 * a_conv**2
 
-        hcp_struct = self.annni_transformation.structures["hcp"].scale_lattice(fcc_volume)
+        hcp_struct = structures["hcp"]
+        hcp_struct = hcp_struct.scale_lattice(fcc_vol_per_atom * hcp_struct.num_sites)
         hcp_result = self.calculator.calculate(hcp_struct)
         hcp_energy = hcp_result["energy"] / hcp_struct.num_sites
 
-        dhcp_struct = self.annni_transformation.structures["dhcp"].scale_lattice(fcc_volume)
+        dhcp_struct = structures["dhcp"]
+        dhcp_struct = dhcp_struct.scale_lattice(fcc_vol_per_atom * dhcp_struct.num_sites)
         dhcp_result = self.calculator.calculate(dhcp_struct)
         dhcp_energy = dhcp_result["energy"] / dhcp_struct.num_sites
 
         return {
-                "isfe": (hcp_energy + (2 * dhcp_energy) - (3 * fcc_energy)) / a_fcc,
-                "esfe": (4 * (dhcp_energy - fcc_energy)) / a_fcc
+            "isfe": (hcp_energy + (2 * dhcp_energy) - (3 * fcc_energy)) / a_fcc,
+            "esfe": (4 * (dhcp_energy - fcc_energy)) / a_fcc,
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """
-        Returns the calculator instance used for energy calculations.
-
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
-
-        Returns:
-            BaseCalculator: The calculator object used for relaxation and energy calculations.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-            self._calculator = M3GNetCalculator()
-        return self._calculator
-
-    @property
+    @lazy_property("_annni_transformation")
     def annni_transformation(self) -> ANNNIStackingFaultTransformation:
-        """
-        Returns the ANNNI stacking fault transformation object used to generate stacking fault structures.
-
-        If the transformation instance is not already initialized, this method creates a new `ANNNIStackingFaultTransformation` instance.
+        """Returns the ANNNI stacking fault transformation object used to generate stacking fault structures.
 
         Returns:
             ANNNIStackingFaultTransformation: The transformation object used to generate stacking fault structures.
         """
-        if self._annni_transformation is None:
-            self._annni_transformation = ANNNIStackingFaultTransformation()
-        return self._annni_transformation
+        return ANNNIStackingFaultTransformation()

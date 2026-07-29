@@ -1,21 +1,31 @@
+"""Cluster expansion module for fitting and predicting material properties.
+
+`ClusterExpansion` builds an `icet` cluster space from a primitive structure, evaluates
+training structures with a `BaseCalculator`, and fits a cross-validated model (via
+`trainstation`) that predicts a chosen property, such as mixing energy, for new
+configurations of the same cluster space.
+"""
+
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
-from ase import Atoms
 from ase.db.sqlite import SQLite3Database
 
-from materialsframework.tools.calculator import BaseCalculator
-from materialsframework.tools.md import BaseMDCalculator
+from materialsframework.utils import default_calculator, requires, to_atoms
+
+if TYPE_CHECKING:
+    from ase import Atoms
+    from pymatgen.core import Structure
+
+    from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
 class ClusterExpansion:
-    """
-    A class to handle cluster expansion calculations.
-    """
+    """A class to handle cluster expansion calculations."""
 
     def __init__(
         self,
@@ -39,23 +49,24 @@ class ClusterExpansion:
         check_condition: bool = True,
         seed: int = 42,
         verbose: bool = False,
-        calculator: BaseCalculator | BaseMDCalculator | None = None,
+        calculator: BaseCalculator | None = None,
     ) -> None:
-        """
-        Initialize the ClusterExpansion instance.
+        """Initialize the ClusterExpansion instance.
 
-        Parameters:
-            symprec (float): Symmetry precision for structure analysis.
-            position_tolerance (float | None): Tolerance for atomic position comparison.
-            is_relaxed (bool): Whether the input structures are relaxed.
-            fit_method (Literal["ardr", "bayesian-ridge", "elasticnet", "lasso", "least-squares", "omp", "rfe", "ridge", "split-bregman"]): Method used for fitting the cluster expansion.
-            standardize (bool): Whether to standardize the data before fitting.
-            validation_method (Literal["shuffle-split", "k-fold"]): Method used for validation of the model.
-            n_splits (int): Number of splits for cross-validation.
-            check_condition (bool): Whether to check the condition number of the fit.
-            seed (int): Random seed for reproducibility.
-            verbose (bool): Whether to print detailed output during relaxation and fitting.
-            calculator (BaseCalculator | BaseMDCalculator | None): Calculator for energy and property calculations.
+        Args:
+            symprec (float, optional): Symmetry precision for structure analysis. Defaults to 1e-5.
+            position_tolerance (float | None, optional): Tolerance for atomic position comparison. Defaults to None.
+            is_relaxed (bool, optional): Whether the input structures are relaxed. Defaults to True.
+            fit_method (Literal["ardr", "bayesian-ridge", "elasticnet", "lasso", "least-squares", "omp", "rfe", "ridge", "split-bregman"], optional):
+                Method used for fitting the cluster expansion. Defaults to "ardr".
+            standardize (bool, optional): Whether to standardize the data before fitting. Defaults to True.
+            validation_method (Literal["shuffle-split", "k-fold"], optional): Method used for validation of the model.
+                Defaults to "k-fold".
+            n_splits (int, optional): Number of splits for cross-validation. Defaults to 10.
+            check_condition (bool, optional): Whether to check the condition number of the fit. Defaults to True.
+            seed (int, optional): Random seed for reproducibility. Defaults to 42.
+            verbose (bool, optional): Whether to print detailed output during relaxation and fitting. Defaults to False.
+            calculator (BaseCalculator | None, optional): Calculator for energy and property calculations. Defaults to None.
         """
         self.symprec = symprec
         self.position_tolerance = position_tolerance
@@ -75,30 +86,32 @@ class ClusterExpansion:
         self.structures = []
         self._calculator = calculator
 
+    @requires("icet", "trainstation", extra="ce")
     def fit(
         self,
-        structures: list[Atoms] | SQLite3Database = None,
-        primitive_structure: Atoms | None = None,
-        cutoffs: list[float] | None = None,
-        chemical_symbols: list[str] | list[list[str]] | None = None,
-        properties: list[str] | None = None,
+        structures: list[Structure] | SQLite3Database,
+        primitive_structure: Atoms,
+        cutoffs: list[float],
+        chemical_symbols: list[str] | list[list[str]],
+        properties: list[str],
         fit_property: str = "mixing_energy",
     ):
-        """
-        Fit the cluster expansion model using the provided structures and calculator.
+        """Fit the cluster expansion model using the provided structures and calculator.
 
-        Parameters:
-            structures (list[Atoms] | SQLite3Database): List of structures or an ASE database containing structures.
-            primitive_structure (Atoms | None): Primitive structure for the cluster space.
-            cutoffs (list[float] | None): Cutoff distances for the cluster space.
-            chemical_symbols (list[str] | list[list[str]] | None): Chemical symbols for the cluster space.
-            properties (list[str] | None): Properties to be calculated and stored in the structure container.
-            fit_property (str): Property to be used for fitting the cluster expansion model.
+        Args:
+            structures (list[Structure] | SQLite3Database): List of structures or an ASE database containing structures.
+            primitive_structure (Atoms): Primitive structure for the cluster space.
+            cutoffs (list[float]): Cutoff distances for the cluster space.
+            chemical_symbols (list[str] | list[list[str]]): Chemical symbols for the cluster space.
+            properties (list[str]): Properties to be calculated and stored in the structure container.
+            fit_property (str, optional): Property to be used for fitting the cluster expansion model. Defaults to "mixing_energy".
         """
+        from icet import (
+            ClusterExpansion as IcetClusterExpansion,
+        )
         from icet import (
             ClusterSpace,
             StructureContainer,
-            ClusterExpansion as IcetClusterExpansion,
         )
         from trainstation import CrossValidationEstimator
 
@@ -125,15 +138,11 @@ class ClusterExpansion:
                 )
         else:
             for structure in self.structures:
-                if not self.is_relaxed:
-                    structure = self.calculator.relax(structure, verbose=self.verbose)["final_structure"]
+                result = self.calculator.calculate(structure) if self.is_relaxed else self.calculator.relax(structure)
 
                 self.structure_container.add_structure(
-                    structure=structure.to_ase_atoms(msonable=False),
-                    properties={
-                        prop: self.calculator.calculator.results.get(prop, None)
-                        for prop in properties
-                    },
+                    structure=to_atoms(result["final_structure"]),
+                    properties={prop: result.get(prop) for prop in properties},
                 )
 
         if self.verbose:
@@ -155,9 +164,9 @@ class ClusterExpansion:
             print(opt)
 
         self.cluster_expansion = IcetClusterExpansion(
-                cluster_space=self.cluster_space,
-                parameters=opt.parameters,
-                metadata=opt.summary,
+            cluster_space=self.cluster_space,
+            parameters=opt.parameters,
+            metadata=opt.summary,
         )
 
         if self.verbose:
@@ -165,16 +174,13 @@ class ClusterExpansion:
 
     @property
     def calculator(self) -> BaseCalculator:
-        """
-        Returns the calculator used for energy and force calculations.
+        """Returns the calculator used for energy and force calculations.
 
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
+        If the calculator instance is not already initialized, this method returns the default calculator.
 
         Returns:
             BaseCalculator: The calculator object used for force and energy calculations.
         """
         if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-
-            self._calculator = M3GNetCalculator()
+            self._calculator = default_calculator()
         return self._calculator

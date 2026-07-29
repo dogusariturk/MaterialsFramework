@@ -1,148 +1,142 @@
-"""
-This module contains a class to calculate the elastic constant tensor of a given structure.
+"""This module provides a class to calculate the elastic constant tensor of a given structure.
 
 The `ElasticConstantsAnalyzer` class computes the elastic constant tensor of a structure using
 energy-volume data and various deformation modes. The class also computes additional mechanical
 properties such as bulk modulus, shear modulus, Poisson's ratio, and Pugh's ratio based on the
 calculated elastic constants.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 import numpy as np
 from pymatgen.analysis.elasticity import ElasticTensor
-from pymatgen.core import Structure
 
+from materialsframework.analysis.base import BaseAnalyzer
+from materialsframework.analysis.utils import require_properties
+from materialsframework.constants import EV_A3_TO_GPA
 from materialsframework.tools import elastic
-from materialsframework.transformations.elastic_constants import ElasticConstantsDeformationTransformation
+from materialsframework.transformations.elastic_constants import (
+    ElasticConstantsDeformationTransformation,
+)
+from materialsframework.utils import lazy_property, to_atoms
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ase import Atoms
+    from pymatgen.core import Structure
+
     from materialsframework.tools.calculator import BaseCalculator
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 
-class ElasticConstantsAnalyzer:
-    """
-    A class used to calculate the elastic constant tensor for a given structure.
+class ElasticConstantsAnalyzer(BaseAnalyzer):
+    """A class used to calculate the elastic constant tensor for a given structure.
 
-    The `ElasticConstantsAnalyzer` class provides methods to compute the elastic constant tensor
-    of a structure using deformation and energy-volume data. In addition to the elastic constants,
-    this class computes mechanical properties such as bulk modulus, shear modulus, Young's modulus,
-    and Poisson's ratio.
+    Computes the elastic constant tensor from deformation and energy-volume data, along with derived
+    mechanical properties such as bulk modulus, shear modulus, Young's modulus, and Poisson's ratio.
     """
 
     EQUIV = {
-            "cubic": [((0, 0), (1, 1), (2, 2)),
-                      ((0, 1), (0, 2), (1, 2)),
-                      ((3, 3), (4, 4), (5, 5))],
-            "hexagonal": [((0, 0), (1, 1)),
-                          ((0, 2), (1, 2)),
-                          ((3, 3), (4, 4))],
-            "tetragonal": [((0, 0), (1, 1)),
-                           ((0, 2), (1, 2)),
-                           ((3, 3), (4, 4))],
-            "trigonal": [((0, 0), (1, 1)),
-                         ((0, 2), (1, 2)),
-                         ((3, 3), (4, 4))],
-            "orthorhombic": [],
-            "monoclinic": [],
-            "triclinic": []
+        "cubic": [
+            ((0, 0), (1, 1), (2, 2)),
+            ((0, 1), (0, 2), (1, 2)),
+            ((3, 3), (4, 4), (5, 5)),
+        ],
+        "hexagonal": [((0, 0), (1, 1)), ((0, 2), (1, 2)), ((3, 3), (4, 4))],
+        "tetragonal": [((0, 0), (1, 1)), ((0, 2), (1, 2)), ((3, 3), (4, 4))],
+        "trigonal": [((0, 0), (1, 1)), ((0, 2), (1, 2)), ((3, 3), (4, 4))],
+        "orthorhombic": [],
+        "monoclinic": [],
+        "triclinic": [],
     }
 
-    SPECIAL = {"hexagonal", "trigonal"}  # need C66 = ½(C11–C12)
+    SPECIAL = {"hexagonal", "trigonal"}  # need C66 = 1/2(C11-C12)
 
     def __init__(
-            self,
-            num_deform: int = 5,
-            max_deform: float = 2,
-            fmax: float = 0.01,
-            calculator: BaseCalculator | None = None,
-            elastic_constant_transformation: ElasticConstantsDeformationTransformation | None = None
+        self,
+        num_deform: int = 5,
+        max_deform: float = 2,
+        calculator: BaseCalculator | None = None,
+        elastic_constant_transformation: ElasticConstantsDeformationTransformation | None = None,
     ) -> None:
-        """
-        Initializes the `ElasticConstantsAnalyzer` object.
+        """Initializes the `ElasticConstantsAnalyzer` object.
 
         Args:
             num_deform (int, optional): The number of deformations to apply. Defaults to 5.
             max_deform (float, optional): The maximum deformation size in percent and degrees. Defaults to 2%.
-            fmax (float, optional): The maximum force for the calculator. Defaults to 0.01.
             calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
-                                                          Defaults to `M3GNetCalculator`.
-            elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The transformation
-                                                                                                    object used to apply
-                                                                                                    cubic distortions.
+            elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The
+                transformation object used to apply cubic distortions.
         """
+        super().__init__(calculator)
         self.num_deform = num_deform
         self.max_deform = max_deform
-        self.fmax = fmax
 
-        self._calculator = calculator
         self._elastic_constant_transformation = elastic_constant_transformation
 
-    def calculate(
-            self,
-            structure: Structure | Atoms,
-            is_relaxed: bool = False
-    ) -> dict[str, float]:
-        """
-        Calculates the elastic constants of a given structure.
+    @require_properties("energy", "stress")
+    def calculate(self, structure: Structure | Atoms, is_relaxed: bool = False) -> dict[str, float]:
+        """Calculates the elastic constants of a given structure.
 
-        The method calculates the elastic constants of a structure using stress-strain data and various
-        deformation modes. The resulting elastic constants are returned as a dictionary with the elastic
-        constant names as keys and the corresponding values in GPa.
+        Uses stress-strain data from a series of deformation modes to fit the elastic constants.
 
         Args:
             structure (Structure | Atoms): The input structure to calculate the elastic constants.
-            is_relaxed (bool, optional): A flag to indicate whether the input structure is already relaxed.
-                                         Defaults to False.
+            is_relaxed (bool, optional): A flag to indicate whether the input structure is already relaxed. Defaults
+                to False.
 
         Returns:
-            dict[str, float]: A dictionary with the following keys:
-                - C_ij: The elastic constants in GPa.
-                - youngs_modulus: Young's modulus in GPa.
-                - voigt_bulk_modulus: Voigt bulk modulus in GPa.
-                - voigt_shear_modulus: Voigt shear modulus in GPa.
-                - reuss_bulk_modulus: Reuss bulk modulus in GPa.
-                - reuss_shear_modulus: Reuss shear modulus in GPa.
-                - voigt_reuss_hill_bulk_modulus: Voigt-Reuss-Hill bulk modulus in GPa.
-                - voigt_reuss_hill_shear_modulus: Voigt-Reuss-Hill shear modulus in GPa.
-                - poisson_ratio: Poisson's ratio.
-                - pugh_ratio: Pugh's ratio.
+            dict[str, float]: Dictionary with keys:
+                - ``C_ij`` entries: Elastic constants in GPa for all fitted tensor components.
+                - ``youngs_modulus``: Young's modulus in GPa.
+                - ``voigt_bulk_modulus``: Voigt bulk modulus in GPa.
+                - ``voigt_shear_modulus``: Voigt shear modulus in GPa.
+                - ``reuss_bulk_modulus``: Reuss bulk modulus in GPa.
+                - ``reuss_shear_modulus``: Reuss shear modulus in GPa.
+                - ``voigt_reuss_hill_bulk_modulus``: Voigt-Reuss-Hill bulk modulus in GPa.
+                - ``voigt_reuss_hill_shear_modulus``: Voigt-Reuss-Hill shear modulus in GPa.
+                - ``poisson_ratio``: Poisson ratio.
+                - ``pugh_ratio``: Pugh ratio.
+                - ``chen_vickers_hardness``: Chen-Vickers hardness in GPa.
 
         Raises:
-            ValueError: If the calculator object does not have the 'energy' property implemented.
+            ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
         """
-        if "energy" not in self.calculator.AVAILABLE_PROPERTIES:
-            raise ValueError("The calculator object must have the 'energy' property implemented.")
+        structure = self._ensure_relaxed(structure, is_relaxed)
+        structure = to_atoms(structure)
 
-        if not is_relaxed:
-            structure = self.calculator.relax(structure)["final_structure"]
-
-        if isinstance(structure, Structure):
-            structure = structure.to_ase_atoms(msonable=False)
-
+        prev_relax_cell = self.calculator.relax_cell
         self.calculator.relax_cell = False
-        structure.calc = self.calculator.calculator
+        try:
+            structure.calc = self.calculator.calculator
 
-        self.elastic_constants_transformation.apply_transformation(structure)
+            distorted_structures = self.elastic_constants_transformation.apply_transformation(structure)
 
-        for distorted_structure in self.elastic_constants_transformation.distorted_structures:
-            distorted_structure.calc = self.calculator.calculator
+            for distorted_structure in distorted_structures:
+                distorted_structure.calc = self.calculator.calculator
 
-        cij_order = elastic.get_cij_order(structure)
-        Cij, Bij = elastic.get_elastic_tensor(
+            cij_order = elastic.get_cij_order(structure)
+            cij, bij = elastic.get_elastic_tensor(
                 cryst=structure,
-                systems=self.elastic_constants_transformation.distorted_structures
-        )
+                systems=distorted_structures,
+            )
+        finally:
+            self.calculator.relax_cell = prev_relax_cell
 
-        elastic_tensor = self._build_elastic_tensor(Cij, cij_order, structure)
+        cij = np.asarray(cij, dtype=float) * EV_A3_TO_GPA
+
+        elastic_tensor = self._build_elastic_tensor(cij, cij_order, structure)
+
+        pugh_ratio = elastic_tensor.g_vrh / elastic_tensor.k_vrh
+        chen_vickers_hardness = 2.0 * (pugh_ratio**2 * elastic_tensor.g_vrh) ** 0.585 - 3.0
 
         return {
-            **{i: j for i, j in zip(cij_order, Cij)},
+            **dict(zip(cij_order, cij, strict=False)),
             "youngs_modulus": elastic_tensor.y_mod / 1e9,
             "voigt_bulk_modulus": elastic_tensor.k_voigt,
             "voigt_shear_modulus": elastic_tensor.g_voigt,
@@ -151,53 +145,27 @@ class ElasticConstantsAnalyzer:
             "voigt_reuss_hill_bulk_modulus": elastic_tensor.k_vrh,
             "voigt_reuss_hill_shear_modulus": elastic_tensor.g_vrh,
             "poisson_ratio": elastic_tensor.homogeneous_poisson,
-            "pugh_ratio": elastic_tensor.g_vrh / elastic_tensor.k_vrh,
+            "pugh_ratio": pugh_ratio,
+            "chen_vickers_hardness": chen_vickers_hardness,
         }
 
-    @property
-    def calculator(self) -> BaseCalculator:
-        """
-        Returns the calculator instance used for energy calculations.
-
-        If the calculator instance is not already initialized, this method creates a new `M3GNetCalculator` instance.
-
-        Returns:
-            BaseCalculator: The calculator object used for energy calculations.
-        """
-        if self._calculator is None:
-            from materialsframework.calculators.m3gnet import M3GNetCalculator
-            self._calculator = M3GNetCalculator(fmax=self.fmax)
-        return self._calculator
-
-    @property
-    def elastic_constants_transformation(self) -> ElasticConstantsDeformationTransformation:
-        """
-        Returns the transformation object used to apply distortions.
-
-        If the transformation object is not already initialized, this method creates a new `ElasticConstantsDeformationTransformation` instance.
+    @lazy_property("_elastic_constant_transformation")
+    def elastic_constants_transformation(
+        self,
+    ) -> ElasticConstantsDeformationTransformation:
+        """Returns the transformation object used to apply distortions.
 
         Returns:
             ElasticConstantsDeformationTransformation: The transformation object used to apply distortions.
         """
-        if self._elastic_constant_transformation is None:
-            self._elastic_constant_transformation = ElasticConstantsDeformationTransformation(
-                num_deform=self.num_deform,
-                max_deform=self.max_deform
-            )
-        return self._elastic_constant_transformation
+        return ElasticConstantsDeformationTransformation(num_deform=self.num_deform, max_deform=self.max_deform)
 
-    def _build_elastic_tensor(
-            self,
-            Cij: list,
-            cij_order: list,
-            structure: Atoms
-    ) -> ElasticTensor:
-        """
-        Builds the elastic tensor from the given Cij and cij_order.
+    def _build_elastic_tensor(self, cij: Sequence[float], cij_order: Sequence[str], structure: Atoms) -> ElasticTensor:
+        """Builds the elastic tensor from the given cij and cij_order.
 
         Args:
-            Cij (list): The list of elastic constants.
-            cij_order (list): The order of the elastic constants.
+            cij (Sequence[float]): The list of elastic constants.
+            cij_order (Sequence[str]): The order of the elastic constants.
             structure (Atoms): The input structure.
 
         Returns:
@@ -205,14 +173,14 @@ class ElasticConstantsAnalyzer:
         """
         elastic_tensor = np.zeros([6, 6])
 
-        for val, sym in zip(Cij, cij_order):
+        for val, sym in zip(cij, cij_order, strict=False):
             i, j = int(sym[2]) - 1, int(sym[3]) - 1
             elastic_tensor[i, j] = elastic_tensor[j, i] = val
 
         for block in self.EQUIV.get(sys := elastic.get_lattice_type(structure)[1].lower(), []):
-            ref = elastic_tensor[block[0]]
-            for (p, q) in block:
-                elastic_tensor[p, q] = elastic_tensor[q, p] = ref
+            mean_val = np.mean([elastic_tensor[p, q] for p, q in block])
+            for p, q in block:
+                elastic_tensor[p, q] = elastic_tensor[q, p] = mean_val
 
         # add the derived C66 if required
         if sys in self.SPECIAL and elastic_tensor[5, 5] == 0:

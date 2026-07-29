@@ -1,7 +1,6 @@
-"""
-This module provides functions to calculate the elastic tensor components
-from the strain-stress relation for various crystal symmetries.
+r"""This module provides functions to calculate the elastic tensor components.
 
+Computes from the strain-stress relation for various crystal symmetries.
 This file is based on code from the `elastic` package by Paweł T. Jochym (Copyright 1998-2017).
 Original source: https://github.com/jochym/elastic
 
@@ -43,22 +42,24 @@ See: [LL]_ L.D. Landau, E.M. Lifszyc, "Theory of elasticity"
 There is some usefull summary also at:
 `ScienceWorld <https://scienceworld.wolfram.com/physics/Elasticity.html>`_
 """
+
 from __future__ import annotations
 
-from typing import Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-from ase.atoms import Atoms
 from numpy import array, diag, dot, linspace, mean, ones, reshape
 from numpy.linalg import inv
 from scipy.linalg import lstsq
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from ase.atoms import Atoms
     from numpy import ndarray
 
 
 def regular(u: Sequence[float]) -> ndarray:
-    """
-    Generate the equation matrix for the regular (cubic) lattice.
+    """Generate the equation matrix for the regular (cubic) lattice.
 
     The order of constants is as follows: C_{11}, C_{12}, C_{44}.
 
@@ -82,8 +83,7 @@ def regular(u: Sequence[float]) -> ndarray:
 
 
 def tetragonal(u: Sequence[float]) -> ndarray:
-    """
-    Generate the equation matrix for the tetragonal lattice.
+    """Generate the equation matrix for the tetragonal lattice.
 
     The order of constants is: C_{11}, C_{33}, C_{12}, C_{13}, C_{44}, C_{66}.
 
@@ -107,8 +107,7 @@ def tetragonal(u: Sequence[float]) -> ndarray:
 
 
 def orthorombic(u: Sequence[float]) -> ndarray:
-    """
-    Generate the equation matrix for the orthorhombic lattice.
+    """Generate the equation matrix for the orthorhombic lattice.
 
     The order of constants is: C_{11}, C_{22}, C_{33}, C_{12}, C_{13}, C_{23},
     C_{44}, C_{55}, C_{66}.
@@ -133,9 +132,7 @@ def orthorombic(u: Sequence[float]) -> ndarray:
 
 
 def trigonal(u: Sequence[float]) -> ndarray:
-    """
-    Construct the equation matrix for the trigonal lattice based on L&L using
-    auxiliary coordinates.
+    """Construct the equation matrix for the trigonal lattice based on L&L using auxiliary coordinates.
 
     The order of constants is: C_{11}, C_{33}, C_{12}, C_{13}, C_{44}, C_{14}.
 
@@ -161,8 +158,7 @@ def trigonal(u: Sequence[float]) -> ndarray:
 
 
 def hexagonal(u: Sequence[float]) -> ndarray:
-    """
-    Construct the equation matrix for the hexagonal lattice using auxiliary coordinates.
+    """Construct the equation matrix for the hexagonal lattice using auxiliary coordinates.
 
     The order of constants is: C_{11}, C_{33}, C_{12}, C_{13}, C_{44}.
 
@@ -187,8 +183,7 @@ def hexagonal(u: Sequence[float]) -> ndarray:
 
 
 def monoclinic(u: Sequence[float]) -> ndarray:
-    """
-    Generate the equation matrix for the monoclinic lattice.
+    """Generate the equation matrix for the monoclinic lattice.
 
     The ordering of constants is:
     C_{11}, C_{22}, C_{33}, C_{12}, C_{13}, C_{23},
@@ -214,8 +209,7 @@ def monoclinic(u: Sequence[float]) -> ndarray:
 
 
 def triclinic(u: Sequence[float]) -> ndarray:
-    """
-    Construct the equation matrix for triclinic crystals.
+    """Construct the equation matrix for triclinic crystals.
 
     *Note*: This implementation is untested.
 
@@ -246,8 +240,7 @@ def triclinic(u: Sequence[float]) -> ndarray:
 
 
 def get_cij_order(cryst: Atoms) -> tuple[str, ...]:
-    """
-    Get the order of elastic constants for the structure.
+    """Get the order of elastic constants for the structure.
 
     Args:
         cryst (Atoms): The ASE atoms object representing the structure.
@@ -256,39 +249,52 @@ def get_cij_order(cryst: Atoms) -> tuple[str, ...]:
         uple[str, ...]: Order of elastic constants as a tuple of strings.
     """
     orders = {
-        1: ("C_11", "C_22", "C_33",
-            "C_12", "C_13", "C_23",
-            "C_44", "C_55", "C_66",
-            "C_16", "C_26", "C_36",
-            "C_46", "C_56", "C_14",
-            "C_15", "C_25", "C_45",),
-        2: ("C_11", "C_22", "C_33",
-            "C_12", "C_13", "C_23",
-            "C_44", "C_55", "C_66",
-            "C_16", "C_26", "C_36",
-            "C_45",),
-        3: ("C_11", "C_22", "C_33",
-            "C_12", "C_13", "C_23",
-            "C_44", "C_55", "C_66"),
-        4: ("C_11", "C_33", "C_12",
-            "C_13", "C_44", "C_66"),
-        5: ("C_11", "C_33", "C_12",
-            "C_13", "C_44", "C_14"),
-        6: ("C_11", "C_33", "C_12",
-            "C_13", "C_44"),
+        1: (
+            "C_11",
+            "C_22",
+            "C_33",
+            "C_12",
+            "C_13",
+            "C_23",
+            "C_44",
+            "C_55",
+            "C_66",
+            "C_16",
+            "C_26",
+            "C_36",
+            "C_46",
+            "C_56",
+            "C_14",
+            "C_15",
+            "C_25",
+            "C_45",
+        ),
+        2: (
+            "C_11",
+            "C_22",
+            "C_33",
+            "C_12",
+            "C_13",
+            "C_23",
+            "C_44",
+            "C_55",
+            "C_66",
+            "C_16",
+            "C_26",
+            "C_36",
+            "C_45",
+        ),
+        3: ("C_11", "C_22", "C_33", "C_12", "C_13", "C_23", "C_44", "C_55", "C_66"),
+        4: ("C_11", "C_33", "C_12", "C_13", "C_44", "C_66"),
+        5: ("C_11", "C_33", "C_12", "C_13", "C_44", "C_14"),
+        6: ("C_11", "C_33", "C_12", "C_13", "C_44"),
         7: ("C_11", "C_12", "C_44"),
     }
     return orders[get_lattice_type(cryst)[0]]
 
 
-def get_lattice_type(
-        structure: Atoms,
-        length_tol: float = 1e-4,
-        angle_tol: float = 1.0
-) -> tuple[int, str, None, None]:
-    """
-    Classify the lattice type and Bravais lattice name of a crystal structure
-    based on its unit cell parameters.
+def get_lattice_type(structure: Atoms, length_tol: float = 1e-4, angle_tol: float = 1.0) -> tuple[int, str, None, None]:
+    """Classify the lattice type and Bravais lattice name of a crystal structure based on its unit cell parameters.
 
     This function has been modified to determine the lattice type solely from
     the unit cell lengths and angles, without relying on external symmetry
@@ -315,31 +321,41 @@ def get_lattice_type(
             - None (placeholder for space group number)
 
     """
+
     def approx_equal(x, y, tol):
+        """Return True if the absolute difference between x and y is less than tol."""
         return abs(x - y) < tol
 
     a, b, c = structure.cell.lengths()
     alpha, beta, gamma = structure.cell.angles()
+
+    if (
+        approx_equal(a, b, length_tol)
+        and approx_equal(alpha, 90, angle_tol)
+        and approx_equal(beta, 90, angle_tol)
+        and approx_equal(gamma, 120, angle_tol)
+    ):
+        return 6, "Hexagonal", None, None
 
     if approx_equal(alpha, 90, angle_tol) and approx_equal(beta, 90, angle_tol) and approx_equal(gamma, 90, angle_tol):
         if approx_equal(a, b, length_tol) and approx_equal(b, c, length_tol):
             return 7, "Cubic", None, None
         elif approx_equal(a, b, length_tol):
             return 4, "Tetragonal", None, None
-        elif approx_equal(gamma, 120, angle_tol):
-            return 6, "Hexagonal", None, None
         else:
             return 3, "Orthorombic", None, None
-    else:
-        if approx_equal(alpha, beta, angle_tol) and approx_equal(beta, gamma, angle_tol):
-            return 5, "Trigonal", None, None
-        else:
-            return 1, "Triclinic", None, None
+
+    if approx_equal(alpha, beta, angle_tol) and approx_equal(beta, gamma, angle_tol):
+        return 5, "Trigonal", None, None
+
+    if approx_equal(alpha, 90, angle_tol) and approx_equal(gamma, 90, angle_tol):
+        return 2, "Monoclinic", None, None
+
+    return 1, "Triclinic", None, None
 
 
 def get_pressure(s: ndarray) -> float:
-    """
-    Return external isotropic (hydrostatic) pressure in ASE units.
+    """Return external isotropic (hydrostatic) pressure in ASE units.
 
     The pressure is taken as negative of the mean of the first three stress components.
 
@@ -353,8 +369,7 @@ def get_pressure(s: ndarray) -> float:
 
 
 def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[Atoms]:
-    """
-    Generate elementary deformations for elastic tensor calculation based on crystal symmetry.
+    """Generate elementary deformations for elastic tensor calculation based on crystal symmetry.
 
     Args:
         cryst (Atoms): Base structure.
@@ -389,8 +404,7 @@ def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[
 
 
 def get_elastic_tensor(cryst: Atoms, systems: list[Atoms]) -> tuple[ndarray, tuple[ndarray, ...]]:
-    """
-    Calculate the elastic tensor of the crystal using stress-strain fitting.
+    """Calculate the elastic tensor of the crystal using stress-strain fitting.
 
     The elastic tensor is derived from the stress-strain relation
     using a least squares fit.
@@ -427,32 +441,29 @@ def get_elastic_tensor(cryst: Atoms, systems: list[Atoms]) -> tuple[ndarray, tup
     eqm = array([symm(u) for u in ul])
     eqm = reshape(eqm, (eqm.shape[0] * eqm.shape[1], eqm.shape[2]))
     slm = reshape(array(sl), (-1,))
-    Bij = lstsq(eqm, slm)
+    bij = lstsq(eqm, slm)
     # TODO: Check the sign of the pressure array in the B <=> C relation
     if symm == orthorombic:
-        Cij = Bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p])
+        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p])
     elif symm == tetragonal:
-        Cij = Bij[0] - array([-p, -p, p, p, -p, -p])
+        cij = bij[0] - array([-p, -p, p, p, -p, -p])
     elif symm == regular:
-        Cij = Bij[0] - array([-p, p, -p])
+        cij = bij[0] - array([-p, p, -p])
     elif symm == trigonal:
-        Cij = Bij[0] - array([-p, -p, p, p, -p, p])
+        cij = bij[0] - array([-p, -p, p, p, -p, p])
     elif symm == hexagonal:
-        Cij = Bij[0] - array([-p, -p, p, p, -p])
+        cij = bij[0] - array([-p, -p, p, p, -p])
     elif symm == monoclinic:
         # TODO: verify this pressure array
-        Cij = Bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p])
+        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p])
     elif symm == triclinic:
         # TODO: verify this pressure array
-        Cij = Bij[0] - array(
-            [-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p, p, p, p, p, p]
-        )
-    return Cij, Bij
+        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p, p, p, p, p, p])
+    return cij, bij
 
 
 def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) -> Atoms:
-    """
-    Return a cell deformed along one of the Cartesian or shear directions.
+    """Return a cell deformed along one of the Cartesian or shear directions.
 
     The deformation is performed by applying a linear deformation matrix
     to the base structure's cell.
@@ -460,8 +471,7 @@ def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) ->
     Args:
         base_cryst (Atoms): The base structure.
         axis (int): Deformation axis (0, 1, 2 for x, y, z; 3,4,5 for shear).
-        size (float): Magnitude of the deformation (percentage for axial deformation
-                      and degrees for shear deformation).
+        size (float): Magnitude of the deformation (percentage for axial deformation and degrees for shear deformation).
 
     Returns:
         Atoms: New structure with deformed cell.
@@ -469,24 +479,22 @@ def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) ->
     cryst = base_cryst.copy()
     uc = base_cryst.get_cell()
     s = size / 100.0
-    L = diag(ones(3))
+    deform_matrix = diag(ones(3))
     if axis < 3:
-        L[axis, axis] += s
+        deform_matrix[axis, axis] += s
+    elif axis == 3:
+        deform_matrix[1, 2] += s
+    elif axis == 4:
+        deform_matrix[0, 2] += s
     else:
-        if axis == 3:
-            L[1, 2] += s
-        elif axis == 4:
-            L[0, 2] += s
-        else:
-            L[0, 1] += s
-    uc = dot(uc, L)
+        deform_matrix[0, 1] += s
+    uc = dot(uc, deform_matrix)
     cryst.set_cell(uc, scale_atoms=True)
     return cryst
 
 
 def get_strain(cryst: Atoms, refcell: Atoms | None = None) -> ndarray:
-    """
-    Calculate the strain tensor in Voigt notation based on a reference cell.
+    """Calculate the strain tensor in Voigt notation based on a reference cell.
 
     The strain tensor is computed as a symmetric tensor represented as a 6-element vector.
 

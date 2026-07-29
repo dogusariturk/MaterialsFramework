@@ -1,0 +1,188 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-core:
+    name: "Core Tests (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen --group dev
+
+      - name: Run tests
+        run: uv run pytest -v -m "not integration and not slow"
+
+  test-mlip:
+    name: "${{ matrix.name }} Tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: mace
+            install: --extra mace
+            tests: tests/calculators/test_mace.py
+          - name: chgnet
+            install: --extra chgnet --extra sqsgen
+            tests: >-
+              tests/calculators/test_chgnet.py
+              tests/tools/test_bond_lattice_parameter.py
+              tests/analysis/test_annni.py
+              tests/analysis/test_bain.py
+              tests/analysis/test_cubic_elastic_constants.py
+              tests/analysis/test_elastic_constants.py
+              tests/analysis/test_eos.py
+              tests/analysis/test_formation_energy.py
+          - name: matgl
+            install: --extra matgl
+            tests: tests/calculators/test_m3gnet.py tests/calculators/test_megnet.py
+          - name: sevennet
+            install: --extra sevennet
+            tests: tests/calculators/test_sevennet.py
+          - name: uma
+            install: --extra uma
+            tests: tests/calculators/test_uma.py
+          - name: petmad
+            install: --extra petmad
+            tests: tests/calculators/test_petmad.py
+          - name: deepmd
+            install: --extra deepmd
+            tests: tests/calculators/test_deepmd.py
+          - name: nequip
+            install: --extra nequip
+            tests: tests/calculators/test_nequip.py
+          - name: allegro
+            install: --extra allegro
+            tests: tests/calculators/test_allegro.py
+          - name: eqv2
+            install: --extra eqv2
+            tests: tests/calculators/test_eqv2.py
+          - name: esen
+            install: --extra esen
+            tests: tests/calculators/test_esen.py
+          - name: orb
+            install: --extra orb
+            tests: tests/calculators/test_orb.py
+          - name: phonopy
+            install: --extra phonopy
+            tests: tests/analysis/test_phonopy.py tests/transformations/test_phonopy.py
+          - name: phono3py
+            install: --extra phono3py
+            tests: tests/analysis/test_phono3py.py tests/transformations/test_phono3py.py
+          - name: sqsgen
+            install: --extra sqsgen
+            tests: tests/tools/test_sqsgen.py tests/transformations/test_annni.py
+          - name: calphad
+            install: --extra calphad
+            tests: >-
+              tests/tools/test_stability_map.py
+              tests/tools/test_cahn_hilliard.py
+              tests/tools/test_sqs2tdb.py
+          - name: alignn
+            install: --extra alignn
+            tests: tests/calculators/test_alignn.py
+          - name: mattersim
+            install: --extra mattersim
+            tests: tests/calculators/test_mattersim.py
+          - name: nequix
+            install: --extra nequix
+            tests: tests/calculators/test_nequix.py
+          - name: newtonnet
+            install: --extra newtonnet
+            tests: tests/calculators/test_newtonnet.py
+          - name: grace
+            install: --extra grace
+            tests: tests/calculators/test_grace.py
+          - name: eqnorm
+            install: --extra eqnorm
+            tests: tests/calculators/test_eqnorm.py
+          - name: alphanet
+            install: --extra alphanet
+            tests: tests/calculators/test_alphanet.py
+          - name: gptff
+            install: ""
+            extra_install: >-
+              uv pip install
+              "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git@4cef93a9aa573c86c6bb9100d3d48978ad616429"
+            tests: tests/calculators/test_gptff.py
+          - name: equflash
+            install: ""
+            extra_install: >-
+              uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
+            tests: tests/calculators/test_equflash.py
+          - name: posegnn
+            install: ""
+            extra_install: git clone --depth 1 https://github.com/IBM/materials.git /tmp/ibm-materials
+            python_path: /tmp/ibm-materials/models/pos_egnn
+            tests: tests/calculators/test_posegnn.py
+          - name: hienet
+            install: --extra hienet
+            tests: tests/calculators/test_hienet.py
+          - name: tace
+            install: --extra tace
+            tests: tests/calculators/test_tace.py
+          - name: matris
+            install: --extra matris
+            tests: tests/calculators/test_matris.py
+          - name: ce
+            install: --extra ce
+            tests: tests/tools/test_cluster_expansion.py
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen ${{ matrix.install }} --group dev
+
+      - name: Install extra dependency from GitHub
+        if: matrix.extra_install
+        run: ${{ matrix.extra_install }}
+
+      - name: Run tests
+        run: uv run pytest -v -m "not slow" ${{ matrix.tests }}
+        env:
+          PYTHONPATH: ${{ matrix.python_path || '' }}

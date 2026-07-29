@@ -1,15 +1,16 @@
-"""
-This module provides a `TrajectoryObserver` class for observing and recording the states
-of atomic structures during relaxation processes in the Atomic Simulation Environment (ASE).
+"""This module provides the `TrajectoryObserver` class for observing and recording atomic states.
 
-The `TrajectoryObserver` class can save properties like energies, forces, stresses,
-magnetic moments, dipoles, and more for each step of the relaxation.
+`TrajectoryObserver` records the state of atomic structures at each step of a relaxation
+in the Atomic Simulation Environment (ASE), saving properties such as energies, forces,
+stresses, magnetic moments, and dipoles.
 """
+
 from __future__ import annotations
 
 import collections
 import pickle
-from typing import Any, TYPE_CHECKING
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
@@ -22,11 +23,9 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class TrajectoryObserver(collections.abc.Sequence):
-    """
-    TrajectoryObserver is a class that observes and records the states of atomic structures
-    during the relaxation process in ASE.
+    """TrajectoryObserver is a class that observes and records the states of atomic structures.
 
-    This class acts as a hook during the relaxation process, saving intermediate structures and
+    Acts as a hook during the relaxation process in ASE, saving intermediate structures and
     their associated properties like energies, forces, stresses, and optionally, temperatures,
     magnetic moments, and dipoles.
 
@@ -41,17 +40,16 @@ class TrajectoryObserver(collections.abc.Sequence):
         This class was adapted from the matgl code and extended to include the ability
         to save additional property values.
     """
+
     def __init__(
-            self,
-            atoms: Atoms,
-            include_temperature: bool = False,
-            include_magmoms: bool = False,
-            include_dipoles: bool = False,
-            include_velocities: bool = False,
+        self,
+        atoms: Atoms,
+        include_temperature: bool = False,
+        include_magmoms: bool = False,
+        include_dipoles: bool = False,
+        include_velocities: bool = False,
     ) -> None:
-        """
-        Initializes the TrajectoryObserver with the ASE Atoms object and optional flags
-        for recording additional properties.
+        """Initializes the TrajectoryObserver with the ASE Atoms object and optional flags.
 
         Args:
             atoms (Atoms): The ASE Atoms object representing the atomic structure to observe and record.
@@ -89,12 +87,9 @@ class TrajectoryObserver(collections.abc.Sequence):
         self.chemical_symbols: list[str] = []
 
     def __call__(self) -> None:
-        """
-        Records the current state of the atoms, including energies, forces, stresses,
-        and optionally, temperatures, magnetic moments,dipoles, and velocities.
+        """Records the current state of the atoms, including energies, forces, and stresses.
 
-        This method captures and stores various properties of the ASE Atoms object at the current
-        step of the relaxation process.
+        Optionally records temperatures, magnetic moments, dipoles, and velocities.
         """
         self.total_energies.append(float(self.atoms.get_total_energy()))
         self.potential_energies.append(float(self.atoms.get_potential_energy()))
@@ -107,59 +102,51 @@ class TrajectoryObserver(collections.abc.Sequence):
         if self.include_magmoms:
             self.magmoms.append(self.atoms.get_magnetic_moments())
         if self.include_dipoles:
-            self.dipoles.append(self.atoms.get_array("dipole"))
+            self.dipoles.append(self.atoms.get_dipole_moment())
         if self.include_velocities:
             self.velocities.append(self.atoms.get_velocities())
         self.atom_positions.append(self.atoms.get_positions())
         self.atomic_numbers.append(self.atoms.get_atomic_numbers())
         self.chemical_symbols.append(self.atoms.get_chemical_symbols())
 
-    def __getitem__(self, item):
-        """
-        Returns a tuple of recorded properties at the specified index.
+    def __getitem__(self, item) -> tuple[Any, ...]:
+        """Returns a tuple of recorded properties at the specified index.
 
         Args:
             item (int): The index of the step to retrieve properties for.
 
         Returns:
-            tuple: A tuple containing the total energies, potential energies, kinetic energies,
-            forces, stresses, cell parameters, atomic positions, atomic numbers, chemical symbols,
-            and, if applicable, temperatures, magnetic moments, dipoles, and velocities at the specified step.
+            tuple: A tuple containing the total energies, potential energies, kinetic energies, forces, stresses, cell
+                parameters, atomic positions, atomic numbers, chemical symbols, and, if applicable, temperatures, magnetic
+                moments, dipoles, and velocities at the specified step.
         """
         item_properties = (
-                self.total_energies[item],
-                self.potential_energies[item],
-                self.kinetic_energies[item],
-                self.forces[item],
-                self.stresses[item],
-                self.cells[item],
-                self.atom_positions[item],
-                self.atomic_numbers[item],
-                self.chemical_symbols[item],
+            self.total_energies[item],
+            self.potential_energies[item],
+            self.kinetic_energies[item],
+            self.forces[item],
+            self.stresses[item],
+            self.cells[item],
+            self.atom_positions[item],
+            self.atomic_numbers[item],
+            self.chemical_symbols[item],
         )
         if self.include_temperature:
-            item_properties += self.temperatures[item],
+            item_properties += (self.temperatures[item],)
         if self.include_magmoms:
-            item_properties += self.magmoms[item],
+            item_properties += (self.magmoms[item],)
         if self.include_dipoles:
-            item_properties += self.dipoles[item],
+            item_properties += (self.dipoles[item],)
         if self.include_velocities:
-            item_properties += self.velocities[item],
+            item_properties += (self.velocities[item],)
         return item_properties
 
     def __len__(self):
-        """
-        Returns the number of recorded steps in the observer.
-
-        This method provides the length of the recorded trajectory, corresponding to the
-        number of steps at which properties were saved.
-        """
-
+        """Returns the number of recorded steps in the observer."""
         return len(self.total_energies)
 
     def _out_dict(self) -> dict[str, Any]:
-        """
-        Returns a dictionary containing all recorded properties from the relaxation process.
+        """Returns a dictionary containing all recorded properties from the relaxation process.
 
         Returns:
             dict[str, Any]: A dictionary with the following keys:
@@ -178,15 +165,15 @@ class TrajectoryObserver(collections.abc.Sequence):
                 - "velocities" (optional): List of velocities recorded at each step, if applicable.
         """
         out_dict = {
-                "total_energies": self.total_energies,
-                "potential_energies": self.potential_energies,
-                "kinetic_energies": self.kinetic_energies,
-                "forces": self.forces,
-                "stresses": self.stresses,
-                "cells": self.cells,
-                "atom_positions": self.atom_positions,
-                "atomic_numbers": self.atomic_numbers,
-                "chemical_symbols": self.chemical_symbols,
+            "total_energies": self.total_energies,
+            "potential_energies": self.potential_energies,
+            "kinetic_energies": self.kinetic_energies,
+            "forces": self.forces,
+            "stresses": self.stresses,
+            "cells": self.cells,
+            "atom_positions": self.atom_positions,
+            "atomic_numbers": self.atomic_numbers,
+            "chemical_symbols": self.chemical_symbols,
         }
         if self.include_temperature:
             out_dict["temperatures"] = self.temperatures
@@ -199,8 +186,7 @@ class TrajectoryObserver(collections.abc.Sequence):
         return out_dict
 
     def as_pandas(self) -> pd.DataFrame:
-        """
-        Converts the recorded trajectory into a pandas DataFrame.
+        """Converts the recorded trajectory into a pandas DataFrame.
 
         The DataFrame will contain columns for total energies, potential energies,
         kinetic energies, forces, stresses, cell parameters, atomic positions,
@@ -214,14 +200,10 @@ class TrajectoryObserver(collections.abc.Sequence):
         return pd.DataFrame(self._out_dict())
 
     def save(self, filename: str) -> None:
-        """
-        Saves the recorded trajectory to a file in binary format using pickle.
+        """Saves the recorded trajectory to a file in binary format using pickle.
 
         Args:
             filename (str): The name of the file where the trajectory will be saved.
-
-        The trajectory data, including all recorded properties, will be serialized
-        and saved to the specified file.
         """
-        with open(filename, "wb") as file:
+        with Path(filename).open("wb") as file:
             pickle.dump(self._out_dict(), file)

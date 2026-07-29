@@ -1,15 +1,12 @@
-"""
-This module provides a class for performing calculations and structure relaxation using the NewtonNet potential.
+"""Calculator for computing potential energy, forces, and stresses, and for relaxing structures, with the NewtonNet potential."""
 
-The `NewtonNetCalculator` class is designed to calculate properties such as potential energy, forces,
-stresses, and to perform structure relaxation using a specified NewtonNet model.
-"""
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
+from materialsframework.utils import lazy_property, requires
 
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator
@@ -19,52 +16,40 @@ __email__ = "dogu.sariturk@gmail.com"
 
 
 class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
-    """
-    A calculator class for performing material property calculations and structure relaxation using the NewtonNet potential.
-
-    The `NewtonNetCalculator` class supports the calculation of properties such as potential energy,
-    forces, and stresses. It also allows for the relaxation of structures using a specified NewtonNet model.
+    """Calculator for material property calculations and structure relaxation using the NewtonNet potential.
 
     Attributes:
-        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute,
-                                          including "energy", "forces", "hessian", and "stresses".
+        AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
+            "forces", "hessian", and "stresses".
 
     References:
         - NewtonNet: https://doi.org/10.1039/D2DD00008C
     """
 
-    AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "hessian", "stress"]
+    AVAILABLE_PROPERTIES = ["bec", "charges", "energy", "free_energy", "forces", "hessian", "stress"]
 
     def __init__(
-            self,
-            model: str | Literal["ani1", "ani1x", "t1x"] = "t1x",
-            properties: list = ["energy", "free_energy", "forces", "hessian", "stress"],
-            device: Literal["cpu", "cuda"] = "cpu",
-            precision: Literal["float64", "float32", "float16"] = "float32",
-            **kwargs
+        self,
+        model: str | Literal["ani1", "ani1x", "t1x"] = "t1x",
+        properties: list | None = None,
+        device: Literal["cpu", "cuda"] = "cpu",
+        precision: Literal["float64", "float32", "float16"] = "float32",
+        **kwargs: Any,
     ) -> None:
-        """
-        Initializes the NewtonNetCalculator with the specified model and calculation settings.
-
-        This method sets up the calculator with a predefined NewtonNet model, which will be used
-        to calculate properties and perform structure relaxation. Additional parameters
-        for the relaxation process can be passed via `basecalculator_kwargs`.
+        """Initializes the NewtonNetCalculator with the specified model and calculation settings.
 
         Args:
-            model (str | Literal["ani1", "ani1x", "t1x"]): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
-            properties (list): List of properties to calculate, such as "energy", "forces", etc.
-            device (Literal["cpu", "cuda"]): The device to use for calculations. Defaults to "cpu".
-            precision (Literal["float64", "float32", "float16"]): Floating-point precision of the calculations. Defaults to "float32".
+            model (str | Literal["ani1", "ani1x", "t1x"], optional): Path to the NewtonNet model or a predefined model name. Defaults to "t1x"
+            properties (list | None, optional): List of properties to calculate, such as "energy", "forces", etc. Defaults to None,
+                which will calculate all available properties.
+            device (Literal["cpu", "cuda"], optional): The device to use for calculations. Defaults to "cpu".
+            precision (Literal["float64", "float32", "float16"], optional): Floating-point precision of the calculations. Defaults to "float32".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        basecalculator_kwargs = {key: kwargs.pop(key) for key in BaseCalculator.__init__.__annotations__ if key in kwargs}
-        basemd_kwargs = {key: kwargs.pop(key) for key in BaseMDCalculator.__init__.__annotations__ if key in kwargs}
+        super().__init__(**kwargs)
 
-        # BaseCalculator and BaseMDCalculator specific attributes
-        BaseCalculator.__init__(self, **basecalculator_kwargs)
-        BaseMDCalculator.__init__(self, **basemd_kwargs)
-
-        # NewtonNet specific attributes
+        if properties is None:
+            properties = ["energy", "free_energy", "forces", "hessian", "stress"]
         self.model = model
         self.properties = properties
         self.device = device
@@ -72,24 +57,21 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
 
         self._calculator = None
 
-    @property
+    @lazy_property("_calculator")
+    @requires("newtonnet", extra="newtonnet")
     def calculator(self) -> Calculator:
-        """
-        Creates and returns the ASE Calculator object associated with this calculator instance.
-
-        This property initializes the Calculator object using the NewtonNet potential and other settings
-        specified during the initialization of this calculator. The Calculator object is then returned
-        to the caller. If the Calculator object has already been created, it is returned directly.
+        """Lazily builds the ASE Calculator object for the NewtonNet potential, using the settings from initialization.
 
         Returns:
             Calculator: The ASE Calculator object configured with the NewtonNet potential.
         """
-        if self._calculator is None:
-            from newtonnet.utils.ase_interface import MLAseCalculator as NewtonNetASECalculator
-            self._calculator = NewtonNetASECalculator(
-                    model_path=self.model,
-                    properties=self.properties,
-                    device=self.device,
-                    precision=self.precision
-            )
-        return self._calculator
+        from newtonnet.utils.ase_interface import (
+            MLAseCalculator as NewtonNetASECalculator,
+        )
+
+        return NewtonNetASECalculator(
+            model_path=self.model,
+            properties=self.properties,
+            device=self.device,
+            precision=self.precision,
+        )
