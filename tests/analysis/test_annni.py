@@ -13,16 +13,17 @@ from materialsframework.transformations.annni import ANNNIStackingFaultTransform
 class _SmallANNNITransformation(ANNNIStackingFaultTransformation):
     """ANNNI transformation that always uses minimal supercells for fast testing.
 
-    fcc_prim (2,1,1) gives 2 atoms; hcp (1,1,1) gives 2 atoms; dhcp (1,1,1) gives 4 atoms.
-    All sizes are large enough to accommodate a binary 50/50 composition.
+    fcc_prim (2,2,1) gives 4 atoms; hcp (2,1,1) gives 4 atoms; dhcp (1,1,1) gives 4 atoms.
+    All sizes are large enough to accommodate a binary 50/50 composition and to let
+    sqsgenerator resolve the requested coordination shells.
     """
 
-    def apply_transformation(self, composition, **kwargs) -> None:  # type: ignore[override]
+    def apply_transformation(self, composition, **kwargs):  # type: ignore[override]
         """Run the transformation with minimal supercell sizes for fast testing."""
-        super().apply_transformation(
+        return super().apply_transformation(
             composition,
-            fcc_supercell_size=(2, 1, 1),
-            hcp_supercell_size=(1, 1, 1),
+            fcc_supercell_size=(2, 2, 1),
+            hcp_supercell_size=(2, 1, 1),
             dhcp_supercell_size=(1, 1, 1),
         )
 
@@ -67,17 +68,17 @@ def test_calculate_returns_isfe_and_esfe(result) -> None:
 @pytest.mark.integration
 def test_hcp_dhcp_scaled_to_fcc_per_atom_volume(analyzer) -> None:
     """HCP and DHCP structures are scaled to the same per-atom volume as the relaxed FCC."""
-    analyzer.annni_transformation.apply_transformation("Fe0.5Co0.5")
+    structures = analyzer.annni_transformation.apply_transformation("Fe0.5Co0.5")
 
-    fcc_struct = analyzer.annni_transformation.structures["fcc"]
+    fcc_struct = structures["fcc"]
     fcc_result = analyzer.calculator.relax(fcc_struct)
     fcc_vol_per_atom = fcc_result["final_structure"].volume / fcc_result["final_structure"].num_sites
 
-    hcp_struct = analyzer.annni_transformation.structures["hcp"]
+    hcp_struct = structures["hcp"]
     hcp_scaled = hcp_struct.scale_lattice(fcc_vol_per_atom * hcp_struct.num_sites)
     hcp_vol_per_atom = hcp_scaled.volume / hcp_scaled.num_sites
 
-    dhcp_struct = analyzer.annni_transformation.structures["dhcp"]
+    dhcp_struct = structures["dhcp"]
     dhcp_scaled = dhcp_struct.scale_lattice(fcc_vol_per_atom * dhcp_struct.num_sites)
     dhcp_vol_per_atom = dhcp_scaled.volume / dhcp_scaled.num_sites
 
