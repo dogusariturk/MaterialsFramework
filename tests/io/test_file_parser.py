@@ -1,4 +1,4 @@
-"""Tests for io/file_parser.py — no external dependencies beyond pandas/pymatgen."""
+"""Tests for io/file_parser.py, no external dependencies beyond pandas/pymatgen."""
 
 from __future__ import annotations
 

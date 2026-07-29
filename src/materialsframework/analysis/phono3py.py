@@ -136,7 +136,6 @@ class Phono3pyAnalyzer(BaseAnalyzer):
         phonon.init_phph_interaction()
         phonon.run_phonon_solver()
 
-        # Thermal Conductivity
         phonon.run_thermal_conductivity(
             is_LBTE=is_lbte,
             is_isotope=is_isotope,

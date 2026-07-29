@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 from materialsframework.analysis.base import BaseAnalyzer
 from materialsframework.analysis.utils import require_properties
+from materialsframework.constants import EV_A2_TO_MJ_M2
 from materialsframework.transformations.usfe import USFETransformation
 from materialsframework.utils import lazy_property
 
@@ -26,8 +27,6 @@ __email__ = "dogu.sariturk@gmail.com"
 
 class USFEAnalyzer(BaseAnalyzer):
     """A class used to compute GSFE curves and USFE values for BCC-like slip systems."""
-
-    _EV_A2_TO_MJ_M2 = 16021.76634
 
     def __init__(
         self,
@@ -106,7 +105,7 @@ class USFEAnalyzer(BaseAnalyzer):
         gsfe_curve = [
             {
                 "displacement_fraction": float(frac),
-                "gamma_mJ_m2": float((energy - reference_energy) / fault_area * self._EV_A2_TO_MJ_M2),
+                "gamma_mJ_m2": float((energy - reference_energy) / fault_area * EV_A2_TO_MJ_M2),
             }
             for frac, energy in energy_points
         ]

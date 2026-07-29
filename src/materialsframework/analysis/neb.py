@@ -74,13 +74,11 @@ class NEBAnalyzer(BaseAnalyzer):
         """
         super().__init__(calculator)
 
-        # NEB specific attributes
         self.spring_constant = spring_constant
         self.climb = climb
         self.remove_rotation_and_translation = remove_rotation_and_translation
         self.method = method
 
-        # Interpolation specific attributes
         self.n_images = n_images
         self.interpolate_lattices = interpolate_lattices
         self.pbc = pbc

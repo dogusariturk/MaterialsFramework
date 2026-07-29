@@ -407,6 +407,12 @@ class BaseMDCalculator(ABC):
     def run(self, structure: Atoms | Structure | Molecule, steps: int) -> dict[str, Any]:
         """Executes the Molecular Dynamics (MD) simulation using the specified calculator.
 
+        If `structure` has no velocities set, initial momenta are drawn from a Maxwell-Boltzmann
+        distribution at `temperature`. If it already has velocities set (only possible by passing
+        an `ase.Atoms` with `set_velocities()`/`set_momenta()` already called; pymatgen `Structure`/
+        `Molecule` carry no velocity information, and neither does this method's own
+        `final_structure` output), those are kept as-is instead of being overwritten.
+
         Args:
             structure (Atoms | Structure | Molecule): The input atomic structure for the MD simulation.
             steps (int): The number of MD steps to perform.
@@ -424,7 +430,8 @@ class BaseMDCalculator(ABC):
         """
         ase_atoms = to_atoms(structure)
 
-        thermalize_momenta(ase_atoms, temperature_K=self.temperature)
+        if "momenta" not in ase_atoms.arrays:
+            thermalize_momenta(ase_atoms, temperature_K=self.temperature)
 
         if self.stationary:
             Stationary(ase_atoms)

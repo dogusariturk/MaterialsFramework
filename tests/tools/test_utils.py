@@ -1,4 +1,4 @@
-"""Tests for tools/utils.py — no external dependencies."""
+"""Tests for tools/utils.py, no external dependencies."""
 
 from __future__ import annotations
 

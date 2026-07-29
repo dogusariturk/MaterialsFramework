@@ -20,7 +20,7 @@ _SQS2TDB_AVAILABLE = shutil.which("sqs2tdb") is not None
 def test_raises_oserror_without_binary() -> None:
     """Sqs2tdb() raises OSError when sqs2tdb binary is not on PATH."""
     if _SQS2TDB_AVAILABLE:
-        pytest.skip("sqs2tdb is installed — skipping absence test")
+        pytest.skip("sqs2tdb is installed, skipping absence test")
 
     from materialsframework.tools.sqs2tdb import Sqs2tdb
 
