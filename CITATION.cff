@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: MaterialsFramework
+version: 1.0.0
+date-released: "2026-07-29"
+license: GPL-3.0-or-later
+repository-code: "https://github.com/dogusariturk/MaterialsFramework"
+doi: 10.5281/zenodo.15731044
+url: "https://doi.org/10.5281/zenodo.15731044"
+abstract: "A modular Python framework for deploying, benchmarking, and experimenting with machine learning interatomic potentials (MLIPs)."
+authors:
+  - family-names: "Sarıtürk"
+    given-names: "Doğuhan"
+    email: dogu.sariturk@gmail.com
+    orcid: "https://orcid.org/0000-0003-0008-1165"
