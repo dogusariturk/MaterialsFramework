@@ -44,7 +44,6 @@ class EqnormCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # Eqnorm specific attributes
         self.model = model
         self.model_name = model_name
         self.device = device

@@ -49,7 +49,6 @@ class ORBCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # ORB specific attributes
         self.model = model
         self.device = device
         self.precision = precision

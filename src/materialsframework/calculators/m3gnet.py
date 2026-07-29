@@ -58,7 +58,6 @@ class M3GNetCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # M3GNet specific attributes
         self.model = model
         self.state_attr = state_attr
         self.stress_unit = stress_unit

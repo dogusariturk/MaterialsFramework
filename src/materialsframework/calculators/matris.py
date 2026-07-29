@@ -57,7 +57,6 @@ class MatRISCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(include_magmoms=include_magmoms, **kwargs)
 
-        # MatRIS specific attributes
         self.model = model
         self.task = task
         self.device = device

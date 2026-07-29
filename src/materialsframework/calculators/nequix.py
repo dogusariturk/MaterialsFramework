@@ -51,7 +51,6 @@ class NequixCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # Nequix specific attributes
         self.model = model
         self.model_path = model_path
         self.capacity_multiplier = capacity_multiplier

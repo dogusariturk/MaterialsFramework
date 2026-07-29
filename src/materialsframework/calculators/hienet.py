@@ -52,7 +52,6 @@ class HIENetCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # HIENet specific attributes
         self.model = model
         self.device = device
         self.file_type = file_type

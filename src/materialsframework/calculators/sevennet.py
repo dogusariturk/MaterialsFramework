@@ -55,7 +55,6 @@ class SevenNetCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # SevenNet specific attributes
         self.model = model
         self.modal = modal
         self.device = device

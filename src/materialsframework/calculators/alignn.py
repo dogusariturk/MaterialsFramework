@@ -49,7 +49,6 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # ALIGNN-FF specific attributes
         self.model = model
         self.model_filename = model_filename
         self.config_filename = config_filename

@@ -49,7 +49,6 @@ class EqV2Calculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # EqV2 specific attributes
         self.model = model
         self.checkpoint_path = checkpoint_path
         self.local_cache = local_cache

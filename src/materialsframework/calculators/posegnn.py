@@ -48,7 +48,6 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # PosEGNN specific attributes
         self.model = model
         self.device = device
         self.compute_stress = compute_stress

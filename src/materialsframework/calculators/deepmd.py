@@ -41,7 +41,6 @@ class DeePMDCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # DeePMD specific attributes
         self.model = model
 
         self._calculator = None

@@ -48,7 +48,6 @@ class GraceCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # Grace specific attributes
         self.model = model
         self.pad_neighbors_fraction = pad_neighbors_fraction
         self.pad_atoms_number = pad_atoms_number

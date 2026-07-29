@@ -57,7 +57,6 @@ class MatterSimCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # MatterSim specific attributes
         self.model = model
         self.args_dict = args_dict or {}
         self.compute_stress = compute_stress

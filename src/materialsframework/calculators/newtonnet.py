@@ -46,10 +46,8 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
             precision (Literal["float64", "float32", "float16"], optional): Floating-point precision of the calculations. Defaults to "float32".
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
         """
-        # Cooperatively initializes BaseCalculator, then BaseMDCalculator, per the MRO.
         super().__init__(**kwargs)
 
-        # NewtonNet specific attributes
         if properties is None:
             properties = ["energy", "free_energy", "forces", "hessian", "stress"]
         self.model = model

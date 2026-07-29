@@ -48,7 +48,6 @@ class PetMadCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # PET-MAD via UPET specific attributes
         self.model = model
         self.version = version
         self.checkpoint_path = checkpoint_path

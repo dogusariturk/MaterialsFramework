@@ -52,7 +52,6 @@ class AllegroCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # Allegro specific attributes
         self.model = model
         self.device = device
         self.chemical_species_to_atom_type_map = chemical_species_to_atom_type_map

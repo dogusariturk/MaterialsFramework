@@ -65,7 +65,6 @@ class TACECalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # TACE specific attributes
         self.model = model
         self.dtype = dtype
         self.device = device

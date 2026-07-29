@@ -61,7 +61,6 @@ class MACECalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(include_dipoles=include_dipoles, **kwargs)
 
-        # MACE specific attributes
         self.model = model
         self.head = head
         self.device = device

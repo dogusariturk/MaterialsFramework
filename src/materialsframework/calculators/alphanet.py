@@ -47,7 +47,6 @@ class AlphaNetCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # AlphaNet specific attributes
         self.model = model
         self.config = config
         self.device = device

@@ -49,7 +49,6 @@ class eSENCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # eSEN specific attributes
         self.model = model
         self.checkpoint_path = checkpoint_path
         self.device = device

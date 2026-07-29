@@ -23,7 +23,8 @@ class NequIPCalculator(BaseCalculator, BaseMDCalculator):
             "forces", and "stresses".
 
     References:
-        - NequIP: https://arxiv.org/abs/2504.16068
+        - NequIP: https://arxiv.org/abs/2101.03164
+        - NequIP training/inference framework: https://arxiv.org/abs/2504.16068
     """
 
     AVAILABLE_PROPERTIES = ["energy", "energies", "free_energy", "forces", "stress"]
@@ -47,7 +48,6 @@ class NequIPCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # NequIP specific attributes
         self.model = model
         self.device = device
         self.chemical_species_to_atom_type_map = chemical_species_to_atom_type_map

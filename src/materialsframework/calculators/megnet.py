@@ -42,7 +42,6 @@ class MEGNetCalculator:
         Note:
             The remaining parameters for the MEGNet potential are set to their default values.
         """
-        # MEGNet specific attributes
         self.model = model
 
         self._potential = None

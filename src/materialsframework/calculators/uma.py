@@ -49,7 +49,6 @@ class UMACalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(**kwargs)
 
-        # UMA specific attributes
         self.model = model
         self.task_name = task_name
         self.inference_settings = inference_settings

@@ -60,7 +60,6 @@ class CHGNetCalculator(BaseCalculator, BaseMDCalculator):
         """
         super().__init__(include_magmoms=include_magmoms, **kwargs)
 
-        # CHGNet specific attributes
         self.model = model
         self.stress_weight = stress_weight
         self.on_isolated_atoms = on_isolated_atoms
