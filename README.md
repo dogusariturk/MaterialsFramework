@@ -38,32 +38,32 @@
 
 | MLIP      | Extra       | Package            | API                                      | Repository                                                         | Paper                                                       |
 |-----------|-------------|--------------------|------------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
-| ALIGNN    | `alignn`    | `alignn`           | [API](docs/api/calculators/alignn.md)    | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
-| Allegro   | `allegro`   | `nequip-allegro`   | [API](docs/api/calculators/allegro.md)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
-| AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](docs/api/calculators/alphanet.md)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
-| CHGNet    | `chgnet`    | `chgnet`           | [API](docs/api/calculators/chgnet.md)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
-| DeePMD    | `deepmd`    | `deepmd-kit`       | [API](docs/api/calculators/deepmd.md)    | [Repo](https://github.com/deepmodeling/deepmd-kit)                 | [Paper](https://arxiv.org/abs/2506.01686)                   |
-| EqNorm    | `eqnorm`    | `eqnorm`           | [API](docs/api/calculators/eqnorm.md)    | [Repo](https://github.com/yzchen08/eqnorm)                         | N/A                                                         |
-| EquFlash  | N/A         | `GGNN` (git-only)  | [API](docs/api/calculators/equflash.md)  | [Repo](https://github.com/SamsungDS/GGNN)                          | N/A                                                         |
-| EqV2      | `eqv2`      | `fairchem-core`    | [API](docs/api/calculators/eqv2.md)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2306.12059)                   |
-| eSEN      | `esen`      | `fairchem-core`    | [API](docs/api/calculators/esen.md)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2502.12147)                   |
-| GPTFF     | N/A         | `gptff` (git-only) | [API](docs/api/calculators/gptff.md)     | [Repo](https://github.com/atomly-materials-research-lab/GPTFF)     | [Paper](https://doi.org/10.1016/j.scib.2024.08.039)         |
-| GRACE     | `grace`     | `tensorpotential`  | [API](docs/api/calculators/grace.md)     | [Repo](https://github.com/ICAMS/grace-tensorpotential)             | [Paper](https://arxiv.org/abs/2508.17936)                   |
-| HIENet    | `hienet`    | `hienet`           | [API](docs/api/calculators/hienet.md)    | [Repo](https://github.com/divelab/AIRS/tree/main/OpenMat/HIENet)   | [Paper](https://arxiv.org/abs/2503.05771)                   |
-| M3GNet    | `matgl`     | `matgl`            | [API](docs/api/calculators/m3gnet.md)    | [Repo](https://github.com/materialsvirtuallab/m3gnet)              | [Paper](https://arxiv.org/abs/2202.02450)                   |
-| MACE      | `mace`      | `mace-torch`       | [API](docs/api/calculators/mace.md)      | [Repo](https://github.com/ACEsuit/mace)                            | [Paper](https://arxiv.org/abs/2401.00096)                   |
-| MatRIS    | `matris`    | `matris`           | [API](docs/api/calculators/matris.md)    | [Repo](https://github.com/HPC-AI-Team/MatRIS)                      | [Paper](https://arxiv.org/abs/2603.02002)                   |
-| MatterSim | `mattersim` | `mattersim`        | [API](docs/api/calculators/mattersim.md) | [Repo](https://github.com/microsoft/mattersim)                     | [Paper](https://arxiv.org/abs/2405.04967)                   |
-| MEGNet    | `matgl`     | `matgl`            | [API](docs/api/calculators/megnet.md)    | [Repo](https://github.com/materialsvirtuallab/megnet)              | [Paper](https://arxiv.org/abs/1812.05055)                   |
-| NequIP    | `nequip`    | `nequip`           | [API](docs/api/calculators/nequip.md)    | [Repo](https://github.com/mir-group/nequip)                        | [Paper](https://arxiv.org/abs/2504.16068)                   |
-| Nequix    | `nequix`    | `nequix`           | [API](docs/api/calculators/nequix.md)    | [Repo](https://github.com/atomicarchitects/nequix)                 | [Paper](https://arxiv.org/abs/2508.16067)                   |
-| NewtonNet | `newtonnet` | `newtonnet`        | [API](docs/api/calculators/newtonnet.md) | [Repo](https://github.com/THGLab/NewtonNet)                        | [Paper](https://doi.org/10.1039/D2DD00008C)                 |
-| ORB       | `orb`       | `orb-models`       | [API](docs/api/calculators/orb.md)       | [Repo](https://github.com/orbital-materials/orb-models)            | [Paper](https://arxiv.org/abs/2504.06231)                   |
-| PetMad    | `petmad`    | `upet`             | [API](docs/api/calculators/petmad.md)    | [Repo](https://github.com/lab-cosmo/upet)                          | [Paper](https://www.nature.com/articles/s41467-025-65662-7) |
-| PosEGNN   | N/A         | N/A                | [API](docs/api/calculators/posegnn.md)   | [Repo](https://github.com/IBM/materials/tree/main/models/pos_egnn) | N/A                                                         |
-| SevenNet  | `sevennet`  | `sevenn`           | [API](docs/api/calculators/sevennet.md)  | [Repo](https://github.com/MDIL-SNU/SevenNet)                       | [Paper](https://arxiv.org/abs/2510.11241)                   |
-| TACE      | `tace`      | `TACE`             | [API](docs/api/calculators/tace.md)      | [Repo](https://github.com/xvzemin/tace)                            | [Paper](https://arxiv.org/abs/2509.14961)                   |
-| UMA       | `uma`       | `fairchem-core`    | [API](docs/api/calculators/uma.md)       | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2506.23971)                   |
+| ALIGNN    | `alignn`    | `alignn`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/alignn/)    | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
+| Allegro   | `allegro`   | `nequip-allegro`   | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/allegro/)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
+| AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/alphanet/)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
+| CHGNet    | `chgnet`    | `chgnet`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/chgnet/)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
+| DeePMD    | `deepmd`    | `deepmd-kit`       | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/deepmd/)    | [Repo](https://github.com/deepmodeling/deepmd-kit)                 | [Paper](https://arxiv.org/abs/2506.01686)                   |
+| EqNorm    | `eqnorm`    | `eqnorm`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/eqnorm/)    | [Repo](https://github.com/yzchen08/eqnorm)                         | N/A                                                         |
+| EquFlash  | N/A         | `GGNN` (git-only)  | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/equflash/)  | [Repo](https://github.com/SamsungDS/GGNN)                          | N/A                                                         |
+| EqV2      | `eqv2`      | `fairchem-core`    | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/eqv2/)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2306.12059)                   |
+| eSEN      | `esen`      | `fairchem-core`    | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/esen/)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2502.12147)                   |
+| GPTFF     | N/A         | `gptff` (git-only) | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/gptff/)     | [Repo](https://github.com/atomly-materials-research-lab/GPTFF)     | [Paper](https://doi.org/10.1016/j.scib.2024.08.039)         |
+| GRACE     | `grace`     | `tensorpotential`  | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/grace/)     | [Repo](https://github.com/ICAMS/grace-tensorpotential)             | [Paper](https://arxiv.org/abs/2508.17936)                   |
+| HIENet    | `hienet`    | `hienet`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/hienet/)    | [Repo](https://github.com/divelab/AIRS/tree/main/OpenMat/HIENet)   | [Paper](https://arxiv.org/abs/2503.05771)                   |
+| M3GNet    | `matgl`     | `matgl`            | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/m3gnet/)    | [Repo](https://github.com/materialsvirtuallab/m3gnet)              | [Paper](https://arxiv.org/abs/2202.02450)                   |
+| MACE      | `mace`      | `mace-torch`       | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/mace/)      | [Repo](https://github.com/ACEsuit/mace)                            | [Paper](https://arxiv.org/abs/2401.00096)                   |
+| MatRIS    | `matris`    | `matris`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/matris/)    | [Repo](https://github.com/HPC-AI-Team/MatRIS)                      | [Paper](https://arxiv.org/abs/2603.02002)                   |
+| MatterSim | `mattersim` | `mattersim`        | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/mattersim/) | [Repo](https://github.com/microsoft/mattersim)                     | [Paper](https://arxiv.org/abs/2405.04967)                   |
+| MEGNet    | `matgl`     | `matgl`            | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/megnet/)    | [Repo](https://github.com/materialsvirtuallab/megnet)              | [Paper](https://arxiv.org/abs/1812.05055)                   |
+| NequIP    | `nequip`    | `nequip`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/nequip/)    | [Repo](https://github.com/mir-group/nequip)                        | [Paper](https://arxiv.org/abs/2504.16068)                   |
+| Nequix    | `nequix`    | `nequix`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/nequix/)    | [Repo](https://github.com/atomicarchitects/nequix)                 | [Paper](https://arxiv.org/abs/2508.16067)                   |
+| NewtonNet | `newtonnet` | `newtonnet`        | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/newtonnet/) | [Repo](https://github.com/THGLab/NewtonNet)                        | [Paper](https://doi.org/10.1039/D2DD00008C)                 |
+| ORB       | `orb`       | `orb-models`       | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/orb/)       | [Repo](https://github.com/orbital-materials/orb-models)            | [Paper](https://arxiv.org/abs/2504.06231)                   |
+| PetMad    | `petmad`    | `upet`             | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/petmad/)    | [Repo](https://github.com/lab-cosmo/upet)                          | [Paper](https://www.nature.com/articles/s41467-025-65662-7) |
+| PosEGNN   | N/A         | N/A                | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/posegnn/)   | [Repo](https://github.com/IBM/materials/tree/main/models/pos_egnn) | N/A                                                         |
+| SevenNet  | `sevennet`  | `sevenn`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/sevennet/)  | [Repo](https://github.com/MDIL-SNU/SevenNet)                       | [Paper](https://arxiv.org/abs/2510.11241)                   |
+| TACE      | `tace`      | `TACE`             | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/tace/)      | [Repo](https://github.com/xvzemin/tace)                            | [Paper](https://arxiv.org/abs/2509.14961)                   |
+| UMA       | `uma`       | `fairchem-core`    | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/uma/)       | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2506.23971)                   |
 
 Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VASPCalculator` (external licensed VASP backend).
 
@@ -83,7 +83,7 @@ Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VAS
 > [!WARNING]
 > **EquFlash** is only installable from its upstream git repository, and the bare install below leaves
 > `fairchem-core` missing, so `EquFlashCalculator().calculator` raises `ModuleNotFoundError`. See
-> [installation](docs/installation.md) for the CPU-only dependency set that's confirmed to work.
+> [installation](https://dogusariturk.github.io/MaterialsFramework/installation/) for the CPU-only dependency set that's confirmed to work.
 > ```bash
 > uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
 > ```
@@ -158,7 +158,7 @@ Add an MLIP extra the same way:
 pip install "materialsframework[chgnet]"
 ```
 
-See the [installation guide](https://github.com/dogusariturk/MaterialsFramework/blob/main/docs/installation.md) for full setup instructions and [MLIP Conflicts](https://github.com/dogusariturk/MaterialsFramework/blob/main/docs/mlip-conflicts.md) for conflict details.
+See the [installation guide](https://dogusariturk.github.io/MaterialsFramework/installation/) for full setup instructions and [MLIP Conflicts](https://dogusariturk.github.io/MaterialsFramework/mlip-conflicts/) for conflict details.
 
 ---
 
