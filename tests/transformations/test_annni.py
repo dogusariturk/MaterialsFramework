@@ -31,8 +31,8 @@ def test_apply_transformation_returns_correct_structures() -> None:
     t = ANNNIStackingFaultTransformation()
     result = t.apply_transformation(
         "Fe0.5Co0.5",
-        fcc_supercell_size=(2, 1, 1),
-        hcp_supercell_size=(1, 1, 1),
+        fcc_supercell_size=(2, 2, 1),
+        hcp_supercell_size=(2, 1, 1),
         dhcp_supercell_size=(1, 1, 1),
     )
     for key in ("fcc", "hcp", "dhcp"):
@@ -46,8 +46,8 @@ def test_apply_transformation_accepts_string_composition() -> None:
     t = ANNNIStackingFaultTransformation()
     result = t.apply_transformation(
         "Fe0.5Co0.5",
-        fcc_supercell_size=(2, 1, 1),
-        hcp_supercell_size=(1, 1, 1),
+        fcc_supercell_size=(2, 2, 1),
+        hcp_supercell_size=(2, 1, 1),
         dhcp_supercell_size=(1, 1, 1),
     )
     assert len(result) == 3
