@@ -56,6 +56,6 @@ class GPTFFCalculator(BaseCalculator, BaseMDCalculator):
         Returns:
             Calculator: The ASE Calculator object configured with the GPTFF potential.
         """
-        from gptff.interfaces import ASECalculator as GPTFFASECalculator
+        from gptff.model.mpredict import ASECalculator as GPTFFASECalculator
 
         return GPTFFASECalculator(model_path=self.model, device=self.device)
