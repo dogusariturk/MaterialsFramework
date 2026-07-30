@@ -175,38 +175,6 @@ wheels = [
 ]
 
 [[package]]
-name = "alignn"
-version = "2026.5.20"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "ase" },
-    { name = "flake8" },
-    { name = "jarvis-tools" },
-    { name = "lmdb" },
-    { name = "matplotlib" },
-    { name = "mpmath" },
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-alphanet' or extra == 'extra-18-materialsframework-eqv2' or extra == 'extra-18-materialsframework-newtonnet' or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra != 'extra-18-materialsframework-uma')" },
-    { name = "numpy", version = "2.1.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-esen' or extra == 'extra-18-materialsframework-matris' or extra == 'extra-18-materialsframework-mattersim' or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-deepmd') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra != 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-orb' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
-    { name = "pandas" },
-    { name = "pycodestyle" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "pydocstyle" },
-    { name = "pyparsing" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "spglib" },
-    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-eqv2' or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-deepmd') or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-esen') or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
-    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-deepmd' or extra == 'extra-18-materialsframework-esen' or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra != 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra != 'extra-18-materialsframework-orb' and extra == 'extra-18-materialsframework-uma')" },
-    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-alphanet' or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-esen') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-newtonnet') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-mattersim') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-newtonnet') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-uma')" },
-    { name = "tqdm" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e0/2b/186e5d9d6c08d8ad1badcac721ecd9a10d843d901916b19621d3a6ac5011/alignn-2026.5.20.tar.gz", hash = "sha256:abf9dfaf508e6517ed8600f2e2873e460fa5f2bc364cdbe2c910e0c0c797064f", size = 129276, upload-time = "2026-05-24T03:59:24.549Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b6/19/8eb33600ad0222666114deffa16b3d4b628be283957e7b22ed901288ba0e/alignn-2026.5.20-py2.py3-none-any.whl", hash = "sha256:d74ea5e7d8732a7c9a7203e8cde6ff8bd1fe545cb6002ff9c0ce747dc944780e", size = 170372, upload-time = "2026-05-24T03:59:21.558Z" },
-]
-
-[[package]]
 name = "annotated-doc"
 version = "0.0.5"
 source = { registry = "https://pypi.org/simple" }
@@ -505,30 +473,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.43.58"
+version = "1.43.59"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/18/95/bd6276870084c9c1a94e17d1dc73b2de275e59bd7a0ad8bfff0a1598cec4/boto3-1.43.58.tar.gz", hash = "sha256:12871fb50c383f1b9aa4ed6dd386ba689062baef730552e79d5a9cd782b53058", size = 112685, upload-time = "2026-07-28T19:35:09.336Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/c8/ef9de1d7413da3adcdb6363258ba6b5cc703593409d8c1957825b20a69d3/boto3-1.43.59.tar.gz", hash = "sha256:4e9b14f89adc1a533c89312e86d8e00455a6f15d398796d92f9191b06e56b401", size = 112653, upload-time = "2026-07-29T19:33:25.703Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/85/b0709066efb4ce7b86aba4092c739ad0e458be9d62cf32550fc4c130c93f/boto3-1.43.58-py3-none-any.whl", hash = "sha256:ce1a20cbcfaa1d0b3c8f568e2b6c7fbd34b842ea00e729d49a4b4de522828db9", size = 140026, upload-time = "2026-07-28T19:35:06.993Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/10/c5999e72b020012f2e0ccccf2a15632329edd34cb95b02b1ccfb1712ec08/boto3-1.43.59-py3-none-any.whl", hash = "sha256:58b9635deebf075c1c3d76df78df08eb2979c2a74283194676783a0bff3b4557", size = 140024, upload-time = "2026-07-29T19:33:23.751Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.43.58"
+version = "1.43.59"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5e/64/5cd46a7e72b0647e6d78fc8da016259ad66b9ae0818f4c5d629c75e7ca49/botocore-1.43.58.tar.gz", hash = "sha256:e110ca53f65c128fe98df4d6d36a459b1db17c6114671c8a18becf151bf20909", size = 15742412, upload-time = "2026-07-28T19:34:57.468Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e5/37/3712a70796583570a5a2e426163e13762ba5ec615a73e966ad18e5933954/botocore-1.43.59.tar.gz", hash = "sha256:8016da69ecc1d705249a8ef13548d3c95eec87ac1cd26133a8bdfa73ca175be0", size = 15788291, upload-time = "2026-07-29T19:33:14.871Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/82/6f8fbbea47b773734ba0199643d2d851e5c2f75bc3699fe99db8af344d96/botocore-1.43.58-py3-none-any.whl", hash = "sha256:f516159f0732da8249206163ccea3bd1f82ad2a9d184fe6ed447e1abdba4330e", size = 15426503, upload-time = "2026-07-28T19:34:53.508Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/cd/62d749f824b25c152144665f7c5eb8b5ca8be967a87e0c63577b7d4501ae/botocore-1.43.59-py3-none-any.whl", hash = "sha256:21393c35d23b19d7ba95cc4156b59f4013f80696d667997e1abd9d4e29651708", size = 15471171, upload-time = "2026-07-29T19:33:10.864Z" },
 ]
 
 [[package]]
@@ -1115,7 +1083,7 @@ wheels = [
 
 [[package]]
 name = "fairchem-core"
-version = "2.13.0"
+version = "2.21.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "implementation_name == 'cpython' and platform_machine == 'x86_64' and sys_platform == 'linux'",
@@ -1137,6 +1105,8 @@ dependencies = [
     { name = "pyyaml" },
     { name = "ray", extra = ["serve"], marker = "extra == 'extra-18-materialsframework-esen' or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-deepmd') or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-mattersim') or (extra != 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra != 'extra-18-materialsframework-orb' and extra == 'extra-18-materialsframework-uma')" },
     { name = "requests" },
+    { name = "scipy" },
+    { name = "setuptools" },
     { name = "submitit" },
     { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" } },
     { name = "torchtnt" },
@@ -1144,14 +1114,14 @@ dependencies = [
     { name = "wandb" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/10/cf/0c6e0fa2a00c1747b9e06aa280370a93dcc4bdc2cc89b7eb17d1a0e7dcc8/fairchem_core-2.13.0.tar.gz", hash = "sha256:b8ccefcdef4ea8fc13fee63a964a5b9e0663dc1eccd5d131bb0887514f2bbb21", size = 248523, upload-time = "2025-12-11T18:25:28.082Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/55/a83469847aefd58b1b2ec0209a8483449649f71e954e2369936e71063b07/fairchem_core-2.21.0.tar.gz", hash = "sha256:e43c76fa4baf6e8867285b8ab0b911ef0a2b62604e5b38bc400525cfc98e0e45", size = 387002, upload-time = "2026-06-08T20:00:50.911Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ff/81/454aa513417936c14d3a0b53e543ca6ec7255c0e64e947f9652f95a0846f/fairchem_core-2.13.0-py3-none-any.whl", hash = "sha256:d804955a9c6d8600373214bb6b361848d3579ccf7eea1e62e2a4827e4cbd3371", size = 353553, upload-time = "2025-12-11T18:25:26.706Z" },
+    { url = "https://files.pythonhosted.org/packages/6b/a6/2abc8fc329567fc19e5e5db951bd0cba3608780e2b6af11826f281cfaa9a/fairchem_core-2.21.0-py3-none-any.whl", hash = "sha256:9db616317927c7a91cea2dbca707a163b090f88b329d8856297d22e1db9469fd", size = 521771, upload-time = "2026-06-08T20:00:49.438Z" },
 ]
 
 [[package]]
 name = "fastapi"
-version = "0.140.13"
+version = "0.141.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
@@ -1160,32 +1130,18 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2f/cb/7a4d2c2eb5a5d8a91763c05b7383d72917862e32f780daa0e27ffbb34cc6/fastapi-0.140.13.tar.gz", hash = "sha256:500172a08cf1459901f90b05c37d93060dada3b573fec8f0862445db52ba6b4b", size = 424843, upload-time = "2026-07-28T15:37:00.805Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/02/91e3416a8fdd715abb903a952a6bec7cdd8d14eed55d415fc8595524c319/fastapi-0.141.1.tar.gz", hash = "sha256:e8822fc40db1e1858054d7a949a888695bc9bdce70139178e33bd2871a453ca1", size = 425799, upload-time = "2026-07-29T17:18:05.568Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/84/4e/f9e8c762ef5e05c40482131e3d5e8b36bca13fa127578261f1d6b35a25d4/fastapi-0.140.13-py3-none-any.whl", hash = "sha256:8b017110e1e9f30a95e8bdb8f71fbe2f0fe3af5717109e5b14f9e069df54f6d4", size = 131222, upload-time = "2026-07-28T15:37:02.124Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/03/10388a42375ee7e4ac9b94eb2c5c569c8b5795e377e701c9ac3ad63de890/fastapi-0.141.1-py3-none-any.whl", hash = "sha256:bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3", size = 131954, upload-time = "2026-07-29T17:18:04.364Z" },
 ]
 
 [[package]]
 name = "filelock"
-version = "3.32.0"
+version = "3.32.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c0/80/8232b582c4b318b817cf1274ba74976b07b34d35ef439b3eb948f98645a1/filelock-3.32.0.tar.gz", hash = "sha256:7be2ad23a14607ccc71808e68fe30848aeace7058ace17852f68e2a68e310402", size = 213757, upload-time = "2026-07-21T13:17:42.898Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f6/57/3ba6e6cb097f85b855b00163d169f35365f44277df044dcf96d55b8f62a3/filelock-3.32.2.tar.gz", hash = "sha256:c33351e1f49cae33414acbc6d56784e6ecee82514ec90795da1161fc4836b5b8", size = 217172, upload-time = "2026-07-29T22:46:04.895Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/79/b4c714bef36bc4ec2beeae1e0c124f0223888cd8c6feb1cdc56038116920/filelock-3.32.0-py3-none-any.whl", hash = "sha256:d396bea984af47333ef05e50eae7eff88c84256de6112aea0ec48a233c064fe3", size = 97732, upload-time = "2026-07-21T13:17:41.55Z" },
-]
-
-[[package]]
-name = "flake8"
-version = "7.3.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "mccabe" },
-    { name = "pycodestyle" },
-    { name = "pyflakes" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9b/af/fbfe3c4b5a657d79e5c47a2827a362f9e1b763336a52f926126aa6dc7123/flake8-7.3.0.tar.gz", hash = "sha256:fe044858146b9fc69b551a4b490d69cf960fcb78ad1edcb84e7fbb1b4a8e3872", size = 48326, upload-time = "2025-06-20T19:31:35.838Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/56/13ab06b4f93ca7cac71078fbe37fcea175d3216f31f85c3168a6bbd0bb9a/flake8-7.3.0-py2.py3-none-any.whl", hash = "sha256:b9696257b9ce8beb888cdbe31cf885c90d31928fe202be0889a7cdafad32f01e", size = 57922, upload-time = "2025-06-20T19:31:34.425Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/e8/72f8cef9fdfeffe06213fe8508039396ee48daa0e3259457ed766173bfd6/filelock-3.32.2-py3-none-any.whl", hash = "sha256:87dd94cf281e586d135fa51132b8e3d9a598b316e90377a288663c9321036c82", size = 98830, upload-time = "2026-07-29T22:46:03.52Z" },
 ]
 
 [[package]]
@@ -1743,27 +1699,6 @@ wheels = [
 ]
 
 [[package]]
-name = "jarvis-tools"
-version = "2026.6.12"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "joblib" },
-    { name = "matplotlib" },
-    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-alphanet' or extra == 'extra-18-materialsframework-eqv2' or extra == 'extra-18-materialsframework-newtonnet' or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra != 'extra-18-materialsframework-uma')" },
-    { name = "numpy", version = "2.1.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-esen' or extra == 'extra-18-materialsframework-matris' or extra == 'extra-18-materialsframework-mattersim' or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-deepmd') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra != 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-orb' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
-    { name = "requests" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "toolz" },
-    { name = "tqdm" },
-    { name = "xmltodict" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/91/8f/21df0e91358fa4744ff718e5a02e47e3bb034eff2e83a5a50fed144e2f31/jarvis_tools-2026.6.12.tar.gz", hash = "sha256:6eec46c15cbd94f26eb5f5055e36dbc87205016d7ac82370bc67f384c74c49ee", size = 4129083, upload-time = "2026-06-18T16:55:21.369Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/e8/b1c8a4bac3610b1e2d92af43a751af8467830677a3af26a6f49942bf59e8/jarvis_tools-2026.6.12-py2.py3-none-any.whl", hash = "sha256:d1d9e4524ce221df596a7250af0491bdbe74943d2773801f7aab0d53e33c936c", size = 4200993, upload-time = "2026-06-18T16:55:15.976Z" },
-]
-
-[[package]]
 name = "jax"
 version = "0.5.3"
 source = { registry = "https://pypi.org/simple" }
@@ -2186,7 +2121,7 @@ wheels = [
 
 [[package]]
 name = "keras"
-version = "3.15.0"
+version = "3.15.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "absl-py" },
@@ -2199,9 +2134,9 @@ dependencies = [
     { name = "packaging" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/02/0a/c2524cda024e5b24038726de899c4b0ae2603dd0324a30cbc129d6b6314e/keras-3.15.0.tar.gz", hash = "sha256:0123749ac2a704d63f691994b18e432e006cb8ae910cc0ea7035d777aed9c00d", size = 1326815, upload-time = "2026-06-24T23:17:12.332Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/a6/4cebb4196f4e6284b35e68dc17dda9a4111a2e2bf21db8211de12881ef89/keras-3.15.1.tar.gz", hash = "sha256:92ae7c1dd7f61041953dc2d42253181ee099086f0b58ae36fcf98147a6f08a29", size = 1919818, upload-time = "2026-07-29T18:20:13.909Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d4/16/d506c09bbff25927a65d13c542cb4eedc2d573e304f38b6ac3f49ed6be9b/keras-3.15.0-py3-none-any.whl", hash = "sha256:9bbd7df12b7b53500d00dc24d97b7e066c771260482cb7118de0b7687a7a2781", size = 1696954, upload-time = "2026-06-24T23:17:10.808Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/b3/c9b848bbdba18e765a8051917c0cc82585b64278ce87895f2e521a27438f/keras-3.15.1-py3-none-any.whl", hash = "sha256:836460e480930acbd19bb7a17e62f9ecad40e8a9af9a651fc8d0586a96d27e20", size = 2398595, upload-time = "2026-07-29T18:20:12.345Z" },
 ]
 
 [[package]]
@@ -2437,9 +2372,6 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-alignn = [
-    { name = "alignn" },
-]
 allegro = [
     { name = "nequip-allegro" },
 ]
@@ -2470,7 +2402,7 @@ eqv2 = [
     { name = "fairchem-core", version = "1.10.0", source = { registry = "https://pypi.org/simple" } },
 ]
 esen = [
-    { name = "fairchem-core", version = "2.13.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "fairchem-core", version = "2.21.0", source = { registry = "https://pypi.org/simple" } },
 ]
 grace = [
     { name = "tensorpotential" },
@@ -2524,7 +2456,7 @@ tace = [
     { name = "tace" },
 ]
 uma = [
-    { name = "fairchem-core", version = "2.13.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "fairchem-core", version = "2.21.0", source = { registry = "https://pypi.org/simple" } },
 ]
 
 [package.dev-dependencies]
@@ -2537,7 +2469,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "alignn", marker = "extra == 'alignn'", specifier = ">=2025.4.1" },
     { name = "ase", specifier = ">=3.27.0" },
     { name = "chgnet", marker = "extra == 'chgnet'", specifier = ">=0.4.2" },
     { name = "deepmd-kit", extras = ["torch"], marker = "extra == 'deepmd'", specifier = ">=3.1.2" },
@@ -2575,7 +2506,7 @@ requires-dist = [
     { name = "trainstation", marker = "extra == 'ce'", specifier = ">=1.2" },
     { name = "upet", marker = "extra == 'petmad'", specifier = ">=0.2.1" },
 ]
-provides-extras = ["docs", "plots", "phonopy", "phono3py", "sqsgen", "calphad", "ce", "alignn", "allegro", "alphanet", "chgnet", "deepmd", "eqnorm", "eqv2", "esen", "grace", "hienet", "mace", "matgl", "matris", "mattersim", "nequip", "nequix", "newtonnet", "orb", "petmad", "sevennet", "tace", "uma"]
+provides-extras = ["docs", "plots", "phonopy", "phono3py", "sqsgen", "calphad", "ce", "allegro", "alphanet", "chgnet", "deepmd", "eqnorm", "eqv2", "esen", "grace", "hienet", "mace", "matgl", "matris", "mattersim", "nequip", "nequix", "newtonnet", "orb", "petmad", "sevennet", "tace", "uma"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2746,15 +2677,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/7d/0a/c7754e4bd86b7778533f2375ff58ac4187b75fc5e137bbd535815b17e429/mattersim-1.2.5-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:eda9a6c594111541298872f25fd577c3bb4de764290b479af13921039cc4b64e", size = 350044, upload-time = "2026-05-28T15:59:44.242Z" },
     { url = "https://files.pythonhosted.org/packages/63/00/5ebc37661b3333793b2861827439cc8e2a3129dd0c9694d54028328650ef/mattersim-1.2.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1b5e46ba56efa5c1e93372ad32321300fa5e1f07dd9188a11b727bd578cf8d7f", size = 755919, upload-time = "2026-05-28T15:59:45.909Z" },
     { url = "https://files.pythonhosted.org/packages/3a/28/c464d60a641c8a93cbc96dc2b9b83f59a33eeac589c929b7ec5e9b2fabf5/mattersim-1.2.5-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:f472e340c07ee4e1ee76687653622b854c542b4fe41fc253adf619936c7ea279", size = 773037, upload-time = "2026-05-28T15:59:49.642Z" },
-]
-
-[[package]]
-name = "mccabe"
-version = "0.7.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e7/ff/0ffefdcac38932a54d2b5eed4e0ba8a408f215002cd178ad1df0f2806ff8/mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325", size = 9658, upload-time = "2022-01-24T01:14:51.113Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3aad8395a3d6dd7921c0686e23853ff5a9/mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e", size = 7350, upload-time = "2022-01-24T01:14:49.62Z" },
 ]
 
 [[package]]
@@ -4543,15 +4465,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pycodestyle"
-version = "2.14.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/11/e0/abfd2a0d2efe47670df87f3e3a0e2edda42f055053c85361f19c0e2c1ca8/pycodestyle-2.14.0.tar.gz", hash = "sha256:c4b5b517d278089ff9d0abdec919cd97262a3367449ea1c8b49b91529167b783", size = 39472, upload-time = "2025-06-20T18:49:48.75Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/27/a58ddaf8c588a3ef080db9d0b7e0b97215cee3a45df74f3a94dbbf5c893a/pycodestyle-2.14.0-py2.py3-none-any.whl", hash = "sha256:dd6bf7cb4ee77f8e016f9c8e74a35ddd9f67e1d5fd4184d86c3b98e07099f42d", size = 31594, upload-time = "2025-06-20T18:49:47.491Z" },
-]
-
-[[package]]
 name = "pycparser"
 version = "3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4599,9 +4512,9 @@ name = "pydantic-settings"
 version = "2.14.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pydantic" },
-    { name = "python-dotenv" },
-    { name = "typing-inspection" },
+    { name = "pydantic", marker = "extra == 'extra-18-materialsframework-alphanet' or extra == 'extra-18-materialsframework-mattersim' or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-esen') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
+    { name = "python-dotenv", marker = "extra == 'extra-18-materialsframework-alphanet' or extra == 'extra-18-materialsframework-mattersim' or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-esen') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
+    { name = "typing-inspection", marker = "extra == 'extra-18-materialsframework-alphanet' or extra == 'extra-18-materialsframework-mattersim' or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-esen') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-newtonnet') or (extra == 'extra-18-materialsframework-newtonnet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5c/b5/8f48e906c3e0205276e8bd8cb7512217a87b2685304d64be27cad5b3019f/pydantic_settings-2.14.2.tar.gz", hash = "sha256:c19dd64b19097f1de80184f0cc7b0272a13ae6e170cbf240a3e27e381ed14a5f", size = 237700, upload-time = "2026-06-19T13:44:56.324Z" }
 wheels = [
@@ -4621,33 +4534,12 @@ wheels = [
 ]
 
 [[package]]
-name = "pydocstyle"
-version = "6.3.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "snowballstemmer" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/5c/d5385ca59fd065e3c6a5fe19f9bc9d5ea7f2509fa8c9c22fb6b2031dd953/pydocstyle-6.3.0.tar.gz", hash = "sha256:7ce43f0c0ac87b07494eb9c0b462c0b73e6ff276807f204d6b53edc72b7e44e1", size = 36796, upload-time = "2023-01-17T20:29:19.838Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/36/ea/99ddefac41971acad68f14114f38261c1f27dac0b3ec529824ebc739bdaa/pydocstyle-6.3.0-py3-none-any.whl", hash = "sha256:118762d452a49d6b05e194ef344a55822987a462831ade91ec5c06fd2169d019", size = 38038, upload-time = "2023-01-17T20:29:18.094Z" },
-]
-
-[[package]]
 name = "pyfiglet"
 version = "0.8.post1"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/02/48293654fb2e4fdeb4d927f00a380230a832744b6c9af757373a72d018d1/pyfiglet-0.8.post1.tar.gz", hash = "sha256:c6c2321755d09267b438ec7b936825a4910fec696292139e664ca8670e103639", size = 634618, upload-time = "2019-02-05T13:50:20.006Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/33/07/fcfdd7a2872f5b348953de35acce1544dab0c1e8368dca54279b1cde5c15/pyfiglet-0.8.post1-py2.py3-none-any.whl", hash = "sha256:d555bcea17fbeaf70eaefa48bb119352487e629c9b56f30f383e2c62dd67a01c", size = 865831, upload-time = "2019-02-05T13:50:22.689Z" },
-]
-
-[[package]]
-name = "pyflakes"
-version = "3.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/45/dc/fd034dc20b4b264b3d015808458391acbf9df40b1e54750ef175d39180b1/pyflakes-3.4.0.tar.gz", hash = "sha256:b24f96fafb7d2ab0ec5075b7350b3d2d2218eab42003821c06344973d3ea2f58", size = 64669, upload-time = "2025-06-20T18:45:27.834Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c2/2f/81d580a0fb83baeb066698975cb14a618bdbed7720678566f1b046a95fe8/pyflakes-3.4.0-py2.py3-none-any.whl", hash = "sha256:f742a7dbd0d9cb9ea41e9a24a918996e8170c799fa528688d40dd582c8265f4f", size = 63551, upload-time = "2025-06-20T18:45:26.937Z" },
 ]
 
 [[package]]
@@ -5327,15 +5219,6 @@ wheels = [
 ]
 
 [[package]]
-name = "snowballstemmer"
-version = "3.1.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/43/f8/0a71edf031f03c40db17503cb8ca78a69a171254e568e7db241b0ab57ea1/snowballstemmer-3.1.1.tar.gz", hash = "sha256:e07bbc54a0d798fe6010a12398422e62a8bfbba95c394fd0956ef58cb4d3e260", size = 123314, upload-time = "2026-06-03T00:56:40.194Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4c/07/2ebca9b11fb9be7340a818d8d6f63feaebb146be2c4afbd6061701d6df6e/snowballstemmer-3.1.1-py3-none-any.whl", hash = "sha256:7e207fa178741da09cdee59d3ecec3827ad5f92b1fc5c9ff3755b639f71f5752", size = 104164, upload-time = "2026-06-03T00:56:38.614Z" },
-]
-
-[[package]]
 name = "spglib"
 version = "2.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -5647,15 +5530,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a0/79/4af51e2bb214b6ea58f857c51183d92beba85b23f7ba61c983ab3de56c33/tinydb-4.8.2.tar.gz", hash = "sha256:f7dfc39b8d7fda7a1ca62a8dbb449ffd340a117c1206b68c50b1a481fb95181d", size = 32566, upload-time = "2024-10-12T15:24:01.13Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/78/17/853354204e1ca022d6b7d011ca7f3206c4f8faa3cc743e92609b49c1d83f/tinydb-4.8.2-py3-none-any.whl", hash = "sha256:f97030ee5cbc91eeadd1d7af07ab0e48ceb04aa63d4a983adbaca4cba16e86c3", size = 24888, upload-time = "2024-10-12T15:23:59.833Z" },
-]
-
-[[package]]
-name = "toolz"
-version = "1.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/11/d6/114b492226588d6ff54579d95847662fc69196bdeec318eb45393b24c192/toolz-1.1.0.tar.gz", hash = "sha256:27a5c770d068c110d9ed9323f24f1543e83b2f300a687b7891c1a6d56b697b5b", size = 52613, upload-time = "2025-10-17T04:03:21.661Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fb/12/5911ae3eeec47800503a238d971e51722ccea5feb8569b735184d5fcdbc0/toolz-1.1.0-py3-none-any.whl", hash = "sha256:15ccc861ac51c53696de0a5d6d4607f99c210739caf987b5d2054f3efed429d8", size = 58093, upload-time = "2025-10-17T04:03:20.435Z" },
 ]
 
 [[package]]
@@ -6033,15 +5907,15 @@ wheels = [
 
 [[package]]
 name = "ty"
-version = "0.0.64"
+version = "0.0.65"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8e/aa/14c9965d3b173105692473897cc89c34cd91241368b2044e43167e1c17ff/ty-0.0.64.tar.gz", hash = "sha256:d12ddbb05f15158bb518af619378b385486450def95fb06f8ab98037febe9f2c", size = 6350966, upload-time = "2026-07-27T18:32:45.403Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cf561927e8e9ab5c1892a833b664aa9cd6f051a75f6280c66d8047246bda/ty-0.0.65.tar.gz", hash = "sha256:b7134bffcc00b715fa8291e84d845782ced810a998dc1f7f11d71c85c4046325", size = 6460098, upload-time = "2026-07-29T18:31:03.27Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4c/de/19f14357888a7198438926303753cf749428e3d62e8980ff1e9a72a78402/ty-0.0.64-py3-none-macosx_11_0_arm64.whl", hash = "sha256:4f6d1c7f897cca05d12bacbf1435150d5ffa496099515aa6ed303c8b29e1d0bb", size = 11317394, upload-time = "2026-07-27T18:32:13.162Z" },
-    { url = "https://files.pythonhosted.org/packages/08/2f/f54462300535ab99b551eda733177be2eef5dbc2997d3fdb357c4ddd760a/ty-0.0.64-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:138d6c37ad4bf8583aa7a9b29d90954151d7856f9910a03eae3eb34b34c57215", size = 11863042, upload-time = "2026-07-27T18:32:15.307Z" },
-    { url = "https://files.pythonhosted.org/packages/af/ef/dfb9b7f9bcc032d3b540b0d1f55f532a336e2fb41b1bd539c05ae81a151a/ty-0.0.64-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:86db830cb914bb33bb8247b66ccea58de4496c2391bd42658aba744b439f3290", size = 12440880, upload-time = "2026-07-27T18:32:26.341Z" },
-    { url = "https://files.pythonhosted.org/packages/79/d5/795733f13ceff1378f08b3de0c49d0f518df220ed856b0dfac869f3b7c81/ty-0.0.64-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:4838768295774a86e95f9ec5633e739d016adbbb69dcbdc62f3549578a11f624", size = 11814821, upload-time = "2026-07-27T18:32:30.632Z" },
-    { url = "https://files.pythonhosted.org/packages/dd/9b/75768e562cec990d189dc05807ae72890b20ffbd1e1f43597bb98db63c60/ty-0.0.64-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:39b9dd42908df47c2dc57dda87e656fab97097ffd2618474bbdea986af0d6a9d", size = 12548817, upload-time = "2026-07-27T18:32:36.995Z" },
+    { url = "https://files.pythonhosted.org/packages/13/09/7f3766aef9dc627e2698cf4e3e59cf53389dcae3812040d33c1aa931230f/ty-0.0.65-py3-none-macosx_11_0_arm64.whl", hash = "sha256:685f49a9312bbf69d5b65bbb66384fed1f927403ea030c217b9289092d7e46c4", size = 11451922, upload-time = "2026-07-29T18:30:19.155Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/7b/1a77cd50e0befb50f55b8bf9bd3ed3eddf184bf28c61b56727039e0774fc/ty-0.0.65-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6f564b5ebe78e2f3a8e7b8eacb1292eb88b7c0f3c8630671cfca31abc0709cd9", size = 11994999, upload-time = "2026-07-29T18:30:22.315Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/26/c250c2c569adc53a8591716641388397bcb2a442e4a30b952ae81b50c0e0/ty-0.0.65-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5a75bd0c245c38802a8f488378e74f92feb7dd33db7d63fbdd6fdf82791ba730", size = 12579338, upload-time = "2026-07-29T18:30:37.199Z" },
+    { url = "https://files.pythonhosted.org/packages/36/b6/1e22fa11a1e0dfb20b1c7f3cbfd8170273aada2a82f9ecd3055275370c44/ty-0.0.65-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:03a88493d4842889f65280ae241e06b399d57eb3c63571054cad21a4c33b3b69", size = 11938625, upload-time = "2026-07-29T18:30:42.603Z" },
+    { url = "https://files.pythonhosted.org/packages/77/22/a1a08ebc84c083db2fb55e3b5cd186db0c067692f4921146f601360231e2/ty-0.0.65-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:c852da96091ad22361e6586b7c7ba98e1334dcd4d8ffb67e47f4fb673de33f77", size = 12682710, upload-time = "2026-07-29T18:30:51.364Z" },
 ]
 
 [[package]]
@@ -6201,17 +6075,17 @@ wheels = [
 
 [[package]]
 name = "vesin"
-version = "0.6.0"
+version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-alphanet' or extra == 'extra-18-materialsframework-eqv2' or extra == 'extra-18-materialsframework-newtonnet' or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-matris') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-mattersim') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-matris' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-esen' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra != 'extra-18-materialsframework-uma')" },
     { name = "numpy", version = "2.1.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-18-materialsframework-esen' or extra == 'extra-18-materialsframework-matris' or extra == 'extra-18-materialsframework-mattersim' or (extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-deepmd') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-nequip') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-sevennet') or (extra == 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-eqv2') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-alphanet' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-mace') or (extra == 'extra-18-materialsframework-allegro' and extra == 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-eqnorm' and extra == 'extra-18-materialsframework-eqv2') or (extra != 'extra-18-materialsframework-mace' and extra != 'extra-18-materialsframework-orb' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-orb') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra == 'extra-18-materialsframework-eqv2' and extra == 'extra-18-materialsframework-uma') or (extra != 'extra-18-materialsframework-alphanet' and extra != 'extra-18-materialsframework-deepmd' and extra != 'extra-18-materialsframework-mace' and extra == 'extra-18-materialsframework-uma') or (extra == 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-matris' and extra != 'extra-18-materialsframework-mattersim' and extra == 'extra-18-materialsframework-orb') or (extra == 'extra-18-materialsframework-allegro' and extra != 'extra-18-materialsframework-eqnorm' and extra != 'extra-18-materialsframework-eqv2' and extra != 'extra-18-materialsframework-esen' and extra == 'extra-18-materialsframework-mace')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0e/70/52ef4b30afe7d27fb2c0c9ef8d8e7e28ffd6b21603d308413690be8867ca/vesin-0.6.0.tar.gz", hash = "sha256:127f11694478f61a47be1c253b5ce0f24247648774494dd15de8ff16ef9881c7", size = 113307, upload-time = "2026-07-09T10:09:04.633Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1a/3e/5b57c48223fea42e44714bda5b1c5c5de945b8eb69c2ee7d194efaa23602/vesin-0.6.1.tar.gz", hash = "sha256:d76b8c7f21551a494c7bf7697a8c05986b8179bd2d3683f0d634537bc2fe48c0", size = 115323, upload-time = "2026-07-29T12:33:31.373Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/52/2d91ab075569763e2839446bcf610dc5e6f5f1e7be4c0c1c9c476ad857e6/vesin-0.6.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:6fdb37490bd4fc8a00cfc12595861684855ef9ec30981d6086ce78569ed24b80", size = 106219, upload-time = "2026-07-09T10:08:58.286Z" },
-    { url = "https://files.pythonhosted.org/packages/71/16/6b9674b3483afced915d2b1bf627e10e6c0b31769270c47d6daf5c869a4f/vesin-0.6.0-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:239b900497c1fde11bb7c77df81058861147269ed923b7f106723c3e23a2d5ca", size = 181410, upload-time = "2026-07-09T10:09:00.49Z" },
-    { url = "https://files.pythonhosted.org/packages/75/d1/2ca1ec1cbd728e29a0754b2fee177eb10f1b9840f5f62940a3c4085b6672/vesin-0.6.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:166b6bb2ecb8178387d412b4ac6120d0ac5f6c7e2fc055be0e0456010d9e5dbb", size = 201746, upload-time = "2026-07-09T10:09:01.568Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/19/0f8bd7ed5fd54a9917f9385298d0696942cff92fae3bdd0295caab5a3c47/vesin-0.6.1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:5992919826b8935ac6abca105bd3b5eba61e7a58e656940b261b20740b8e0fe6", size = 106962, upload-time = "2026-07-29T12:33:23.617Z" },
+    { url = "https://files.pythonhosted.org/packages/12/5b/221a0ec1845c38100c72f410fe6aed905c56ded6007140bdffce608ae595/vesin-0.6.1-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:8448ca611df50ee8b6087eb67fd4b4ba2eed21e8a43dabea706ad27fdc77bc0b", size = 182142, upload-time = "2026-07-29T12:33:26.632Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/24/ef992ce7a8491b8f1e223febce36ebe1221f24bf5f60f62aa3dba69ae43b/vesin-0.6.1-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:27c4d838bbe315837cf7ca62597b94581235c269dce4d1d3600749f64396e746", size = 202842, upload-time = "2026-07-29T12:33:27.808Z" },
 ]
 
 [[package]]
@@ -6340,17 +6214,17 @@ wheels = [
 
 [[package]]
 name = "websockets"
-version = "16.1.1"
+version = "17.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/21/f7/bc3a25c5ec26ce62ce487690becc2f3710bbc7b33338f005ad390db0b986/websockets-16.1.1.tar.gz", hash = "sha256:db234eda965dcce15df96bb9709f587cd87d4d52aaf0e80e2f34ec04c7670c57", size = 182204, upload-time = "2026-07-17T22:51:05.858Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/da/ea/c0f7924f7ccf005d6ad1f829971762ae751727497d6db1977ba5a635314f/websockets-17.0.tar.gz", hash = "sha256:6bbe83c4ef52a7533d2d8c6a3512b93722fd0db6bc6bc638d45edd49ef201444", size = 183456, upload-time = "2026-07-29T18:07:16.726Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/9d/681cda21c9eee743203a6cb79b9d3d05adad9aa60ec660c6c9bf4dd619ca/websockets-16.1.1-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:cc97814dfb786a83b6e2dc2e79351e1b83e6d715647d6887fcabd83026417a00", size = 179600, upload-time = "2026-07-17T22:49:13.92Z" },
-    { url = "https://files.pythonhosted.org/packages/73/e3/fe2d498c64dea0095c9a9f9a351af4cd6eef31b618395582bc1f38ba45ff/websockets-16.1.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:01fbdcbac298efe19360b94bc0039c8f746f0220ba570f327577bfee81059175", size = 177542, upload-time = "2026-07-17T22:49:16.875Z" },
-    { url = "https://files.pythonhosted.org/packages/fe/ed/f1831681fce0e3242346e5458486003c5f124ed69e5e0b847fd029db4973/websockets-16.1.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:0f62863e8a00a6d33c3d6566ec0b89f23787b747ffe0c3bc71ec0e76b82c94b1", size = 187137, upload-time = "2026-07-17T22:49:18.323Z" },
-    { url = "https://files.pythonhosted.org/packages/6f/79/4ff9dcc1bb46f6b4c536936dde1fd60f9b564f3304307274db97f4c9496d/websockets-16.1.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8087e82f842609734c9b5a1330464f8e94e346ba0e18c832c08bafa4b0d63c15", size = 188374, upload-time = "2026-07-17T22:49:19.65Z" },
-    { url = "https://files.pythonhosted.org/packages/1d/5b/14af3cd4ee69d8ea9baca58f3dc3cfb1ba78332a347fd478cb096549d60e/websockets-16.1.1-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:2a636ff1e7a5c4edf71ef0e79adae7f25dba93b4fcbe3dc958733477ffeb0eaf", size = 187809, upload-time = "2026-07-17T22:49:27.147Z" },
-    { url = "https://files.pythonhosted.org/packages/9d/0b/f78de76ff446f1e66af12b43c48a35f31744de93cfdec2f4ea67d5d7bbf1/websockets-16.1.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:53260c8930da5771cec89439bff99c20c8cb03ddb9588b980697355a83cd4bd3", size = 187102, upload-time = "2026-07-17T22:49:34.616Z" },
-    { url = "https://files.pythonhosted.org/packages/be/4d/2d0d67834092e354d2b0498f014a41249a89556bc406cf86f3e1557bb463/websockets-16.1.1-py3-none-any.whl", hash = "sha256:6abbd3e82c731c8e531714466acd5d87b5e88ac3243465337ba71d68e23ae7e3", size = 173814, upload-time = "2026-07-17T22:51:04.184Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/e3/e4f27930a556ea4039487415ed7100ce96d607b29dfc65ac309168695ba4/websockets-17.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:6312d9926196483550c0ad83459595dd02dd816fa0523ec91dac5601b35de2da", size = 212744, upload-time = "2026-07-29T18:04:54.041Z" },
+    { url = "https://files.pythonhosted.org/packages/b2/9d/a88e66b7b8581f433b990f20738045093bfc15dd3b8b939980daf793121d/websockets-17.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e219be64a9dff86d33b3314ecc6c42289a2d8a447821931012f874b2cc3c70a9", size = 210692, upload-time = "2026-07-29T18:04:56.944Z" },
+    { url = "https://files.pythonhosted.org/packages/be/7c/883fddde356c9366bbb1abc9a16d02e20515aadb89de3364c5dd7b9cc360/websockets-17.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:abfa93514d5d7fe50988c4b6092585da0e9a737c1063530cf62fecfe93f7acf0", size = 220295, upload-time = "2026-07-29T18:04:59.958Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/18/2b2c71d158206b759e79a2e606ad057a3e3f01e05353a676081417ea9bc2/websockets-17.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:aacbf208ef605c463e5cc888d26e25b68732baa171990339c1b4e2880f7b60dd", size = 221533, upload-time = "2026-07-29T18:05:01.734Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/99/2872777a8d96c4bc546bc79a22acd7db57aa2acddcbd3527c83515c7d789/websockets-17.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:d8ddfc7ae598004778e8e092580aafec16ae9f8f16ebf0c178bb76292db6e8dd", size = 220970, upload-time = "2026-07-29T18:05:09.071Z" },
+    { url = "https://files.pythonhosted.org/packages/57/f8/271327f8fa4c07326ba9c79c9daea81e4c043029c6df48bbddfb0bf46649/websockets-17.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:3c59f7a03967dcdb490098a7e684b1e691f8032835f8176d9cb3cbc654773381", size = 220259, upload-time = "2026-07-29T18:05:18.217Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/b4/9b5bd8ad82a7ace4e4a497aed083b6a9bf9076b1ea1a0bf5831686b4af71/websockets-17.0-py3-none-any.whl", hash = "sha256:0c24d62cafaca7dc1631e9f3bf0672fa83f010e66a2aeff4d00727b18addcd8e", size = 206871, upload-time = "2026-07-29T18:07:15.156Z" },
 ]
 
 [[package]]
@@ -6434,15 +6308,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ea/96/3f7bdd00e505ec3698903415b30135024703e017b28c6b61f98da3193b0d/xarray-2026.7.0.tar.gz", hash = "sha256:361b495928fdbf5b58d0969bb6775339019da5e93ca74d61ddf4eb5edd6ce604", size = 3145348, upload-time = "2026-07-09T17:38:26.515Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/57/5b/28365212062939d213802e5e5fe855cdb231e1c2a93254ba1690066504e3/xarray-2026.7.0-py3-none-any.whl", hash = "sha256:bf9dd130b93806dc78e90c1b7ac24851b31557b888674c53622235691cf21824", size = 1426778, upload-time = "2026-07-09T17:38:24.224Z" },
-]
-
-[[package]]
-name = "xmltodict"
-version = "1.0.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/19/70/80f3b7c10d2630aa66414bf23d210386700aa390547278c789afa994fd7e/xmltodict-1.0.4.tar.gz", hash = "sha256:6d94c9f834dd9e44514162799d344d815a3a4faec913717a9ecbfa5be1bb8e61", size = 26124, upload-time = "2026-02-22T02:21:22.074Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/34/98a2f52245f4d47be93b580dae5f9861ef58977d73a79eb47c58f1ad1f3a/xmltodict-1.0.4-py3-none-any.whl", hash = "sha256:a4a00d300b0e1c59fc2bfccb53d7b2e88c32f200df138a0dd2229f842497026a", size = 13580, upload-time = "2026-02-22T02:21:21.039Z" },
 ]
 
 [[package]]

@@ -8,7 +8,6 @@ Any two extras *not* listed against each other here can be installed together. A
 
 | Extra       | Conflicts with                                                                      |
 |-------------|-------------------------------------------------------------------------------------|
-| `alignn`    | none                                                                                |
 | `allegro`   | `mace`                                                                              |
 | `alphanet`  | `deepmd`, `eqv2`, `esen`, `matris`, `mattersim`, `uma`                              |
 | `chgnet`    | none                                                                                |
@@ -55,7 +54,10 @@ Any two extras *not* listed against each other here can be installed together. A
 
 ## Extras Without a Pip Package
 
-`gptff`, `equflash`, and `posegnn` can't be requested with `--extra` and never appear in the conflicts table above. Each has its own install path, detailed in [Non-Extra Calculators](installation.md#non-extra-calculators):
+`alignn`, `gptff`, `equflash`, and `posegnn` can't be requested with `--extra` and never appear in the conflicts table above. Each has its own install path, detailed in [Non-Extra Calculators](installation.md#non-extra-calculators):
+
+`alignn`
+:   Needs a hard-pinned `torch==2.3.0` plus a matching `dgl` build from DGL's own wheel index (not PyPI). Wheels are Linux-only; macOS needs building `dgl` from source instead.
 
 `gptff`
 :   Git-only install. Its pins (`ase>=3.22.1`, `torch>=1.6`) are loose enough to coexist with every other extra in this project.

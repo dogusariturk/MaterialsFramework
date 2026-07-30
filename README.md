@@ -38,7 +38,7 @@
 
 | MLIP      | Extra       | Package            | API                                      | Repository                                                         | Paper                                                       |
 |-----------|-------------|--------------------|------------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
-| ALIGNN    | `alignn`    | `alignn`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/alignn/)    | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
+| ALIGNN    | N/A         | `alignn` (no pip extra) | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/alignn/) | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
 | Allegro   | `allegro`   | `nequip-allegro`   | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/allegro/)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
 | AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/alphanet/)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
 | CHGNet    | `chgnet`    | `chgnet`           | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/chgnet/)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
@@ -66,6 +66,15 @@
 | UMA       | `uma`       | `fairchem-core`    | [API](https://dogusariturk.github.io/MaterialsFramework/api/calculators/uma/)       | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2506.23971)                   |
 
 Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VASPCalculator` (external licensed VASP backend).
+
+> [!WARNING]
+> **ALIGNN** has no `materialsframework` extra. `dgl` only ships Linux wheels, pinned to an exact `torch` build:
+> ```bash
+> uv pip install torch==2.3.0
+> uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+> uv pip install "alignn>=2025.4.1"
+> ```
+> On macOS, [build `dgl` from source](https://docs.dgl.ai/install/index.html#install-from-source) instead. See [installation](https://dogusariturk.github.io/MaterialsFramework/installation/) for details.
 
 > [!WARNING]
 > **PosEGNN** has no installable package on any public index. Clone the repository and add the module directory to `PYTHONPATH` manually:

@@ -6,7 +6,7 @@
 
 | Calculator   | Class                 | Backend                   |
 |--------------|-----------------------|---------------------------|
-| ALIGNN       | `AlignnCalculator`    | alignn                    |
+| ALIGNN       | `AlignnCalculator`    | N/A                       |
 | Allegro      | `AllegroCalculator`   | nequip-allegro            |
 | AlphaNet     | `AlphaNetCalculator`  | msc-alphanet              |
 | CHGNet       | `CHGNetCalculator`    | chgnet                    |
@@ -27,7 +27,7 @@
 | Nequix       | `NequixCalculator`    | nequix                    |
 | NewtonNet    | `NewtonNetCalculator` | newtonnet                 |
 | ORB          | `ORBCalculator`       | orb-models                |
-| PET-MAD      | `PetMadCalculator`    | upet (`pet-mad-s`)        |
+| PET-MAD      | `PetMadCalculator`    | upet                      |
 | PosEGNN      | `PosEGNNCalculator`   | N/A                       |
 | Random       | `RandomCalculator`    | (built-in, no ML backend) |
 | SevenNet     | `SevenNetCalculator`  | sevenn                    |
@@ -37,7 +37,7 @@
 
 ## Common Interface
 
-All calculators except `MEGNetCalculator` expose the same `calculate()`/`relax()` methods, and most also expose `run()`. `fmax`, `steps`, `optimizer`, and `relax_cell` are set once on the calculator's constructor, not passed to `relax()` itself:
+Every calculator except `MEGNetCalculator` exposes both `calculate()` and `relax()` in the form shown below; `MEGNetCalculator` only has `calculate()`, and it returns a single scalar formation energy instead of the structured result the other calculators produce. Most calculators also expose `run()`. `fmax`, `steps`, `optimizer`, and `relax_cell` are set once on the calculator's constructor, not passed to `relax()` itself:
 
 ```python
 calc = SomeCalculator(fmax=0.05, steps=500, optimizer="FIRE", relax_cell=True)

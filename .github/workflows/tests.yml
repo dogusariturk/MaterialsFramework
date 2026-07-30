@@ -112,7 +112,11 @@ jobs:
               tests/tools/test_cahn_hilliard.py
               tests/tools/test_sqs2tdb.py
           - name: alignn
-            install: --extra alignn
+            install: ""
+            extra_install: |
+              uv pip install torch==2.3.0
+              uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+              uv pip install "alignn>=2025.4.1"
             tests: tests/calculators/test_alignn.py
           - name: mattersim
             install: --extra mattersim

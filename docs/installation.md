@@ -58,7 +58,7 @@ If you are on a different platform, installation may still be possible with manu
 
 | Calculator      | Extra       | Dependency spec                                            |
 |-----------------|-------------|------------------------------------------------------------|
-| ALIGNN          | `alignn`    | `alignn>=2025.4.1`                                         |
+| ALIGNN          | N/A         | `alignn` (no pip extra; see note below)                    |
 | Allegro         | `allegro`   | `nequip-allegro>=0.8.3`                                    |
 | AlphaNet        | `alphanet`  | `msc-alphanet>=0.1.3`                                      |
 | CHGNet          | `chgnet`    | `chgnet>=0.4.2`                                            |
@@ -85,6 +85,37 @@ If you are on a different platform, installation may still be possible with manu
 | UMA             | `uma`       | `fairchem-core>=2.0.0`                                     |
 
 ### Non-Extra Calculators
+
+=== "ALIGNN"
+
+    `AlignnCalculator` has no `materialsframework` extra. `dgl` (which it needs) has no PyPI wheel
+    for Python 3.12 on Linux or macOS, so it has to come from DGL's own wheel index instead, pinned
+    to the exact `torch` build that wheel was compiled against:
+
+    ```bash
+    uv pip install torch==2.3.0
+    uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+    uv pip install "alignn>=2025.4.1"
+    ```
+
+    Verified end to end on Linux x86_64. Don't change any one of these versions without
+    re-testing, since the whole chain is tightly coupled.
+
+    !!! warning "Still failing after installing everything above?"
+
+        If `AlignnCalculator` still raises `TypeError: 'NoneType' object is not callable`, you're
+        probably missing the system `libcurl4` library (rare outside minimal containers):
+
+        ```bash
+        apt-get install -y libcurl4
+        ```
+
+    !!! info "macOS or no prebuilt wheel for your platform"
+
+        DGL's wheel index only covers Linux. For macOS, or any platform without a prebuilt wheel,
+        DGL can be built from source instead. See their
+        [build-from-source guide](https://docs.dgl.ai/install/index.html#install-from-source) for
+        the macOS, Linux, and Windows steps.
 
 === "EquFlash"
 

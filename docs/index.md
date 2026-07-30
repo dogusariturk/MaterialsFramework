@@ -73,7 +73,7 @@
 <div align="center" markdown>
 | MLIP      | Extra       | Package            | API                                 | Repository                                                         | Paper                                                       |
 |-----------|-------------|--------------------|-------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
-| ALIGNN    | `alignn`    | `alignn`           | [API](api/calculators/alignn.md)    | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
+| ALIGNN    | N/A         | `alignn` (no pip extra) | [API](api/calculators/alignn.md) | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
 | Allegro   | `allegro`   | `nequip-allegro`   | [API](api/calculators/allegro.md)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
 | AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](api/calculators/alphanet.md)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
 | CHGNet    | `chgnet`    | `chgnet`           | [API](api/calculators/chgnet.md)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
@@ -102,6 +102,19 @@
 </div>
 
 Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VASPCalculator` (external licensed VASP backend).
+
+??? info "ALIGNN"
+
+    *ALIGNN* has no `materialsframework` extra. `dgl` (which it needs) only ships prebuilt wheels
+    for Linux, pinned to an exact `torch` version:
+
+    ```bash
+    uv pip install torch==2.3.0
+    uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+    uv pip install "alignn>=2025.4.1"
+    ```
+
+    On macOS or anywhere else without a wheel, [build `dgl` from source](https://docs.dgl.ai/install/index.html#install-from-source) instead. See [installation](installation.md#non-extra-calculators) for the full details.
 
 ??? info "EquFlash"
 
