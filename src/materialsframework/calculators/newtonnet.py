@@ -26,7 +26,7 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
         - NewtonNet: https://doi.org/10.1039/D2DD00008C
     """
 
-    AVAILABLE_PROPERTIES = ["bec", "charges", "energy", "free_energy", "forces", "hessian", "stress"]
+    AVAILABLE_PROPERTIES = ["energy", "free_energy", "forces", "hessian", "stress"]
 
     def __init__(
         self,
