@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
+import numpy as np
+
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 from materialsframework.utils import lazy_property, requires
@@ -66,7 +68,16 @@ class AlignnCalculator(BaseCalculator, BaseMDCalculator):
         """
         from alignn.ff.calculators import AlignnAtomwiseCalculator
 
-        return AlignnAtomwiseCalculator(
+        class _AlignnAtomwiseCalculator(AlignnAtomwiseCalculator):
+            """AlignnAtomwiseCalculator with `energy` squeezed to an actual scalar."""
+
+            def calculate(self, atoms, properties=None, system_changes=None) -> None:
+                super().calculate(atoms, properties, system_changes)
+                energy = self.results.get("energy")
+                if isinstance(energy, np.ndarray):
+                    self.results["energy"] = energy.item()
+
+        return _AlignnAtomwiseCalculator(
             path=self.model,
             model_filename=self.model_filename,
             config_filename=self.config_filename,

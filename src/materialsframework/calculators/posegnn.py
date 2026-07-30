@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
+import numpy as np
+
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 from materialsframework.utils import lazy_property, requires
@@ -65,9 +67,19 @@ class PosEGNNCalculator(BaseCalculator, BaseMDCalculator):
         Returns:
             Calculator: The ASE Calculator object configured with the PosEGNN potential.
         """
+        from ase.calculators.calculator import all_changes
         from posegnn.calculator import PosEGNNCalculator as PosEGNNASECalculator
 
-        return PosEGNNASECalculator(
+        class _PosEGNNASECalculator(PosEGNNASECalculator):
+            """PosEGNNASECalculator with `results["energy"]` squeezed to a scalar."""
+
+            def calculate(self, atoms=None, properties=None, system_changes=all_changes) -> None:
+                super().calculate(atoms, properties, system_changes)
+                energy = self.results.get("energy")
+                if isinstance(energy, np.ndarray):
+                    self.results["energy"] = energy.item()
+
+        return _PosEGNNASECalculator(
             checkpoint=self.model,
             device=self.device,
             compute_stress=self.compute_stress,

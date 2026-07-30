@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
+import numpy as np
+
 from materialsframework.tools.calculator import BaseCalculator
 from materialsframework.tools.md import BaseMDCalculator
 from materialsframework.utils import lazy_property, requires
@@ -69,7 +71,17 @@ class NewtonNetCalculator(BaseCalculator, BaseMDCalculator):
             MLAseCalculator as NewtonNetASECalculator,
         )
 
-        return NewtonNetASECalculator(
+        class _NewtonNetASECalculator(NewtonNetASECalculator):
+            """NewtonNetASECalculator with `energy`/`free_energy` squeezed to actual scalars."""
+
+            def calculate(self, atoms=None, properties=None, system_changes=None) -> None:
+                super().calculate(atoms, properties, system_changes)
+                for name in ("energy", "free_energy"):
+                    value = self.results.get(name)
+                    if isinstance(value, np.ndarray):
+                        self.results[name] = value.item()
+
+        return _NewtonNetASECalculator(
             model_path=self.model,
             properties=self.properties,
             device=self.device,
