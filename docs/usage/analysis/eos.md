@@ -5,10 +5,10 @@ Fits energy-volume data to an equation of state (EOS) to extract equilibrium vol
 ```python
 from ase.build import bulk
 from materialsframework.analysis import EOSAnalyzer
-from materialsframework.calculators import RandomCalculator
+from materialsframework.calculators import CHGNetCalculator
 
 struct = bulk("Cu", "fcc", a=3.6, cubic=True)
-calc = RandomCalculator()
+calc = CHGNetCalculator()
 
 eos = EOSAnalyzer(calculator=calc)
 res = eos.calculate(struct)

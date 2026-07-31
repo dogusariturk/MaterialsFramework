@@ -11,7 +11,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15731044.svg)](https://doi.org/10.5281/zenodo.15731044)
 
-`MaterialsFramework` provides a single, uniform API for 20+ machine learning interatomic potentials (MLIPs), covering single-point calculations, structure relaxation, and molecular dynamics, plus the property analyzers and structure-generation tools that build on them. Swapping one MLIP for another, or for the licensed `VASPCalculator`, means changing one line of code.
+`MaterialsFramework` provides a largely uniform API for 20+ machine learning interatomic potentials (MLIPs), covering single-point calculations, structure relaxation, and molecular dynamics, plus the property analyzers and structure-generation tools that build on them. Most backends share the same workflow calls; their available properties and setup requirements can differ.
 
 <p>
   <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=bug">Report a Bug</a> |
@@ -62,7 +62,7 @@
 
 - Run single-point calculations and structure relaxations across 20+ ML interatomic potentials through one shared `BaseCalculator` interface, or swap in the licensed `VASPCalculator` without changing calling code
 - Accept `ase.Atoms`, `pymatgen.Structure`, and `pymatgen.Molecule` interchangeably as calculator input
-- Run molecular dynamics (NVE, NVT/NPT Nose-Hoover, NPT/Inhomogeneous-NPT Berendsen) on any calculator that supports it
+- Run molecular dynamics with NVE and a broad set of NVT/NPT thermostats and barostats on calculators that support it
 - Compute formation energy, elastic constants, phonons, stacking faults, surface/binding energies, and reaction barriers with 14 property analyzers, each paired with a transformation that generates the structures it needs
 - Generate special quasirandom structures, cluster expansion models, phase-field simulations, and stability maps with the built-in tools
 - Look up calculators, analyzers, transformations, and tools by name, without importing every MLIP backend at once
@@ -73,7 +73,7 @@
 <div align="center" markdown>
 | MLIP      | Extra       | Package            | API                                 | Repository                                                         | Paper                                                       |
 |-----------|-------------|--------------------|-------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
-| ALIGNN    | N/A         | `alignn`           | [API](api/calculators/alignn.md) | [Repo](https://github.com/usnistgov/alignn)                      | [Paper](https://arxiv.org/abs/2106.01829)                   |
+| ALIGNN    | `alignn`    | `alignn`           | [API](api/calculators/alignn.md) | [Repo](https://github.com/usnistgov/alignn)                      | [Paper](https://arxiv.org/abs/2106.01829)                   |
 | Allegro   | `allegro`   | `nequip-allegro`   | [API](api/calculators/allegro.md)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
 | AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](api/calculators/alphanet.md)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
 | CHGNet    | `chgnet`    | `chgnet`           | [API](api/calculators/chgnet.md)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
@@ -118,7 +118,7 @@ Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VAS
 | `FormationEnergyAnalyzer`       | Formation energy per atom                                                    |
 | `HSolubilityAnalyzer`           | Hydrogen insertion and solution energies                                     |
 | `NEBAnalyzer`                   | Nudged elastic band minimum energy path and reaction barrier                 |
-| `PhonopyAnalyzer`               | Phonon DOS, band structure, and thermal properties                           |
+| `PhonopyAnalyzer`               | Total/projected phonon DOS and thermal properties                            |
 | `Phono3pyAnalyzer`              | Anharmonic force constants and lattice thermal conductivity                  |
 | `SBEAnalyzer`                   | Surface binding energies, a first-principles proxy for sputtering resistance |
 | `SurfaceAnalyzer`               | Slab surface energies for a given Miller index                               |

@@ -35,11 +35,11 @@ Maps thermodynamic stability and phase-separation (spinodal) regions across a co
 ```python
 from materialsframework.tools import StabilityMap
 
-sm = StabilityMap("Al-Ni-Cr.tdb", elements=["AL", "NI", "CR"], phase="FCC_A1", temperature=1200)
+sm = StabilityMap("Al-Ni-Cr-Fe.tdb", elements=["AL", "NI", "CR", "FE"], phase="FCC_A1", temperature=1200)
 sm.fit()
 
-print(sm.compositions[["AL", "NI", "CR", "negative_eigenvalues"]].head())
-sm.plot()  # only valid for systems with exactly 4 elements
+print(sm.compositions[["AL", "NI", "CR", "FE", "negative_eigenvalues"]].head())
+sm.plot()  # plotting currently supports exactly four elements
 ```
 
 ```python

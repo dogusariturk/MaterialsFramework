@@ -2,22 +2,26 @@
 
 !!! info "Optional dependency"
 
-    `AlignnCalculator` has no `materialsframework` extra. `dgl` only ships Linux wheels, pinned to an exact `torch` build. See [Non-Extra Calculators](../../installation.md#non-extra-calculators) for the verified install sequence, or [DGL's build-from-source guide](https://docs.dgl.ai/install/index.html#install-from-source) for macOS.
+    `AlignnCalculator` requires the `alignn` extra plus a compatible `dgl` wheel pinned to an exact `torch` build. See [Extras Needing an Additional Install Step](../../installation.md#extras-needing-an-additional-install-step) for the verified install sequence.
 
     === "uv"
 
         ```bash
-        uv pip install torch==2.3.0
-        uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
-        uv pip install "alignn>=2025.4.1"
+        uv add "materialsframework[alignn]"
+        uv pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+        uv pip install dgl==2.2.1 torchdata==0.9.0 pyyaml \
+          --find-links https://data.dgl.ai/wheels/torch-2.3/repo.html \
+          --find-links https://data.dgl.ai/wheels/repo.html
         ```
 
     === "pip"
 
         ```bash
-        pip install torch==2.3.0
-        pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
-        pip install "alignn>=2025.4.1"
+        pip install "materialsframework[alignn]"
+        pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+        pip install dgl==2.2.1 torchdata==0.9.0 pyyaml \
+          --find-links https://data.dgl.ai/wheels/torch-2.3/repo.html \
+          --find-links https://data.dgl.ai/wheels/repo.html
         ```
 
 ::: materialsframework.calculators.alignn.AlignnCalculator

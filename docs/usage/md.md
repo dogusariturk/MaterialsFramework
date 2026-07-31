@@ -1,6 +1,6 @@
 # Molecular Dynamics
 
-The `run()` method on any calculator performs molecular dynamics using ASE's integrators. It covers NVE, six NVT thermostats (Nosé-Hoover, Langevin, Andersen, Bussi, Berendsen, and a Nosé-Hoover chain), and six NPT/barostat variants (Nosé-Hoover, isotropic MTK, MTK, masked MTK, Berendsen, and inhomogeneous Berendsen). See the table below for the full list of keywords.
+The `run()` method on calculators that implement `BaseMDCalculator` performs molecular dynamics using ASE's integrators. The supported ensembles cover NVE, six NVT thermostats (Nosé-Hoover, Langevin, Andersen, Bussi, Berendsen, and a Nosé-Hoover chain), and six NPT/barostat variants (Nosé-Hoover, isotropic MTK, MTK, masked MTK, Berendsen, and inhomogeneous Berendsen).
 
 ## Basic NVT Example
 
@@ -80,7 +80,8 @@ calc = GraceCalculator(
     ensemble="nvt_nose_hoover",
     temperature=300,
     timestep=2.0,       # fs
-    loginterval=10,     # record every 10 steps
+    loginterval=10,     # write the log every 10 steps
+    interval=10,        # record trajectory data every 10 steps
     logfile="md.log",
 )
 res = calc.run(structure=struct, steps=10000)

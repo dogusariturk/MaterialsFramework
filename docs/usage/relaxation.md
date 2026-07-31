@@ -1,6 +1,6 @@
 # Geometry Optimization
 
-The `relax()` method, available on every calculator except `MEGNetCalculator` (which only exposes `calculate()`), performs structure optimization using ASE optimizers combined with `FrechetCellFilter` for simultaneous cell-shape and position relaxation.
+The standard `BaseCalculator.relax()` method performs structure optimization using ASE optimizers. Most MLIP calculators use this implementation. `MEGNetCalculator` has no `relax()` method, `RandomCalculator` is a test stub that returns the input unchanged, and `VASPCalculator` delegates optimization to VASP.
 
 ## Basic Usage
 
@@ -20,7 +20,7 @@ print(res["stress"])
 
 ## Optimizer Options
 
-`relax()` itself takes no configuration keyword arguments beyond the structure: `optimizer`, `fmax`, `steps`, and `relax_cell` are all set once on the calculator's constructor and reused for every `relax()` call. Supported ASE optimizers include:
+Core settings such as `optimizer`, `fmax`, `steps`, and `relax_cell` are set on the calculator and reused for every `relax()` call. Additional keyword arguments passed to `relax()` are forwarded to the selected ASE optimizer's constructor. Supported optimizers include:
 
 | Optimizer           | Description                               |
 |---------------------|-------------------------------------------|
@@ -60,11 +60,12 @@ res = calc.relax(struct)
 
 ## Trajectory
 
-The returned dict includes a `trajectory` key with all intermediate structures:
+For calculators using the standard implementation, the returned dict includes a `TrajectoryObserver` under the `trajectory` key. It stores structures and calculated properties at every recorded step:
 
 ```python
-for frame in res["trajectory"]:
-    print(frame)    # pymatgen Structure at each optimization step
+trajectory = res["trajectory"]
+print(trajectory.atom_positions)
+print(trajectory.as_pandas())
 ```
 
 ## Input Formats

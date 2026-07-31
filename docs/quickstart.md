@@ -20,7 +20,7 @@ res = calc.calculate(struct)
 # Inspect results
 print(res["energy"])    # eV
 print(res["forces"])    # numpy array, eV/Å
-print(res["stress"])    # numpy array, GPa
+print(res["stress"])    # numpy array, eV/Å³
 ```
 
 The `calculate()` method returns a dict with at minimum:
@@ -30,7 +30,7 @@ The `calculate()` method returns a dict with at minimum:
 | `final_structure` | Input structure as a pymatgen `Structure`, unchanged |
 | `energy`          | Total energy (eV)                                    |
 | `forces`          | Forces on each atom (eV/Å)                           |
-| `stress`          | Stress tensor (GPa)                                  |
+| `stress`          | Stress tensor (eV/Å³)                                |
 
 ## Geometry Optimization
 
@@ -50,22 +50,22 @@ res = calc.relax(struct)
 # Inspect results
 print(res["final_structure"])   # pymatgen Structure
 print(res["forces"])            # numpy array, eV/Å
-print(res["stress"])            # numpy array, GPa
+print(res["stress"])            # numpy array, eV/Å³
 ```
 
 The `relax()` method returns a dict with at minimum:
 
-| Key               | Description                                 |
-|-------------------|---------------------------------------------|
-| `final_structure` | Relaxed structure as a pymatgen `Structure` |
-| `trajectory`      | List of intermediate structures             |
-| `energy`          | Final total energy (eV)                     |
-| `forces`          | Forces on each atom (eV/Å)                  |
-| `stress`          | Stress tensor (GPa)                         |
+| Key               | Description                                         |
+|-------------------|-----------------------------------------------------|
+| `final_structure` | Relaxed structure as a pymatgen `Structure`         |
+| `trajectory`      | `TrajectoryObserver` containing intermediate states |
+| `energy`          | Final total energy (eV)                             |
+| `forces`          | Forces on each atom (eV/Å)                          |
+| `stress`          | Stress tensor (eV/Å³)                               |
 
 ## Swapping Calculators
 
-Any supported calculator implementation can be used as a drop-in replacement:
+Most MLIP calculators implement the same `BaseCalculator` interface and can be swapped without changing the workflow. `MEGNetCalculator` is the exception: it predicts formation energy only and does not implement `relax()`.
 
 ```python
 from materialsframework.calculators import CHGNetCalculator

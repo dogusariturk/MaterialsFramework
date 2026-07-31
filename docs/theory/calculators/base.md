@@ -33,7 +33,7 @@ within `steps` iterations of the chosen `optimizer` (a member of the `OPTIMIZERS
 
 ### Molecular Dynamics (`.run()`)
 
-Every ensemble starts by drawing initial velocities from the Maxwell-Boltzmann distribution at `temperature` (`thermalize_momenta`), then optionally removing net linear (`stationary`) and angular (`zero_rotation`) momentum so the thermostatted dynamics don't drift or spin as a rigid body.
+Every ensemble uses velocities already present on the input structure. If none are set, it draws initial velocities from the Maxwell-Boltzmann distribution at `temperature` (`thermalize_momenta`). It then optionally removes net linear (`stationary`) and angular (`zero_rotation`) momentum so the thermostatted dynamics don't drift or spin as a rigid body.
 
 NVE (`nve`)
 :   The microcanonical ensemble: plain Velocity-Verlet integration of Newton's equations with no thermostat or barostat, conserving total energy up to timestep discretization error:

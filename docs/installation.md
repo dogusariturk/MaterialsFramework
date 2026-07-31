@@ -42,7 +42,7 @@ Each MLIP has its own extra (for example `mace`, `chgnet`, `eqv2`, `petmad`). In
     pip install "materialsframework[chgnet,matgl,sevennet]"
     ```
 
-If `uv`/`pip` reports an extra conflict, choose a different combination using [MLIP Conflicts](mlip-conflicts.md).
+Before combining MLIPs, check [MLIP Conflicts](mlip-conflicts.md). Published package metadata cannot express the project-level exclusions or manually installed optional dependencies, so downstream `uv` and `pip` installs may not reject an unsupported combination.
 
 ## Supported Platforms
 
@@ -53,6 +53,8 @@ If `uv`/`pip` reports an extra conflict, choose a different combination using [M
 - macOS `arm64` (Apple Silicon)
 
 If you are on a different platform, installation may still be possible with manual dependency management, but it is not a supported target.
+
+Calculator-specific native dependencies can narrow this support. In particular, PyG does not publish the EqV2 extension wheels for Linux `aarch64`; see its install note below.
 
 ## MLIP Extras Overview
 
@@ -65,7 +67,7 @@ If you are on a different platform, installation may still be possible with manu
 | DeePMD          | `deepmd`    | `deepmd-kit[torch]>=3.1.2`                                 |
 | EqNorm          | `eqnorm`    | `eqnorm>=0.1.1` (extra step needed; see note below)        |
 | EquFlash        | N/A         | `GGNN` (git-only, no pip extra; see note below)            |
-| EquiformerV2    | `eqv2`      | `fairchem-core>=1.10.0,<2.0`                               |
+| EquiformerV2    | `eqv2`      | `fairchem-core>=1.10.0,<2.0` (extra step needed; see below) |
 | eSEN            | `esen`      | `fairchem-core>=2.0.0`                                     |
 | GPTFF           | N/A         | `gptff` (git-only, no pip extra; see note below)           |
 | GRACE           | `grace`     | `tensorpotential>=0.5.7`                                   |
@@ -86,11 +88,11 @@ If you are on a different platform, installation may still be possible with manu
 
 ### Extras Needing an Additional Install Step
 
-EqNorm, HIENet, NewtonNet, and AlphaNet need `torch-scatter` (NewtonNet also needs `torch-cluster`), installed manually from PyG's wheel index after installing the extra.
+EqNorm, HIENet, NewtonNet, and AlphaNet need `torch-scatter` (NewtonNet also needs `torch-cluster`), installed manually from PyG's wheel index after installing the extra. EqV2 also needs PyG extensions installed manually from that wheel index.
 
-ALIGNN needs `dgl` instead, an undeclared dependency with no PyPI wheel for Python 3.12. Install it from DGL's own wheel index.
+ALIGNN needs `dgl` instead, an undeclared dependency with no PyPI wheel for Python 3.12. Install it from DGL's own wheel indexes.
 
-CPU-based install commands for each calculator, run in the order shown:
+Run the install commands for each calculator in the order shown:
 
 === "ALIGNN"
 
@@ -98,21 +100,21 @@ CPU-based install commands for each calculator, run in the order shown:
 
         ```bash
         uv add "materialsframework[alignn]"
-        uv pip install torch==2.3.0
-        uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+        uv pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+        uv pip install dgl==2.2.1 torchdata==0.9.0 pyyaml \
+          --find-links https://data.dgl.ai/wheels/torch-2.3/repo.html \
+          --find-links https://data.dgl.ai/wheels/repo.html
         ```
 
     === "pip"
 
         ```bash
         pip install "materialsframework[alignn]"
-        pip install torch==2.3.0
-        pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+        pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+        pip install dgl==2.2.1 torchdata==0.9.0 pyyaml \
+          --find-links https://data.dgl.ai/wheels/torch-2.3/repo.html \
+          --find-links https://data.dgl.ai/wheels/repo.html
         ```
-
-    !!! danger "Linux x86_64 only"
-
-        This combination doesn't resolve on Linux aarch64 or macOS. On those platforms you need to build `dgl` from source yourself, following DGL's own [build-from-source guide](https://docs.dgl.ai/install/index.html#install-from-source).
 
 === "AlphaNet"
 
@@ -149,6 +151,26 @@ CPU-based install commands for each calculator, run in the order shown:
         pip install torch==2.9.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
         pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --force-reinstall
         ```
+
+=== "EqV2"
+
+    === "uv"
+
+        ```bash
+        uv add "materialsframework[eqv2]"
+        uv pip install torch_scatter==2.1.2 torch_sparse==0.6.18 --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
+        ```
+
+    === "pip"
+
+        ```bash
+        pip install "materialsframework[eqv2]"
+        pip install torch_scatter==2.1.2 torch_sparse==0.6.18 --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
+        ```
+
+    !!! danger "Linux x86_64 and macOS arm64 only"
+
+        This combination doesn't resolve on Linux `aarch64` because PyG doesn't publish wheels for these PyTorch 2.4 extensions. On that platform you need to build them from source yourself, following PyG's [installation-from-source guide](https://pytorch-geometric.readthedocs.io/en/2.6.1/install/installation.html#installation-from-source).
 
 === "HIENet"
 
@@ -190,70 +212,71 @@ CPU-based install commands for each calculator, run in the order shown:
 
 === "EquFlash"
 
-    `EquFlashCalculator` is only installable from its upstream git repository; install it manually before using `EquFlashCalculator`:
+    `EquFlashCalculator` has no `materialsframework` extra. Its upstream `GGNN` package does not install the calculator's runtime dependencies, so add them explicitly.
+
+    The CPU commands below produce a fully importable `EquFlashCalculator` on Linux `x86_64` and macOS `arm64`. Linux `aarch64` requires source builds because PyG does not publish the matching `torch_scatter` and `torch_sparse` wheels.
 
     === "uv"
 
         ```bash
         uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
+        uv pip install fairchem-core==1.10.0
+        uv pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
+        uv pip install torch_scatter==2.1.2 torch_sparse==0.6.18 \
+            --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
         ```
 
     === "pip"
 
         ```bash
         pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
+        pip install fairchem-core==1.10.0
+        pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
+        pip install torch_scatter==2.1.2 torch_sparse==0.6.18 \
+            --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
         ```
-
-    !!! warning
-
-        That command alone won't give you a working `EquFlashCalculator`. GGNN's `setup.py` pulls in no dependencies, and its code hard-imports `fairchem-core`, which isn't installed by anything above.
-
-        The commands below use CPU builds and were confirmed to produce a fully importable `EquFlashCalculator` on Linux x86_64 and macOS arm64 (not Linux aarch64, since PyG doesn't publish `torch_scatter`/`torch_sparse` wheels for that platform):
-
-        === "uv"
-
-            ```bash
-            uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
-            uv pip install fairchem-core==1.10.0
-            uv pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
-            uv pip install torch_scatter==2.1.2 torch_sparse==0.6.18 \
-                --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
-            ```
-
-        === "pip"
-
-            ```bash
-            pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
-            pip install fairchem-core==1.10.0
-            pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
-            pip install torch_scatter==2.1.2 torch_sparse==0.6.18 \
-                --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
-            ```
 
 === "GPTFF"
 
-    `GPTFFCalculator` is only installable from its upstream git repository; install it manually before using `GPTFFCalculator`:
+    `GPTFFCalculator` is only installable from its upstream git repository. That revision declares `ase>=3.26,<3.29`, while MaterialsFramework requires `ase>=3.29`. Installing GPTFF normally would therefore downgrade ASE and break MaterialsFramework's MD imports. The sequence below bypasses only GPTFF's dependency metadata, then installs its non-core runtime dependencies explicitly.
 
     === "uv"
 
         ```bash
-        uv pip install "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git"
+        uv pip install --no-deps "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git"
+        uv pip install "torch>=2.0" scikit-learn psutil tqdm
         ```
 
     === "pip"
 
         ```bash
-        pip install "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git"
+        pip install --no-deps "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git"
+        pip install "torch>=2.0" scikit-learn psutil tqdm
         ```
 
 === "PosEGNN"
 
-    `PosEGNNCalculator` is not available on any public package index, so it cannot be installed via pip or uv. To use it, clone the repository and add the module directory to `PYTHONPATH` manually:
+    `PosEGNNCalculator` is not available on any public package index. Clone the repository, add its module directory to `PYTHONPATH`, and install the runtime dependencies that the module does not declare:
 
-    ```bash
-    git clone --depth 1 https://github.com/IBM/materials.git
-    export PYTHONPATH="$PWD/materials/models/pos_egnn:$PYTHONPATH"
-    ```
+    === "uv"
+
+        ```bash
+        git clone --depth 1 https://github.com/IBM/materials.git
+        export PYTHONPATH="$PWD/materials/models/pos_egnn:$PYTHONPATH"
+        uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+        uv pip install torch_geometric torch_nl==0.3
+        uv pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+        ```
+
+    === "pip"
+
+        ```bash
+        git clone --depth 1 https://github.com/IBM/materials.git
+        export PYTHONPATH="$PWD/materials/models/pos_egnn:$PYTHONPATH"
+        pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+        pip install torch_geometric torch_nl==0.3
+        pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --force-reinstall
+        ```
 
 === "VASP"
 
@@ -285,7 +308,7 @@ uv sync --group dev
 uv sync --group dev --extra chgnet --extra matgl --extra sevennet
 ```
 
-If you synced `alignn`, `eqnorm`, `hienet`, `newtonnet`, or `alphanet`, run the corresponding `uv pip install` commands from [Extras Needing an Additional Install Step](#extras-needing-an-additional-install-step) afterward. `uv sync` alone leaves `alignn` without a working `dgl`, and builds `torch-scatter`/`torch-cluster` from source for the other four; either way, the resulting calculator crashes at import. Re-run those commands after any later `uv sync`/`uv lock`, which will otherwise undo the fix.
+If you synced `alignn`, `eqnorm`, `eqv2`, `hienet`, `newtonnet`, or `alphanet`, run the corresponding `uv pip install` commands from [Extras Needing an Additional Install Step](#extras-needing-an-additional-install-step) afterward. `uv sync` alone leaves EqV2 without its required PyG extensions, leaves ALIGNN without `dgl`, and may build `torch-scatter`/`torch-cluster` from source for the other four instead of selecting the matching wheels. Re-run the commands after a later `uv sync` if it removes or replaces those manually installed packages.
 
 ## Running Tests
 

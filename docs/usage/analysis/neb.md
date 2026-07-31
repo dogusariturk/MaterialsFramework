@@ -5,13 +5,13 @@ Interpolates a series of images between two endpoint structures and relaxes them
 ```python
 from ase.build import bulk
 from materialsframework.analysis import NEBAnalyzer
-from materialsframework.calculators import RandomCalculator
+from materialsframework.calculators import CHGNetCalculator
 
 initial = bulk("Ni", "fcc", a=3.52, cubic=True)
 final = initial.copy()
 final.positions[0] += [0.5, 0.5, 0.0]  # move one atom toward a neighboring site
 
-calc = RandomCalculator()
+calc = CHGNetCalculator()
 neb = NEBAnalyzer(calculator=calc, n_images=5, climb=True)
 res = neb.calculate(initial, final)
 

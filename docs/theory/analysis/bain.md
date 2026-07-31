@@ -21,7 +21,7 @@ $$
 \delta = \sqrt[3]{\dfrac{1}{c/a}} - 1
 $$
 
-\(\delta\) is chosen so that the in-plane axes both scale by \(1+\delta\) and the out-of-plane axis by \((1+\delta)^{-2}\), keeping the cell volume fixed while realizing the requested \(c/a\) ratio. This isolates the shape change from any volume relaxation effect on the energy. `c_a_list` (default range 0.89 to 1.5) and the corresponding `energy_list` are returned together, ready to plot as the Bain energy curve.
+\(\delta\) is chosen so that the in-plane axes both scale by \(1+\delta\) and the out-of-plane axis by \((1+\delta)^{-2}\), keeping the cell volume fixed while realizing the requested \(c/a\) ratio. This isolates the shape change from any volume relaxation effect on the energy. `c_a_list` (0.89 up to, but excluding, 1.5 by default) and the corresponding `energy_list` are returned together, ready to plot as the Bain energy curve.
 
 ## References
 

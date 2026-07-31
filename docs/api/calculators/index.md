@@ -1,18 +1,18 @@
 # Calculators
 
-`MaterialsFramework` exposes 28 calculator implementations behind a largely unified interface (26 ML-backed calculators plus `RandomCalculator` and `VASPCalculator`). Every calculator except `MEGNetCalculator` inherits from `BaseCalculator`, providing `calculate()` for single-point evaluation and `relax()` for geometry optimization; `MEGNetCalculator` implements neither ABC and only exposes `calculate()`, predicting a single scalar formation energy. Most calculators also inherit from `BaseMDCalculator`, adding `run()` for molecular dynamics; `RandomCalculator` and `VASPCalculator` are the exceptions that implement only `BaseCalculator`, with no MD story.
+`MaterialsFramework` exposes 28 calculator implementations behind a largely unified interface (26 ML-backed calculators plus `RandomCalculator` and `VASPCalculator`). Every calculator except `MEGNetCalculator` inherits from `BaseCalculator`, providing `calculate()` for single-point evaluation and `relax()` for geometry optimization; `MEGNetCalculator` implements neither ABC and only exposes `calculate()`, predicting a single scalar formation energy. Most calculators also inherit from `BaseMDCalculator`, adding `run()` for molecular dynamics.
 
 ## Available Calculators
 
 | Calculator   | Class                 | Backend                   |
 |--------------|-----------------------|---------------------------|
-| ALIGNN       | `AlignnCalculator`    | N/A                       |
+| ALIGNN       | `AlignnCalculator`    | alignn                    |
 | Allegro      | `AllegroCalculator`   | nequip-allegro            |
 | AlphaNet     | `AlphaNetCalculator`  | msc-alphanet              |
 | CHGNet       | `CHGNetCalculator`    | chgnet                    |
 | DeePMD       | `DeePMDCalculator`    | deepmd-kit                |
 | EqNorm       | `EqnormCalculator`    | eqnorm                    |
-| EquFlash     | `EquFlashCalculator`  | N/A                       |
+| EquFlash     | `EquFlashCalculator`  | GGNN                      |
 | EquiformerV2 | `EqV2Calculator`      | fairchem-core             |
 | eSEN         | `eSENCalculator`      | fairchem-core             |
 | GPTFF        | `GPTFFCalculator`     | gptff                     |
@@ -28,7 +28,7 @@
 | NewtonNet    | `NewtonNetCalculator` | newtonnet                 |
 | ORB          | `ORBCalculator`       | orb-models                |
 | PET-MAD      | `PetMadCalculator`    | upet                      |
-| PosEGNN      | `PosEGNNCalculator`   | N/A                       |
+| PosEGNN      | `PosEGNNCalculator`   | PosEGNN                   |
 | Random       | `RandomCalculator`    | (built-in, no ML backend) |
 | SevenNet     | `SevenNetCalculator`  | sevenn                    |
 | TACE         | `TACECalculator`      | TACE                      |

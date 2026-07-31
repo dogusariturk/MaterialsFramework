@@ -1,6 +1,6 @@
 # Analyzers
 
-`MaterialsFramework` provides analyzer classes for common materials property calculations. Each analyzer follows the same pattern: instantiate with a calculator, then call `calculate(structure)`.
+`MaterialsFramework` provides analyzer classes for common materials property calculations. Instantiate an analyzer with a calculator, then call its `calculate()` method. Most analyzers take one structure; ANNNI takes a composition, and NEB takes initial and final structures.
 
 ```python
 analyzer = SomeAnalyzer(calculator=calc)
@@ -85,7 +85,7 @@ results = analyzer.calculate(structure)
 
     ---
 
-    Phonon DOS, band structure, and thermal properties.
+    Total/projected phonon DOS and thermal properties.
 
     [:octicons-arrow-right-24: Phonopy](phonopy.md)
 

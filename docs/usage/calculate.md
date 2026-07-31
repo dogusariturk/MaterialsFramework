@@ -1,6 +1,6 @@
 # Single-Point Calculation
 
-The `calculate()` method on any calculator evaluates energy, forces, and other properties for a structure exactly as given, with no optimization step.
+The standard `BaseCalculator.calculate()` method evaluates a backend's available properties for a structure exactly as given, with no optimization step. `MEGNetCalculator` instead returns only `formation_energy`, while the minimal `RandomCalculator` test stub returns only `energy` and `forces` and omits `final_structure`.
 
 ## Basic Usage
 

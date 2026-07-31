@@ -21,11 +21,11 @@ Nearly every calculator subclasses `BaseCalculator`, an ABC wrapping an ASE `Cal
 
 - `relax(structure)`: structure optimization (atoms and, optionally, cell)
 - `calculate(structure)`: single-point energy/forces/stress evaluation, no optimization
-- `run(structure, steps)`: molecular dynamics (NVE, NVT/NPT Nose-Hoover, NPT/Inhomogeneous-NPT Berendsen)
+- `run(structure, steps)`: molecular dynamics with NVE and multiple NVT/NPT thermostats and barostats
 
 `RandomCalculator` and `VASPCalculator` are exceptions that implement only `BaseCalculator`, with no MD story: `RandomCalculator` is a dependency-free stub useful as a minimal reference implementation and for tests that shouldn't require a real MLIP installed, while `VASPCalculator` wraps a licensed VASP installation instead of an ML model as a ground-truth reference calculator, not one of the ML backends. `MEGNetCalculator` is a further outlier that implements neither ABC: it only exposes `calculate(structure)`, predicting a single scalar formation energy rather than the energy/forces/stress properties other calculators return, with no `relax()`/`run()` at all.
 
-Swapping one MLIP for another, or for VASP, means changing the calculator you instantiate. Nothing else in your code changes:
+For calculators that implement the base interfaces, swapping one MLIP for another usually means changing only the calculator you instantiate. Available properties and backend-specific setup still vary; VASP, Random, and MEGNet have the exceptions described above.
 
 ```python
 from materialsframework.calculators import CHGNetCalculator, MACECalculator

@@ -24,7 +24,7 @@ Internally, the analyzer uses a paired *Transformation* class to generate deform
 | `FormationEnergyAnalyzer`       | `formation_energy`        | Formation energy per atom                              |
 | `HSolubilityAnalyzer`           | `h_solubility`            | H interstitial insertion energies and solution energy  |
 | `NEBAnalyzer`                   | `neb`                     | Nudged elastic band minimum energy path                |
-| `PhonopyAnalyzer`               | `phonopy`                 | Phonon DOS, band structure, thermal properties         |
+| `PhonopyAnalyzer`               | `phonopy`                 | Total/projected phonon DOS and thermal properties      |
 | `Phono3pyAnalyzer`              | `phono3py`                | Lattice thermal conductivity                           |
 | `SBEAnalyzer`                   | `sbe`                     | Surface binding energies (sputtering-resistance proxy) |
 | `SurfaceAnalyzer`               | `surface`                 | Slab surface energies                                  |

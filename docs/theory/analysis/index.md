@@ -13,7 +13,7 @@ The physics and derivations behind each property analyzer. See [Usage](../../usa
 | [Formation Energy](formation_energy.md)     | Formation energy per atom                                                    |
 | [H-Solubility](h_solubility.md)             | Hydrogen insertion and solution energies                                     |
 | [Nudged Elastic Band](neb.md)               | Nudged elastic band minimum energy path and reaction barrier                 |
-| [Phonopy](phonopy.md)                       | Phonon DOS, band structure, and thermal properties                           |
+| [Phonopy](phonopy.md)                       | Total/projected phonon DOS and thermal properties                            |
 | [Phono3py](phono3py.md)                     | Anharmonic force constants and lattice thermal conductivity                  |
 | [Surface Binding Energy](sbe.md)            | Surface binding energies, a first-principles proxy for sputtering resistance |
 | [Surface Energy](surface.md)                | Slab surface energies for a given Miller index                               |
