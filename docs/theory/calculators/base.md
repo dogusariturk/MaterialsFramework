@@ -43,8 +43,7 @@ NVE (`nve`)
 Nosé-Hoover (`nvt_nose_hoover`, `npt_nose_hoover`)
 :   An extended-Lagrangian thermostat (the same `MelchionnaNPT` integrator, with a barostat term enabled for the NPT variant) that introduces a friction variable \(\xi\) with its own equation of motion, damped on timescale `ttime`:
 
-    $$ \dot{\mathbf p}_i = \mathbf F_i - \xi\,\mathbf p_i, \qquad
-       \dot\xi = \frac{1}{Q}\Big(\sum_i \frac{p_i^2}{m_i} - 3Nk_BT\Big) $$
+    $$ \dot{\mathbf p}_i = \mathbf F_i - \xi\,\mathbf p_i, \qquad \dot\xi = \frac{1}{Q}\Big(\sum_i \frac{p_i^2}{m_i} - 3Nk_BT\Big) $$
 
     This samples the canonical distribution exactly in the long-time limit, unlike the velocity-rescaling thermostats below. The NPT variant additionally couples the cell to a barostat variable damped on timescale set by `pfactor`, targeting `pressure`.
 
@@ -54,8 +53,7 @@ Nosé-Hoover chain (`nose_hoover_chain_nvt`)
 Langevin (`langevin`)
 :   Adds a deterministic drag and a stochastic force satisfying the fluctuation-dissipation theorem directly to the equations of motion:
 
-    $$ m_i\dot{\mathbf v}_i = \mathbf F_i - \gamma m_i \mathbf v_i + \mathbf\eta_i(t), \qquad
-       \langle \eta_i(t)\,\eta_j(t')\rangle = 2\gamma m_i k_BT\,\delta_{ij}\delta(t-t') $$
+    $$ m_i\dot{\mathbf v}_i = \mathbf F_i - \gamma m_i \mathbf v_i + \mathbf\eta_i(t), \qquad \langle \eta_i(t)\,\eta_j(t')\rangle = 2\gamma m_i k_BT\,\delta_{ij}\delta(t-t') $$
 
     with friction coefficient \(\gamma =\) `friction`. Samples the canonical ensemble and tends to be a numerically robust default when a purely deterministic thermostat rings or fails to equilibrate.
 

@@ -2,10 +2,7 @@
 
 !!! info "Optional dependency"
 
-    `AlignnCalculator` has no `materialsframework` extra. `dgl` only ships Linux wheels, pinned
-    to an exact `torch` build. See [Non-Extra Calculators](../../installation.md#non-extra-calculators)
-    for the verified install sequence, or [DGL's build-from-source guide](https://docs.dgl.ai/install/index.html#install-from-source)
-    for macOS.
+    `AlignnCalculator` has no `materialsframework` extra. `dgl` only ships Linux wheels, pinned to an exact `torch` build. See [Non-Extra Calculators](../../installation.md#non-extra-calculators) for the verified install sequence, or [DGL's build-from-source guide](https://docs.dgl.ai/install/index.html#install-from-source) for macOS.
 
     === "uv"
 

@@ -73,15 +73,15 @@
 <div align="center" markdown>
 | MLIP      | Extra       | Package            | API                                 | Repository                                                         | Paper                                                       |
 |-----------|-------------|--------------------|-------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
-| ALIGNN    | N/A         | `alignn` (no pip extra) | [API](api/calculators/alignn.md) | [Repo](https://github.com/usnistgov/alignn)                        | [Paper](https://arxiv.org/abs/2106.01829)                   |
+| ALIGNN    | N/A         | `alignn`           | [API](api/calculators/alignn.md) | [Repo](https://github.com/usnistgov/alignn)                      | [Paper](https://arxiv.org/abs/2106.01829)                   |
 | Allegro   | `allegro`   | `nequip-allegro`   | [API](api/calculators/allegro.md)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
 | AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](api/calculators/alphanet.md)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |
 | CHGNet    | `chgnet`    | `chgnet`           | [API](api/calculators/chgnet.md)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
 | DeePMD    | `deepmd`    | `deepmd-kit`       | [API](api/calculators/deepmd.md)    | [Repo](https://github.com/deepmodeling/deepmd-kit)                 | [Paper](https://doi.org/10.1016/j.cpc.2018.03.016)          |
 | EqNorm    | `eqnorm`    | `eqnorm`           | [API](api/calculators/eqnorm.md)    | [Repo](https://github.com/yzchen08/eqnorm)                         | N/A                                                         |
 | EquFlash  | N/A         | `GGNN` (git-only)  | [API](api/calculators/equflash.md)  | [Repo](https://github.com/SamsungDS/GGNN)                          | N/A                                                         |
-| EqV2      | `eqv2`      | `fairchem-core`    | [API](api/calculators/eqv2.md)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2306.12059)                   |
-| eSEN      | `esen`      | `fairchem-core`    | [API](api/calculators/esen.md)      | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2502.12147)                   |
+| EqV2      | `eqv2`      | `fairchem-core`    | [API](api/calculators/eqv2.md)      | [Repo](https://github.com/facebookresearch/fairchem)               | [Paper](https://arxiv.org/abs/2306.12059)                   |
+| eSEN      | `esen`      | `fairchem-core`    | [API](api/calculators/esen.md)      | [Repo](https://github.com/facebookresearch/fairchem)               | [Paper](https://arxiv.org/abs/2502.12147)                   |
 | GPTFF     | N/A         | `gptff` (git-only) | [API](api/calculators/gptff.md)     | [Repo](https://github.com/atomly-materials-research-lab/GPTFF)     | [Paper](https://doi.org/10.1016/j.scib.2024.08.039)         |
 | GRACE     | `grace`     | `tensorpotential`  | [API](api/calculators/grace.md)     | [Repo](https://github.com/ICAMS/grace-tensorpotential)             | [Paper](https://arxiv.org/abs/2508.17936)                   |
 | HIENet    | `hienet`    | `hienet`           | [API](api/calculators/hienet.md)    | [Repo](https://github.com/divelab/AIRS/tree/main/OpenMat/HIENet)   | [Paper](https://arxiv.org/abs/2503.05771)                   |
@@ -98,50 +98,10 @@
 | PosEGNN   | N/A         | N/A                | [API](api/calculators/posegnn.md)   | [Repo](https://github.com/IBM/materials/tree/main/models/pos_egnn) | N/A                                                         |
 | SevenNet  | `sevennet`  | `sevenn`           | [API](api/calculators/sevennet.md)  | [Repo](https://github.com/MDIL-SNU/SevenNet)                       | [Paper](https://arxiv.org/abs/2510.11241)                   |
 | TACE      | `tace`      | `TACE`             | [API](api/calculators/tace.md)      | [Repo](https://github.com/xvzemin/tace)                            | [Paper](https://arxiv.org/abs/2509.14961)                   |
-| UMA       | `uma`       | `fairchem-core`    | [API](api/calculators/uma.md)       | [Repo](https://github.com/facebookresearch/fairchem)                      | [Paper](https://arxiv.org/abs/2506.23971)                   |
+| UMA       | `uma`       | `fairchem-core`    | [API](api/calculators/uma.md)       | [Repo](https://github.com/facebookresearch/fairchem)               | [Paper](https://arxiv.org/abs/2506.23971)                   |
 </div>
 
 Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VASPCalculator` (external licensed VASP backend).
-
-??? info "ALIGNN"
-
-    *ALIGNN* has no `materialsframework` extra. `dgl` (which it needs) only ships prebuilt wheels
-    for Linux, pinned to an exact `torch` version:
-
-    ```bash
-    uv pip install torch==2.3.0
-    uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
-    uv pip install "alignn>=2025.4.1"
-    ```
-
-    On macOS or anywhere else without a wheel, [build `dgl` from source](https://docs.dgl.ai/install/index.html#install-from-source) instead. See [installation](installation.md#non-extra-calculators) for the full details.
-
-??? info "EquFlash"
-
-    *EquFlash* is only installable from its upstream git repository:
-
-    ```bash
-    uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
-    ```
-
-    That alone won't work: `fairchem-core` is hard-imported but never installed, so `EquFlashCalculator().calculator` raises `ModuleNotFoundError`. See [installation](installation.md) for the CPU-only dependency set that's confirmed to work, and [MLIP Conflicts](mlip-conflicts.md) for details.
-
-??? info "GPTFF"
-
-    *GPTFF* is only installable from its upstream git repository:
-
-    ```bash
-    uv pip install "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git"
-    ```
-
-??? info "PosEGNN"
-
-    *PosEGNN* has no installable package on any public index. Clone the repository and add the module directory to `PYTHONPATH` manually:
-
-    ```bash
-    git clone --depth 1 https://github.com/IBM/materials.git
-    export PYTHONPATH="$PWD/materials/models/pos_egnn:$PYTHONPATH"
-    ```
 
 ---
 
