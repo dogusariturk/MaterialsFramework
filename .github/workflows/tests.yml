@@ -88,14 +88,14 @@ jobs:
             install: --extra nequip
             extra_install: |
               curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/nequip-oam-s.nequip.zip" https://zenodo.org/api/records/18775904/files/NequIP-OAM-S-0.1.nequip.zip/content
-              nequip-compile "$HOME/nequip-oam-s.nequip.zip" "$HOME/nequip-oam-s.nequip.pth" --device cpu --mode torchscript --target ase
+              uv run nequip-compile "$HOME/nequip-oam-s.nequip.zip" "$HOME/nequip-oam-s.nequip.pth" --device cpu --mode torchscript --target ase
               echo "NEQUIP_MODEL=$HOME/nequip-oam-s.nequip.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_nequip.py
           - name: allegro
             install: --extra allegro
             extra_install: |
               curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/allegro-oam-l.nequip.zip" https://zenodo.org/api/records/16980200/files/Allegro-OAM-L-0.1.nequip.zip/content
-              nequip-compile "$HOME/allegro-oam-l.nequip.zip" "$HOME/allegro-oam-l.nequip.pth" --device cpu --mode torchscript --target ase
+              uv run nequip-compile "$HOME/allegro-oam-l.nequip.zip" "$HOME/allegro-oam-l.nequip.pth" --device cpu --mode torchscript --target ase
               echo "ALLEGRO_MODEL=$HOME/allegro-oam-l.nequip.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_allegro.py
           - name: eqv2
