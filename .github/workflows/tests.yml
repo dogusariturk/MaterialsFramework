@@ -100,6 +100,8 @@ jobs:
             tests: tests/calculators/test_allegro.py
           - name: eqv2
             install: --extra eqv2
+            extra_install: |
+              uv pip install torch_scatter==2.1.2 torch_sparse==0.6.18 --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
             tests: tests/calculators/test_eqv2.py
           - name: esen
             install: --extra esen
@@ -133,8 +135,8 @@ jobs:
           - name: alignn
             install: --extra alignn
             extra_install: |
-              uv pip install torch==2.3.0
-              uv pip install "dgl @ https://data.dgl.ai/wheels/torch-2.3/dgl-2.2.1-cp312-cp312-manylinux1_x86_64.whl" torchdata==0.9.0 pyyaml
+              uv pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+              uv pip install dgl==2.2.1 torchdata==0.9.0 pyyaml --find-links https://data.dgl.ai/wheels/torch-2.3/repo.html --find-links https://data.dgl.ai/wheels/repo.html
             tests: tests/calculators/test_alignn.py
           - name: mattersim
             install: --extra mattersim
@@ -170,8 +172,9 @@ jobs:
           - name: gptff
             install: ""
             extra_install: |
+              # GPTFF declares ase<3.29, but MaterialsFramework requires ASE 3.29 APIs.
               uv pip install --no-deps "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git@8a03afa5c9a09411bc4e769a0efc947ee52e32c9"
-              uv pip install "torch>=2.0" pandas scikit-learn psutil tqdm
+              uv pip install "torch>=2.0" scikit-learn psutil tqdm
               curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/gptff-model.pth" https://raw.githubusercontent.com/atomly-materials-research-lab/gptff/8a03afa5c9a09411bc4e769a0efc947ee52e32c9/pretrained/inorganic/gptff_v2.pth
               echo "GPTFF_MODEL=$HOME/gptff-model.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_gptff.py
