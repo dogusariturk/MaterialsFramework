@@ -2539,7 +2539,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "alignn", marker = "extra == 'alignn'", specifier = ">=2025.4.1" },
-    { name = "ase", specifier = ">=3.27.0" },
+    { name = "ase", specifier = ">=3.29.0" },
     { name = "chgnet", marker = "extra == 'chgnet'", specifier = ">=0.4.2" },
     { name = "deepmd-kit", extras = ["torch"], marker = "extra == 'deepmd'", specifier = ">=3.1.2" },
     { name = "eqnorm", marker = "extra == 'eqnorm'", specifier = ">=0.1.1" },
