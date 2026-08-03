@@ -34,7 +34,7 @@ dev = [
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs-material==9.7.4",
+    "mkdocs-material==9.7.7",
     "mkdocstrings[python]==1.0.6",
 ]
 plots     = ["matplotlib>=3.9.0"]
