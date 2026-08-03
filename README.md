@@ -27,7 +27,7 @@
 
 - Run single-point calculations and structure relaxations across 20+ ML interatomic potentials through one shared `BaseCalculator` interface, or swap in the licensed `VASPCalculator` without changing calling code
 - Accept `ase.Atoms`, `pymatgen.Structure`, and `pymatgen.Molecule` interchangeably as calculator input
-- Run molecular dynamics (NVE, NVT/NPT Nose-Hoover, NPT/Inhomogeneous-NPT Berendsen) on any calculator that supports it
+- Run molecular dynamics with NVE and a broad set of NVT/NPT thermostats and barostats on calculators that support it
 - Compute formation energy, elastic constants, phonons, stacking faults, surface/binding energies, and reaction barriers with 14 property analyzers, each paired with a transformation that generates the structures it needs
 - Generate special quasirandom structures, cluster expansion models, phase-field simulations, and stability maps with the built-in tools
 - Look up calculators, analyzers, transformations, and tools by name, without importing every MLIP backend at once
@@ -82,7 +82,7 @@ Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VAS
 | `FormationEnergyAnalyzer`       | Formation energy per atom                                                    |
 | `HSolubilityAnalyzer`           | Hydrogen insertion and solution energies                                     |
 | `NEBAnalyzer`                   | Nudged elastic band minimum energy path and reaction barrier                 |
-| `PhonopyAnalyzer`               | Phonon DOS, band structure, and thermal properties                           |
+| `PhonopyAnalyzer`               | Total/projected phonon DOS and thermal properties                            |
 | `Phono3pyAnalyzer`              | Anharmonic force constants and lattice thermal conductivity                  |
 | `SBEAnalyzer`                   | Surface binding energies, a first-principles proxy for sputtering resistance |
 | `SurfaceAnalyzer`               | Slab surface energies for a given Miller index                               |
@@ -107,7 +107,7 @@ Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VAS
 
 ## Installation
 
-We recommend [uv](https://docs.astral.sh/uv/) for dependency management, though a plain `pip` install also works. Use the `Extra` column in the [Supported MLIPs](#supported-mlips) table above to pick which MLIP extras to add.
+We recommend [uv](https://docs.astral.sh/uv/) for dependency management, though a plain `pip` install also works. Use the `Extra` column in the [Supported MLIPs](#supported-mlips) table above to pick which MLIP extras to add. Some backends require additional installation steps documented in the full installation guide.
 
 ### uv
 
@@ -137,7 +137,7 @@ Add an MLIP extra the same way:
 pip install "materialsframework[chgnet]"
 ```
 
-See the [installation guide](https://dogusariturk.github.io/MaterialsFramework/installation/) for full setup instructions and [MLIP Conflicts](https://dogusariturk.github.io/MaterialsFramework/mlip-conflicts/) for conflict details.
+See the [installation guide](https://dogusariturk.github.io/MaterialsFramework/installation/) for full setup instructions and [MLIP Conflicts](https://dogusariturk.github.io/MaterialsFramework/mlip-conflicts/) for conflict and optional-dependency details.
 
 ---
 
@@ -169,7 +169,7 @@ print(result["forces"])
 
 ### Molecular Dynamics
 
-Calculators that subclass `BaseMDCalculator` add a `run()` method for NVE, NVT/NPT Nose-Hoover, and NPT/Inhomogeneous-NPT Berendsen molecular dynamics.
+Calculators that subclass `BaseMDCalculator` add a `run()` method for NVE and multiple NVT/NPT thermostats and barostats.
 
 ```python
 from ase.build import bulk
