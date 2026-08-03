@@ -42,6 +42,7 @@ def test_available_properties() -> None:
 
 
 @pytest.mark.integration
+@pytest.mark.slow
 def test_calculate_energy(calc: EquFlashCalculator, bcc_fe) -> None:
     """calculate() returns a float energy for BCC Fe."""
     result = calc.calculate(bcc_fe)
@@ -50,6 +51,7 @@ def test_calculate_energy(calc: EquFlashCalculator, bcc_fe) -> None:
 
 
 @pytest.mark.integration
+@pytest.mark.slow
 def test_calculate_forces_shape(calc: EquFlashCalculator, bcc_fe) -> None:
     """calculate() returns forces with shape (n_atoms, 3)."""
     result = calc.calculate(bcc_fe)
@@ -58,6 +60,7 @@ def test_calculate_forces_shape(calc: EquFlashCalculator, bcc_fe) -> None:
 
 
 @pytest.mark.integration
+@pytest.mark.slow
 def test_relax_returns_structure(calc: EquFlashCalculator, bcc_fe) -> None:
     """relax() returns a dict with 'final_structure' and 'trajectory'."""
     result = calc.relax(bcc_fe)
