@@ -149,6 +149,7 @@ ignore = [
     "N802",    # function names should be in snake_case
     "PLC0415", # `import` should be at the top-level of a file
     "PLR0911", # Too many return statements in function
+    "PLR0917", # Too many positional arguments
     "PLR0913", # Too many arguments in function definition
     "PLR2004", # Magic value used in comparison
 ]
