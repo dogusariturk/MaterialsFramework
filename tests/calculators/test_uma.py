@@ -20,10 +20,10 @@ _MISSING = not os.environ.get("HF_TOKEN")
 
 @pytest.fixture(scope="module")
 def calc() -> UMACalculator:
-    """UMACalculator with default model, skipped if HF_TOKEN is unset."""
+    """UMACalculator with the smaller CI model, skipped if HF_TOKEN is unset."""
     if _MISSING:
         pytest.skip("HF_TOKEN not set; cannot download the gated facebook/UMA checkpoint")
-    return UMACalculator()
+    return UMACalculator(model="uma-s-1p2")
 
 
 @pytest.mark.integration
