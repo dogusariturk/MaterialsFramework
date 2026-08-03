@@ -11,7 +11,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15731044.svg)](https://doi.org/10.5281/zenodo.15731044)
 
-`MaterialsFramework` provides a largely uniform API for 20+ machine learning interatomic potentials (MLIPs), covering single-point calculations, structure relaxation, and molecular dynamics, plus the property analyzers and structure-generation tools that build on them. Most backends share the same workflow calls; their available properties and setup requirements can differ.
+`MaterialsFramework` provides a single, uniform API for 20+ machine learning interatomic potentials (MLIPs), covering single-point calculations, structure relaxation, and molecular dynamics, plus the property analyzers and structure-generation tools that build on them. Swapping one MLIP for another, or for the licensed `VASPCalculator`, means changing one line of code.
 
 <p>
   <a href="https://github.com/dogusariturk/MaterialsFramework/issues/new?labels=bug">Report a Bug</a> |

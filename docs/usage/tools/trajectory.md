@@ -4,7 +4,7 @@ Records the state of an atomic structure at each recorded step of a relaxation o
 
 `TrajectoryObserver` is attached as a callback to an ASE `Optimizer` (via `BaseCalculator.relax()`) or an ASE MD integrator (via `BaseMDCalculator.run()`); ASE invokes it every `interval` steps, and it appends the current energies, forces, stress, cell, and atomic positions/species to internal lists. For MD runs it additionally records temperature and velocities. It behaves like a read-only `Sequence`: indexing or iterating over it yields the per-step property tuple. It can be exported as a `pandas.DataFrame` (`as_pandas()`) or pickled to disk (`save()`).
 
-You should not construct or attach a `TrajectoryObserver` yourself. `relax()` and `run()` already construct and attach one internally (configured through their `traj_file`/`interval`/`include_magmoms`/`include_dipoles` arguments), so there's no supported direct-usage path.
+You should not construct or attach a `TrajectoryObserver` yourself. `relax()` and `run()` already construct and attach one internally.
 
 For `relax()`, the returned dict's `"trajectory"` key *is* the `TrajectoryObserver` instance, so you can call its methods directly on the result:
 
