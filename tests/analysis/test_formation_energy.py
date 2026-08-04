@@ -35,6 +35,18 @@ def test_formation_energy_transformation_lazy_property() -> None:
     assert isinstance(analyzer.formation_energy_transformation, FormationEnergyTransformation)
 
 
+def test_calculate_raises_without_energy_property(l10_feni) -> None:
+    """calculate() raises if the calculator lacks the 'energy' property, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoEnergyCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["forces"]
+
+    analyzer = FormationEnergyAnalyzer(calculator=_NoEnergyCalculator())
+    with pytest.raises(ValueError, match="'energy'"):
+        analyzer.calculate(l10_feni, is_relaxed=True)
+
+
 def test_calculate_returns_key_with_random_calc(l10_feni) -> None:
     """calculate() returns formation_energy key without any ML dependency."""
     from materialsframework.calculators.random import RandomCalculator

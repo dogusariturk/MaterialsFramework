@@ -42,6 +42,18 @@ def test_eos_transformation_lazy_property() -> None:
     assert isinstance(analyzer.eos_transformation, EOSTransformation)
 
 
+def test_calculate_raises_without_energy_property(bcc_fe) -> None:
+    """calculate() raises if the calculator lacks the 'energy' property, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoEnergyCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["forces"]
+
+    analyzer = EOSAnalyzer(calculator=_NoEnergyCalculator())
+    with pytest.raises(ValueError, match="'energy'"):
+        analyzer.calculate(bcc_fe)
+
+
 @pytest.mark.integration
 def test_eos_calculate_returns_keys(result) -> None:
     """EOSAnalyzer.calculate returns a dict with all expected keys."""

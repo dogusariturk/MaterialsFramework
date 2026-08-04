@@ -56,6 +56,18 @@ def test_annni_transformation_lazy_property() -> None:
     assert isinstance(analyzer.annni_transformation, ANNNIStackingFaultTransformation)
 
 
+def test_calculate_raises_without_energy_property() -> None:
+    """calculate() raises if the calculator lacks the 'energy' property, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoEnergyCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["forces"]
+
+    analyzer = ANNNIStackingFaultAnalyzer(calculator=_NoEnergyCalculator())
+    with pytest.raises(ValueError, match="'energy'"):
+        analyzer.calculate("Fe0.5Co0.5")
+
+
 @pytest.mark.integration
 def test_calculate_returns_isfe_and_esfe(result) -> None:
     """calculate() returns a dict with 'isfe' and 'esfe' float values."""

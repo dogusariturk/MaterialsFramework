@@ -42,6 +42,18 @@ def test_phono3py_transformation_lazy_property() -> None:
     assert isinstance(analyzer.phono3py_transformation, Phono3pyDisplacementTransformation)
 
 
+def test_calculate_raises_without_forces_property(bcc_fe) -> None:
+    """calculate() raises if the calculator lacks the 'forces' property, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoForcesCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["energy"]
+
+    analyzer = Phono3pyAnalyzer(calculator=_NoForcesCalculator())
+    with pytest.raises(ValueError, match="'forces'"):
+        analyzer.calculate(bcc_fe)
+
+
 @pytest.mark.integration
 @pytest.mark.slow
 def test_calculate_returns_thermal_conductivity(result) -> None:

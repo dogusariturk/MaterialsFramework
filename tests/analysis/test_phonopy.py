@@ -35,6 +35,18 @@ def test_phonopy_transformation_lazy_property() -> None:
     assert isinstance(analyzer.phonopy_transformation, PhonopyDisplacementTransformation)
 
 
+def test_calculate_raises_without_forces_property(bcc_fe) -> None:
+    """calculate() raises if the calculator lacks the 'forces' property, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoForcesCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["energy"]
+
+    analyzer = PhonopyAnalyzer(calculator=_NoForcesCalculator())
+    with pytest.raises(ValueError, match="'forces'"):
+        analyzer.calculate(bcc_fe)
+
+
 @pytest.mark.integration
 def test_calculate_returns_keys(result) -> None:
     """calculate() returns a dict with total_dos, thermal_properties, and projected_dos."""

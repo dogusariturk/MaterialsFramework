@@ -34,6 +34,18 @@ def test_bain_transformation_lazy_property() -> None:
     assert isinstance(analyzer.bain_transformation, BainDisplacementTransformation)
 
 
+def test_calculate_raises_without_energy_property(bcc_fe) -> None:
+    """calculate() raises if the calculator lacks the 'energy' property, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoEnergyCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["forces"]
+
+    analyzer = BainPathAnalyzer(calculator=_NoEnergyCalculator())
+    with pytest.raises(ValueError, match="'energy'"):
+        analyzer.calculate(bcc_fe)
+
+
 def test_calculate_returns_keys_with_random_calc(bcc_fe) -> None:
     """calculate() returns required keys without any ML dependency."""
     from materialsframework.calculators.random import RandomCalculator

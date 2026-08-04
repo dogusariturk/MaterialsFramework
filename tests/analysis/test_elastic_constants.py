@@ -65,6 +65,18 @@ def test_elastic_constants_transformation_lazy_property() -> None:
     assert isinstance(analyzer.elastic_constants_transformation, ElasticConstantsDeformationTransformation)
 
 
+def test_calculate_raises_without_required_properties(bcc_fe) -> None:
+    """calculate() raises if the calculator lacks the required 'energy'/'stress' properties, before doing any real work."""
+    from materialsframework.calculators.random import RandomCalculator
+
+    class _NoEnergyOrStressCalculator(RandomCalculator):
+        AVAILABLE_PROPERTIES = ["forces"]
+
+    analyzer = ElasticConstantsAnalyzer(calculator=_NoEnergyOrStressCalculator())
+    with pytest.raises(ValueError, match="'energy' and 'stress'"):
+        analyzer.calculate(bcc_fe)
+
+
 @pytest.mark.integration
 def test_calculate_contains_cij_for_cubic(result) -> None:
     """For a cubic structure the result contains C_11, C_12, and C_44."""
