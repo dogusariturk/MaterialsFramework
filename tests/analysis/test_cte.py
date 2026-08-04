@@ -48,6 +48,8 @@ def test_calculate_returns_structured_cte_output(calc, bcc_fe) -> None:
     result = analyzer.calculate(bcc_fe, steps=2)
 
     assert {"temperatures", "volumes", "cte", "cte_ppm"} <= result.keys()
+    assert isinstance(result["temperatures"], list)
+    assert isinstance(result["volumes"], list)
     assert len(result["temperatures"]) == _TWO_POINTS
     assert len(result["volumes"]) == _TWO_POINTS
 
@@ -57,6 +59,7 @@ def test_calculate_accepts_ase_atoms(calc, ase_bcc_fe) -> None:
     """calculate() accepts ase.Atoms input."""
     analyzer = CTEAnalyzer(temperatures=[300.0, 350.0], calculator=calc)
     result = analyzer.calculate(ase_bcc_fe, steps=2)
+    assert isinstance(result["volumes"], list)
     assert len(result["volumes"]) == _TWO_POINTS
 
 

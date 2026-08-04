@@ -97,9 +97,9 @@ class MaterialParameters:
         comps = sorted(dbf.elements) if elements is None else elements
         if "/-" in comps:
             comps.remove("/-")
-        phase = list(dbf.phases) if phase is None else phase
+        phases = [phase] if phase is not None else list(dbf.phases)
 
-        gs = calculate(dbf, comps, phase, T=temperature)
+        gs = calculate(dbf, comps, phases, T=temperature)
         xs = gs.X.sel(component=component.upper()).values.ravel()
         ys = gs.GM.values.ravel()
         popt, _ = curve_fit(f=energy, xdata=xs, ydata=ys)

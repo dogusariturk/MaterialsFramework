@@ -117,6 +117,7 @@ def test_apply_transformation_element_arg_returns_single_atom_in_a_box() -> None
     t = SBETransformation(isolated_atom_box_size=15.0)
     structure = t.apply_transformation(element="Fe")
 
+    assert isinstance(structure, Structure)
     assert structure.num_sites == 1
     assert structure.elements[0].symbol == "Fe"
     assert structure.lattice.a == pytest.approx(15.0)

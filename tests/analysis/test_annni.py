@@ -18,7 +18,7 @@ class _SmallANNNITransformation(ANNNIStackingFaultTransformation):
     sqsgenerator resolve the requested coordination shells.
     """
 
-    def apply_transformation(self, composition, **kwargs):  # type: ignore[override]
+    def apply_transformation(self, composition, **kwargs):  # ty: ignore[invalid-method-override]
         """Run the transformation with minimal supercell sizes for fast testing."""
         return super().apply_transformation(
             composition,

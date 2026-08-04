@@ -69,7 +69,7 @@ def test_phase_field_model_laplacian_of_flat_field() -> None:
         free_energy_poly_deriv = np.poly1d([0.0])
 
     grid = SimulationGrid(nx=16, ny=16)
-    model = PhaseFieldModel(_StubMaterial(), simulation_grid=grid)
+    model = PhaseFieldModel(_StubMaterial(), simulation_grid=grid)  # ty: ignore[invalid-argument-type]
     flat = np.ones((16, 16))
     lap = model.laplacian(flat)
     assert np.allclose(lap[1:-1, 1:-1], 0.0, atol=1e-10)

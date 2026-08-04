@@ -118,6 +118,7 @@ def test_calculate_with_climb_enables_climbing_image_on_neb(ni_endpoints) -> Non
     analyzer = NEBAnalyzer(calculator=_EMTCalculator(fmax=1.0, steps=5), n_images=_N_IMAGES, climb=True)
     analyzer.calculate(initial, final, is_relaxed=True)
 
+    assert analyzer.neb is not None
     assert analyzer.neb.climb is True
 
 
@@ -127,4 +128,5 @@ def test_calculate_without_climb_leaves_climbing_image_disabled(ni_endpoints) ->
     analyzer = NEBAnalyzer(calculator=_EMTCalculator(fmax=1.0, steps=5), n_images=_N_IMAGES)
     analyzer.calculate(initial, final, is_relaxed=True)
 
+    assert analyzer.neb is not None
     assert analyzer.neb.climb is False

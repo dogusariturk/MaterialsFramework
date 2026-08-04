@@ -164,6 +164,9 @@ possibly-unresolved-reference = "warn"
 [tool.ty.environment]
 python-version = "3.12"
 
+[tool.ty.src]
+exclude = ["src/materialsframework/tools/elastic.py"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--strict-markers -ra"
