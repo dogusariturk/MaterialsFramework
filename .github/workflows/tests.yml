@@ -80,22 +80,32 @@ jobs:
             tests: tests/calculators/test_petmad.py
           - name: deepmd
             install: --extra deepmd
+            cache_key: DPA-3.2-5M
+            cache_path: ~/.cache/dp-pretrained
             extra_install: |
               uv pip install "deepmd-kit[torch]==3.1.3"
-              echo "DEEPMD_MODEL=$(dp pretrained download DPA-3.2-5M 2>/dev/null)" >> "$GITHUB_ENV"
+              echo "DEEPMD_MODEL=$(uv run dp pretrained download DPA-3.2-5M --cache-dir "$HOME/.cache/dp-pretrained" 2>/dev/null)" >> "$GITHUB_ENV"
             tests: tests/calculators/test_deepmd.py
           - name: nequip
             install: --extra nequip
+            cache_key: NequIP-OAM-S-0.1
+            cache_path: ~/nequip-oam-s.nequip.pth
             extra_install: |
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/nequip-oam-s.nequip.zip" https://zenodo.org/api/records/18775904/files/NequIP-OAM-S-0.1.nequip.zip/content
-              uv run nequip-compile "$HOME/nequip-oam-s.nequip.zip" "$HOME/nequip-oam-s.nequip.pth" --device cpu --mode torchscript --target ase
+              if [ ! -f "$HOME/nequip-oam-s.nequip.pth" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/nequip-oam-s.nequip.zip" https://zenodo.org/api/records/18775904/files/NequIP-OAM-S-0.1.nequip.zip/content
+                uv run nequip-compile "$HOME/nequip-oam-s.nequip.zip" "$HOME/nequip-oam-s.nequip.pth" --device cpu --mode torchscript --target ase
+              fi
               echo "NEQUIP_MODEL=$HOME/nequip-oam-s.nequip.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_nequip.py
           - name: allegro
             install: --extra allegro
+            cache_key: Allegro-OAM-L-0.1
+            cache_path: ~/allegro-oam-l.nequip.pth
             extra_install: |
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/allegro-oam-l.nequip.zip" https://zenodo.org/api/records/16980200/files/Allegro-OAM-L-0.1.nequip.zip/content
-              uv run nequip-compile "$HOME/allegro-oam-l.nequip.zip" "$HOME/allegro-oam-l.nequip.pth" --device cpu --mode torchscript --target ase
+              if [ ! -f "$HOME/allegro-oam-l.nequip.pth" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/allegro-oam-l.nequip.zip" https://zenodo.org/api/records/16980200/files/Allegro-OAM-L-0.1.nequip.zip/content
+                uv run nequip-compile "$HOME/allegro-oam-l.nequip.zip" "$HOME/allegro-oam-l.nequip.pth" --device cpu --mode torchscript --target ase
+              fi
               echo "ALLEGRO_MODEL=$HOME/allegro-oam-l.nequip.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_allegro.py
           - name: eqv2
@@ -161,31 +171,45 @@ jobs:
             tests: tests/calculators/test_eqnorm.py
           - name: alphanet
             install: --extra alphanet
+            cache_key: alphanet-matpes-r2scan_1021
+            cache_path: |
+              ~/alphanet-config.json
+              ~/alphanet-model.ckpt
             extra_install: |
               uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
               uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/alphanet-config.json" https://raw.githubusercontent.com/zmyybc/AlphaNet/jax_and_zbl/pretrained/MATPES/matpes.json
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/alphanet-model.ckpt" https://raw.githubusercontent.com/zmyybc/AlphaNet/jax_and_zbl/pretrained/MATPES/r2scan_1021.ckpt
+              if [ ! -f "$HOME/alphanet-config.json" ] || [ ! -f "$HOME/alphanet-model.ckpt" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/alphanet-config.json" https://raw.githubusercontent.com/zmyybc/AlphaNet/jax_and_zbl/pretrained/MATPES/matpes.json
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/alphanet-model.ckpt" https://raw.githubusercontent.com/zmyybc/AlphaNet/jax_and_zbl/pretrained/MATPES/r2scan_1021.ckpt
+              fi
               echo "ALPHANET_CONFIG=$HOME/alphanet-config.json" >> "$GITHUB_ENV"
               echo "ALPHANET_MODEL=$HOME/alphanet-model.ckpt" >> "$GITHUB_ENV"
             tests: tests/calculators/test_alphanet.py
           - name: gptff
             install: ""
+            cache_key: gptff-8a03afa5c9a09411bc4e769a0efc947ee52e32c9
+            cache_path: ~/gptff-model.pth
             extra_install: |
               # GPTFF declares ase<3.29, but MaterialsFramework requires ASE 3.29 APIs.
               uv pip install --no-deps "gptff @ git+https://github.com/atomly-materials-research-lab/GPTFF.git@8a03afa5c9a09411bc4e769a0efc947ee52e32c9"
               uv pip install "torch>=2.0" scikit-learn psutil tqdm
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/gptff-model.pth" https://raw.githubusercontent.com/atomly-materials-research-lab/gptff/8a03afa5c9a09411bc4e769a0efc947ee52e32c9/pretrained/inorganic/gptff_v2.pth
+              if [ ! -f "$HOME/gptff-model.pth" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/gptff-model.pth" https://raw.githubusercontent.com/atomly-materials-research-lab/gptff/8a03afa5c9a09411bc4e769a0efc947ee52e32c9/pretrained/inorganic/gptff_v2.pth
+              fi
               echo "GPTFF_MODEL=$HOME/gptff-model.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_gptff.py
           - name: equflash
             install: ""
+            cache_key: equflash-65435004
+            cache_path: ~/equflash-model.pt
             extra_install: |
               uv pip install "GGNN @ git+https://github.com/SamsungDS/GGNN.git"
               uv pip install fairchem-core==1.10.0
               uv pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
               uv pip install torch_scatter==2.1.2 torch_sparse==0.6.18 --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/equflash-model.pt" "https://figshare.com/ndownloader/files/65435004" || true
+              if [ ! -s "$HOME/equflash-model.pt" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/equflash-model.pt" "https://figshare.com/ndownloader/files/65435004" || true
+              fi
               if [ -s "$HOME/equflash-model.pt" ] && ! head -c 200 "$HOME/equflash-model.pt" | grep -qi "<html"; then
                 echo "EQUFLASH_MODEL=$HOME/equflash-model.pt" >> "$GITHUB_ENV"
               else
@@ -195,21 +219,29 @@ jobs:
             tests: tests/calculators/test_equflash.py
           - name: posegnn
             install: ""
+            cache_key: posegnn-v1-6M
+            cache_path: ~/posegnn-model.ckpt
             extra_install: |
               git clone --depth 1 https://github.com/IBM/materials.git /tmp/ibm-materials
               uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
               uv pip install torch_geometric torch_nl==0.3
               uv pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/posegnn-model.ckpt" https://huggingface.co/ibm-research/materials.pos-egnn/resolve/main/pos-egnn.v1-6M.ckpt
+              if [ ! -f "$HOME/posegnn-model.ckpt" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/posegnn-model.ckpt" https://huggingface.co/ibm-research/materials.pos-egnn/resolve/main/pos-egnn.v1-6M.ckpt
+              fi
               echo "POSEGNN_MODEL=$HOME/posegnn-model.ckpt" >> "$GITHUB_ENV"
             python_path: /tmp/ibm-materials/models/pos_egnn
             tests: tests/calculators/test_posegnn.py
           - name: hienet
             install: --extra hienet
+            cache_key: hienet-v3
+            cache_path: ~/hienet-model.pth
             extra_install: |
               uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
               uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
-              curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/hienet-model.pth" https://raw.githubusercontent.com/divelab/AIRS/main/OpenMat/HIENet/checkpoints/HIENet-V3.pth
+              if [ ! -f "$HOME/hienet-model.pth" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/hienet-model.pth" https://raw.githubusercontent.com/divelab/AIRS/main/OpenMat/HIENet/checkpoints/HIENet-V3.pth
+              fi
               echo "HIENET_MODEL=$HOME/hienet-model.pth" >> "$GITHUB_ENV"
             tests: tests/calculators/test_hienet.py
           - name: tace
@@ -235,9 +267,17 @@ jobs:
         uses: astral-sh/setup-uv@v9.0.0
         with:
           enable-cache: true
+          cache-suffix: ${{ matrix.name }}
 
       - name: Install dependencies
         run: uv sync --frozen ${{ matrix.install }} --group dev
+
+      - name: Cache downloaded model checkpoint
+        if: matrix.cache_key
+        uses: actions/cache@v6.1.0
+        with:
+          path: ${{ matrix.cache_path }}
+          key: model-${{ matrix.name }}-${{ matrix.cache_key }}
 
       - name: Install extra dependency from GitHub
         if: matrix.extra_install
