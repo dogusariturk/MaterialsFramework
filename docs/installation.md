@@ -88,7 +88,7 @@ Calculator-specific native dependencies can narrow this support. In particular, 
 
 ### Extras Needing an Additional Install Step
 
-EqNorm, HIENet, NewtonNet, and AlphaNet need `torch-scatter` (NewtonNet also needs `torch-cluster`), installed manually from PyG's wheel index after installing the extra. EqV2 also needs PyG extensions installed manually from that wheel index.
+EqNorm, HIENet, NewtonNet, and AlphaNet need `torch-scatter` (NewtonNet also needs `torch-cluster`), installed manually from PyG's wheel index before installing the extra. EqV2 also needs PyG extensions installed manually from that wheel index.
 
 ALIGNN needs `dgl` instead, an undeclared dependency with no PyPI wheel for Python 3.12. Install it from DGL's own wheel indexes.
 
@@ -121,35 +121,37 @@ Run the install commands for each calculator in the order shown:
     === "uv"
 
         ```bash
-        uv add "materialsframework[alphanet]"
-        uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-        uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+        uv add torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+        uv add torch-scatter --find-links https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        uv add "materialsframework[alphanet]" --no-build-isolation-package torch-scatter
         ```
 
     === "pip"
 
         ```bash
-        pip install "materialsframework[alphanet]"
         pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-        pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --force-reinstall
+        pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        pip install "materialsframework[alphanet]"
         ```
 
 === "EqNorm"
 
+    `torch-scatter` has no prebuilt wheel on PyPI, so it must be installed *before* `materialsframework[eqnorm]` — otherwise resolving `eqnorm`'s dependency on it triggers a from-source build that fails outright (its `setup.py` imports `torch` before an isolated build environment has it available).
+
     === "uv"
 
         ```bash
-        uv add "materialsframework[eqnorm]"
-        uv pip install torch==2.9.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-        uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+        uv add torch==2.9.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        uv add torch-scatter --find-links https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        uv add "materialsframework[eqnorm]" --no-build-isolation-package torch-scatter
         ```
 
     === "pip"
 
         ```bash
-        pip install "materialsframework[eqnorm]"
         pip install torch==2.9.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-        pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --force-reinstall
+        pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        pip install "materialsframework[eqnorm]"
         ```
 
 === "EqV2"
@@ -177,17 +179,17 @@ Run the install commands for each calculator in the order shown:
     === "uv"
 
         ```bash
-        uv add "materialsframework[hienet]"
-        uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-        uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+        uv add torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+        uv add torch-scatter --find-links https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        uv add "materialsframework[hienet]" --no-build-isolation-package torch-scatter
         ```
 
     === "pip"
 
         ```bash
-        pip install "materialsframework[hienet]"
         pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-        pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --force-reinstall
+        pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        pip install "materialsframework[hienet]"
         ```
 
 === "NewtonNet"
@@ -195,17 +197,19 @@ Run the install commands for each calculator in the order shown:
     === "uv"
 
         ```bash
-        uv add "materialsframework[newtonnet]"
-        uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-        uv pip install torch-scatter torch-cluster -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+        uv add torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+        uv add torch-scatter torch-cluster --find-links https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        uv add "materialsframework[newtonnet]" \
+          --no-build-isolation-package torch-scatter \
+          --no-build-isolation-package torch-cluster
         ```
 
     === "pip"
 
         ```bash
-        pip install "materialsframework[newtonnet]"
         pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-        pip install torch-scatter torch-cluster -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --force-reinstall
+        pip install torch-scatter torch-cluster -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
+        pip install "materialsframework[newtonnet]"
         ```
 
 ### Non-Extra Calculators
@@ -310,7 +314,15 @@ uv sync --group dev
 uv sync --group dev --extra chgnet --extra matgl --extra sevennet
 ```
 
-If you synced `alignn`, `eqnorm`, `eqv2`, `hienet`, `newtonnet`, or `alphanet`, run the corresponding `uv pip install` commands from [Extras Needing an Additional Install Step](#extras-needing-an-additional-install-step) afterward. `uv sync` alone leaves EqV2 without its required PyG extensions, leaves ALIGNN without `dgl`, and may build `torch-scatter`/`torch-cluster` from source for the other four instead of selecting the matching wheels. Re-run the commands after a later `uv sync` if it removes or replaces those manually installed packages.
+If you synced `alignn` or `eqv2`, run the corresponding `uv pip install` commands from [Extras Needing an Additional Install Step](#extras-needing-an-additional-install-step) afterward.
+
+For `eqnorm`, `hienet`, `newtonnet`, or `alphanet`, add `--no-install-package torch-scatter` (and, for `newtonnet`, `--no-install-package torch-cluster`) to the `uv sync` command itself, for example:
+
+```bash
+uv sync --group dev --extra alphanet --no-install-package torch-scatter
+```
+
+Then run the corresponding `uv pip install torch`/`uv pip install torch-scatter` commands from [Extras Needing an Additional Install Step](#extras-needing-an-additional-install-step). Re-run those commands after a later `uv sync` if it removes or replaces those manually installed packages.
 
 ## Running Tests
 

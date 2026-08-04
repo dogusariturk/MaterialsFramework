@@ -160,29 +160,29 @@ jobs:
             install: --extra nequix
             tests: tests/calculators/test_nequix.py
           - name: newtonnet
-            install: --extra newtonnet
+            install: --extra newtonnet --no-install-package torch-scatter --no-install-package torch-cluster
             extra_install: |
               uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-              uv pip install torch-scatter torch-cluster -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+              uv pip install torch-scatter torch-cluster -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
             tests: tests/calculators/test_newtonnet.py
           - name: grace
             install: --extra grace
             tests: tests/calculators/test_grace.py
           - name: eqnorm
-            install: --extra eqnorm
+            install: --extra eqnorm --no-install-package torch-scatter
             extra_install: |
               uv pip install torch==2.9.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-              uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+              uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
             tests: tests/calculators/test_eqnorm.py
           - name: alphanet
-            install: --extra alphanet
+            install: --extra alphanet --no-install-package torch-scatter
             cache_key: alphanet-matpes-r2scan_1021
             cache_path: |
               ~/alphanet-config.json
               ~/alphanet-model.ckpt
             extra_install: |
               uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-              uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+              uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
               if [ ! -f "$HOME/alphanet-config.json" ] || [ ! -f "$HOME/alphanet-model.ckpt" ]; then
                 curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/alphanet-config.json" https://raw.githubusercontent.com/zmyybc/AlphaNet/jax_and_zbl/pretrained/MATPES/matpes.json
                 curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/alphanet-model.ckpt" https://raw.githubusercontent.com/zmyybc/AlphaNet/jax_and_zbl/pretrained/MATPES/r2scan_1021.ckpt
@@ -239,12 +239,12 @@ jobs:
             python_path: /tmp/ibm-materials/models/pos_egnn
             tests: tests/calculators/test_posegnn.py
           - name: hienet
-            install: --extra hienet
+            install: --extra hienet --no-install-package torch-scatter
             cache_key: hienet-v3
             cache_path: ~/hienet-model.pth
             extra_install: |
               uv pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
-              uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html --reinstall
+              uv pip install torch-scatter -f https://data.pyg.org/whl/torch-2.9.1+cpu.html
               if [ ! -f "$HOME/hienet-model.pth" ]; then
                 curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/hienet-model.pth" https://raw.githubusercontent.com/divelab/AIRS/main/OpenMat/HIENet/checkpoints/HIENet-V3.pth
               fi
