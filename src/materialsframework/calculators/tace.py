@@ -32,7 +32,7 @@ class TACECalculator(BaseCalculator, BaseMDCalculator):
 
     def __init__(
         self,
-        model: str | Path = "TACE-v1-OAM-M",
+        model: str | Path = "TACE-OAM-L",
         dtype: str | None = None,
         device: Literal["cpu", "cuda"] = "cpu",
         fidelity_idx: int | None = None,
@@ -44,8 +44,8 @@ class TACECalculator(BaseCalculator, BaseMDCalculator):
 
         Args:
             model (str | Path, optional): The TACE model to use. This can be the name of a predefined
-                foundation model (e.g., "TACE-v1-OAM-M"), which is downloaded and cached automatically, or a
-                path to a custom model file ending in ".ckpt", ".pt", ".pth", or ".pt2". Defaults to "TACE-v1-OAM-M".
+                foundation model (e.g., "TACE-OAM-L"), which is downloaded and cached automatically, or a
+                path to a custom model file ending in ".ckpt", ".pt", ".pth", or ".pt2". Defaults to "TACE-OAM-L".
             dtype (str, optional): The data type to use for the model, e.g. "float32" or "float64". Defaults to
                 None, meaning the model's own dtype is used.
             device (Literal["cpu", "cuda"], optional): The device to use for calculations. Defaults to "cpu".
@@ -58,7 +58,7 @@ class TACECalculator(BaseCalculator, BaseMDCalculator):
             **kwargs: Additional keyword arguments passed to the `BaseCalculator` and `BaseMDCalculator` constructors.
 
         Examples:
-            >>> tace_calculator = TACECalculator(model="TACE-v1-OAM-M", device="cuda")
+            >>> tace_calculator = TACECalculator(model="TACE-OAM-L", device="cuda")
 
         Note:
             The remaining parameters for the TACE potential are set to their default values.
