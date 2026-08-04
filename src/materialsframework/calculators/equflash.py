@@ -26,6 +26,9 @@ class EquFlashCalculator(BaseCalculator, BaseMDCalculator):
     Attributes:
         AVAILABLE_PROPERTIES (list[str]): A list of properties that this calculator can compute, including "energy",
             "forces", and "stress".
+
+    References:
+        - FlashTP: https://proceedings.mlr.press/v267/lee25l.html
     """
 
     AVAILABLE_PROPERTIES = ["energy", "forces", "stress"]

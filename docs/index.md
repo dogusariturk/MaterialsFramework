@@ -79,7 +79,7 @@
 | CHGNet    | `chgnet`    | `chgnet`           | [API](api/calculators/chgnet.md)    | [Repo](https://github.com/CederGroupHub/chgnet)                    | [Paper](https://arxiv.org/abs/2302.14231)                   |
 | DeePMD    | `deepmd`    | `deepmd-kit`       | [API](api/calculators/deepmd.md)    | [Repo](https://github.com/deepmodeling/deepmd-kit)                 | [Paper](https://doi.org/10.1016/j.cpc.2018.03.016)          |
 | EqNorm    | `eqnorm`    | `eqnorm`           | [API](api/calculators/eqnorm.md)    | [Repo](https://github.com/yzchen08/eqnorm)                         | N/A                                                         |
-| EquFlash  | N/A         | `GGNN` (git-only)  | [API](api/calculators/equflash.md)  | [Repo](https://github.com/SamsungDS/GGNN)                          | N/A                                                         |
+| EquFlash  | N/A         | `GGNN` (git-only)  | [API](api/calculators/equflash.md)  | [Repo](https://github.com/SamsungDS/GGNN)                          | [Paper](https://proceedings.mlr.press/v267/lee25l.html)     |
 | EqV2      | `eqv2`      | `fairchem-core`    | [API](api/calculators/eqv2.md)      | [Repo](https://github.com/facebookresearch/fairchem)               | [Paper](https://arxiv.org/abs/2306.12059)                   |
 | eSEN      | `esen`      | `fairchem-core`    | [API](api/calculators/esen.md)      | [Repo](https://github.com/facebookresearch/fairchem)               | [Paper](https://arxiv.org/abs/2502.12147)                   |
 | GPTFF     | N/A         | `gptff` (git-only) | [API](api/calculators/gptff.md)     | [Repo](https://github.com/atomly-materials-research-lab/GPTFF)     | [Paper](https://doi.org/10.1016/j.scib.2024.08.039)         |
