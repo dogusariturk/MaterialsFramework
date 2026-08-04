@@ -35,11 +35,13 @@ def test_get_tool_resolves_every_registered_name() -> None:
 
     Complements the hardcoded checks above by walking the *live* registry: a typo'd or
     drifted entry-point target (a bad module path or renamed class) fails loudly here even
-    if it's a tool not covered by any hardcoded name list. Two failure modes are expected and
-    tolerated, since both still prove the class itself loaded correctly: missing required
-    constructor arguments (TypeError), and this project's own `@requires(...)` guard reporting
-    a missing optional dependency (an ImportError with its distinctive "is required. Install it
-    with" message). Any other exception indicates real registry drift.
+    if it's a tool not covered by any hardcoded name list. Three failure modes are expected
+    and tolerated, since all three still prove the class itself loaded correctly: missing
+    required constructor arguments (TypeError), this project's own `@requires(...)` guard
+    reporting a missing optional dependency (an ImportError with its distinctive "is required.
+    Install it with" message), and `Sqs2tdb` reporting its external (non-pip-installable)
+    `sqs2tdb` binary isn't on PATH (an OSError with its distinctive "is not installed or not
+    found in the system's PATH" message). Any other exception indicates real registry drift.
     """
     for name in list_tools():
         try:
@@ -48,6 +50,8 @@ def test_get_tool_resolves_every_registered_name() -> None:
             pass
         except ImportError as e:
             assert "is required. Install" in str(e)
+        except OSError as e:
+            assert "is not installed or not found in the system's PATH" in str(e)
 
 
 def test_get_tool_unknown_raises() -> None:
