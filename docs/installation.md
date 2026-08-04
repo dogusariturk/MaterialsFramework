@@ -224,6 +224,7 @@ Run the install commands for each calculator in the order shown:
         uv pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
         uv pip install torch_scatter==2.1.2 torch_sparse==0.6.18 \
             --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
+        uv pip install "scipy<1.17.0"
         ```
 
     === "pip"
@@ -234,6 +235,7 @@ Run the install commands for each calculator in the order shown:
         pip install torch-geometric e3nn cuequivariance==0.6.0 cuequivariance-torch==0.6.0
         pip install torch_scatter==2.1.2 torch_sparse==0.6.18 \
             --find-links https://data.pyg.org/whl/torch-2.4.1+cpu.html
+        pip install "scipy<1.17.0"
         ```
 
 === "GPTFF"
