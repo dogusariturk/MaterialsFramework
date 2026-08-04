@@ -62,10 +62,15 @@ jobs:
               tests/tools/test_bond_lattice_parameter.py
               tests/analysis/test_annni.py
               tests/analysis/test_bain.py
+              tests/analysis/test_cte.py
               tests/analysis/test_cubic_elastic_constants.py
               tests/analysis/test_elastic_constants.py
               tests/analysis/test_eos.py
               tests/analysis/test_formation_energy.py
+              tests/analysis/test_h_solubility.py
+              tests/analysis/test_sbe.py
+              tests/analysis/test_surface.py
+              tests/analysis/test_usfe.py
           - name: matgl
             install: --extra matgl
             tests: tests/calculators/test_m3gnet.py tests/calculators/test_megnet.py
