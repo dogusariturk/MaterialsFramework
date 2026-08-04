@@ -29,9 +29,8 @@ def calc() -> AllegroCalculator:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in AllegroCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in AllegroCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'energies', 'free_energy', 'forces', 'stress']."""
+    assert AllegroCalculator.AVAILABLE_PROPERTIES == ["energy", "energies", "free_energy", "forces", "stress"]
 
 
 @pytest.mark.integration

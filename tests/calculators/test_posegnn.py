@@ -27,9 +27,8 @@ def calc() -> PosEGNNCalculator:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in PosEGNNCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in PosEGNNCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'forces', 'stress']."""
+    assert PosEGNNCalculator.AVAILABLE_PROPERTIES == ["energy", "forces", "stress"]
 
 
 @pytest.mark.integration

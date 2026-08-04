@@ -29,9 +29,8 @@ def calc() -> DeePMDCalculator:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in DeePMDCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in DeePMDCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'free_energy', 'forces', 'virial', 'stress']."""
+    assert DeePMDCalculator.AVAILABLE_PROPERTIES == ["energy", "free_energy", "forces", "virial", "stress"]
 
 
 @pytest.mark.integration

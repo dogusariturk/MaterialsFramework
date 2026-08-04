@@ -25,9 +25,8 @@ def test_lazy_load_contract() -> None:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in M3GNetCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in M3GNetCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'forces', 'stress']."""
+    assert M3GNetCalculator.AVAILABLE_PROPERTIES == ["energy", "forces", "stress"]
 
 
 @pytest.mark.integration

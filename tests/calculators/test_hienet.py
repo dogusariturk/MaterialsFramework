@@ -29,9 +29,8 @@ def calc() -> HIENetCalculator:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in HIENetCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in HIENetCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'free_energy', 'energies', 'forces', 'stress']."""
+    assert HIENetCalculator.AVAILABLE_PROPERTIES == ["energy", "free_energy", "energies", "forces", "stress"]
 
 
 @pytest.mark.integration

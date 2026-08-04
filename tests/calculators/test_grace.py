@@ -25,9 +25,8 @@ def test_lazy_load_contract() -> None:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in GraceCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in GraceCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'forces', 'free_energy', 'stress']."""
+    assert GraceCalculator.AVAILABLE_PROPERTIES == ["energy", "forces", "free_energy", "stress"]
 
 
 @pytest.mark.integration

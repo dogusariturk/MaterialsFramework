@@ -36,9 +36,8 @@ def test_lazy_load_contract() -> None:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in EquFlashCalculator.AVAILABLE_PROPERTIES
-    assert "forces" in EquFlashCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'forces', 'stress']."""
+    assert EquFlashCalculator.AVAILABLE_PROPERTIES == ["energy", "forces", "stress"]
 
 
 @pytest.mark.integration

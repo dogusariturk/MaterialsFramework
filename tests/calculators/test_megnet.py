@@ -21,8 +21,8 @@ def calc() -> MEGNetCalculator:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'formation_energy'."""
-    assert "formation_energy" in MEGNetCalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['formation_energy']."""
+    assert MEGNetCalculator.AVAILABLE_PROPERTIES == ["formation_energy"]
 
 
 @pytest.mark.integration

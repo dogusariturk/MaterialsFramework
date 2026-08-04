@@ -25,9 +25,8 @@ def test_lazy_load_contract() -> None:
 
 @pytest.mark.integration
 def test_available_properties() -> None:
-    """AVAILABLE_PROPERTIES includes 'energy' and 'forces'."""
-    assert "energy" in TACECalculator.AVAILABLE_PROPERTIES
-    assert "forces" in TACECalculator.AVAILABLE_PROPERTIES
+    """AVAILABLE_PROPERTIES is exactly ['energy', 'free_energy', 'forces', 'stress']."""
+    assert TACECalculator.AVAILABLE_PROPERTIES == ["energy", "free_energy", "forces", "stress"]
 
 
 @pytest.mark.integration
