@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+
 import numpy as np
 import pytest
 
@@ -32,6 +34,19 @@ def test_get_transformation_eos() -> None:
 
     transformation = get_transformation("eos")
     assert isinstance(transformation, EOSTransformation)
+
+
+def test_get_transformation_resolves_every_registered_name() -> None:
+    """Every entry-point-registered transformation name resolves to a real, constructible class.
+
+    Complements the hardcoded checks above by walking the *live* registry: a typo'd or
+    drifted entry-point target (a bad module path or renamed class) fails loudly here even
+    if it's a transformation not covered by any hardcoded name list.
+    """
+    for name in list_transformations():
+        # TypeError means it requires constructor arguments
+        with contextlib.suppress(TypeError):
+            get_transformation(name)
 
 
 def test_get_transformation_unknown_raises() -> None:

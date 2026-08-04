@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+
 import pytest
 
 from materialsframework.calculators.registry import get_calculator, list_calculators
@@ -28,6 +30,19 @@ def test_get_calculator_random() -> None:
 
     calc = get_calculator("random")
     assert isinstance(calc, RandomCalculator)
+
+
+def test_get_calculator_resolves_every_registered_name() -> None:
+    """Every entry-point-registered calculator name resolves to a real, loadable class.
+
+    Complements the hardcoded checks above by walking the *live* registry: a typo'd or
+    drifted entry-point target (a bad module path or renamed class) fails loudly here even
+    if it's a calculator not covered by any hardcoded name list.
+    """
+    for name in list_calculators():
+        # TypeError means it requires constructor arguments
+        with contextlib.suppress(TypeError):
+            get_calculator(name)
 
 
 def test_get_calculator_unknown_raises() -> None:

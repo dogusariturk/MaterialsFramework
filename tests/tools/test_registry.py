@@ -30,6 +30,26 @@ def test_get_tool_cluster_expansion() -> None:
     assert isinstance(tool, ClusterExpansion)
 
 
+def test_get_tool_resolves_every_registered_name() -> None:
+    """Every entry-point-registered tool name resolves to a real, loadable class.
+
+    Complements the hardcoded checks above by walking the *live* registry: a typo'd or
+    drifted entry-point target (a bad module path or renamed class) fails loudly here even
+    if it's a tool not covered by any hardcoded name list. Two failure modes are expected and
+    tolerated, since both still prove the class itself loaded correctly: missing required
+    constructor arguments (TypeError), and this project's own `@requires(...)` guard reporting
+    a missing optional dependency (an ImportError with its distinctive "is required. Install it
+    with" message). Any other exception indicates real registry drift.
+    """
+    for name in list_tools():
+        try:
+            get_tool(name)
+        except TypeError:
+            pass
+        except ImportError as e:
+            assert "is required. Install" in str(e)
+
+
 def test_get_tool_unknown_raises() -> None:
     """get_tool raises ValueError for unknown names."""
     with pytest.raises(ValueError, match="Unknown tool"):

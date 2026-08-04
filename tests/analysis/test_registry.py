@@ -32,6 +32,17 @@ def test_get_analyzer_eos() -> None:
     assert isinstance(analyzer, EOSAnalyzer)
 
 
+def test_get_analyzer_resolves_every_registered_name() -> None:
+    """Every entry-point-registered analyzer name resolves to a real, constructible class.
+
+    Complements the hardcoded checks above by walking the *live* registry: a typo'd or
+    drifted entry-point target (a bad module path or renamed class) fails loudly here even
+    if it's an analyzer not covered by any hardcoded name list.
+    """
+    for name in list_analyzers():
+        get_analyzer(name)
+
+
 def test_get_analyzer_unknown_raises() -> None:
     """get_analyzer raises ValueError for unknown names."""
     with pytest.raises(ValueError, match="Unknown analyzer"):
