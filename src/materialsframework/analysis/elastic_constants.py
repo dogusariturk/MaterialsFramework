@@ -32,7 +32,9 @@ if TYPE_CHECKING:
 
 __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
-__contributors__ = ["Elias P. Martin (epm1337@tamu.edu)"]
+__credits__ = ["Elias P. Martin (epm1337@tamu.edu)"]
+
+
 
 class ElasticConstantsAnalyzer(BaseAnalyzer):
     """A class used to calculate the elastic constant tensor for a given structure.
@@ -112,7 +114,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
             ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
         """
         structure = self._ensure_relaxed(structure, is_relaxed)
-        pmg_structure = to_structure(structure) # As some ElasticTensor methods require pymatgen Structure input
+        pmg_structure = to_structure(structure)
         structure = to_atoms(structure)
 
         prev_relax_cell = self.calculator.relax_cell
@@ -125,10 +127,11 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
 
             distorted_structures = self.elastic_constants_transformation.apply_transformation(structure)
 
-            for i in range(len(distorted_structures)): #TODO allow parallelization
-                if relax_ions:
-                    distorted_structures[i] = self.calculator.relax(distorted_structures[i])["final_structure"]
-                distorted_structures[i].calc = self.calculator.calculator
+            if relax_ions:
+                distorted_structures = [to_atoms(self.calculator.relax(s)["final_structure"]) for s in distorted_structures]
+
+            for distorted_structure in distorted_structures:
+                distorted_structure.calc = self.calculator.calculator
 
             cij_order = elastic.get_cij_order(structure)
             cij, bij = elastic.get_elastic_tensor(
@@ -137,8 +140,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
             )
         finally:
             self.calculator.relax_cell = prev_relax_cell
-            if fmax_distort is not None:
-                self.calculator.fmax = prev_fmax
+            self.calculator.fmax = prev_fmax
 
         cij = np.asarray(cij, dtype=float) * EV_A3_TO_GPA
 
