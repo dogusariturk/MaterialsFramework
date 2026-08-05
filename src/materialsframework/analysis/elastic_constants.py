@@ -116,11 +116,10 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         structure = to_atoms(structure)
 
         prev_relax_cell = self.calculator.relax_cell
+        prev_fmax = self.calculator.fmax
         self.calculator.relax_cell = False
         if fmax_distort is not None:
-            prev_fmax = self.calculator.fmax
             self.calculator.fmax = fmax_distort
-
         try:
             structure.calc = self.calculator.calculator
 
