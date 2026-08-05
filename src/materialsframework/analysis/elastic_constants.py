@@ -109,6 +109,11 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
                 - ``poisson_ratio``: Poisson ratio.
                 - ``pugh_ratio``: Pugh ratio.
                 - ``chen_vickers_hardness``: Chen-Vickers hardness in GPa.
+                - ``debye_temperature``: Debye Temperature in Kelvin.
+                - ``gruneisen_approx``: Slater's approximation of the Gruneisen parameter using the Possion ratio.
+                - ``v_longitudinal``: Elastic approximation of longitudinal speed of sound in m/s. (see doi:10.1016/0022-3697(63)90067-2)
+                - ``v_transverse``: Elastic approximation of transverse speed of sound in m/s.
+                - ``v_mean``: Average speed of sound from v_longitudinal and v_transverse in m/s.
 
         Raises:
             ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
