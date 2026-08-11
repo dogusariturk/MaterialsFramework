@@ -19,7 +19,7 @@ Internally, the analyzer uses a paired *Transformation* class to generate deform
 | `BainPathAnalyzer`              | `bain`                    | Bain FCC-to-BCC transformation path                    |
 | `CTEAnalyzer`                   | `cte`                     | NPT-MD volumetric coefficient of thermal expansion     |
 | `CubicElasticConstantsAnalyzer` | `cubic_elastic_constants` | C11, C12, C44 for cubic cells                          |
-| `ElasticConstantsAnalyzer`      | `elastic_constants`       | Full elastic tensor                                    |
+| `ElasticConstantsAnalyzer`      | `elastic_constants`       | Full elastic tensor and Debye/acoustic properties      |
 | `EOSAnalyzer`                   | `eos`                     | Equation of state fitting                              |
 | `FormationEnergyAnalyzer`       | `formation_energy`        | Formation energy per atom                              |
 | `HSolubilityAnalyzer`           | `h_solubility`            | H interstitial insertion energies and solution energy  |

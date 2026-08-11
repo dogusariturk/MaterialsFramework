@@ -113,7 +113,7 @@ Non-MLIP calculators: `RandomCalculator` (dependency-free testing stub) and `VAS
 | `BainPathAnalyzer`              | Energy along the FCC-to-BCC Bain transformation path                         |
 | `CTEAnalyzer`                   | Coefficient of thermal expansion from NPT-MD volume trends                   |
 | `CubicElasticConstantsAnalyzer` | Cubic elastic constants and derived moduli (B, G, E, ν)                      |
-| `ElasticConstantsAnalyzer`      | Full elastic tensor and Voigt-Reuss-Hill averages                            |
+| `ElasticConstantsAnalyzer`      | Full elastic tensor, Voigt-Reuss-Hill averages, Debye/acoustic properties    |
 | `EOSAnalyzer`                   | Equation-of-state curve fitting from E-V data                                |
 | `FormationEnergyAnalyzer`       | Formation energy per atom                                                    |
 | `HSolubilityAnalyzer`           | Hydrogen insertion and solution energies                                     |
