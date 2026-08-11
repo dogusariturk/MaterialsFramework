@@ -236,6 +236,30 @@ def test_build_trigonal_elastic_tensor_adds_signed_c14_equivalents() -> None:
     np.testing.assert_allclose(tensor.voigt, expected)
 
 
+def test_build_monoclinic_elastic_tensor_preserves_unique_b_constants() -> None:
+    """Monoclinic tensor assembly preserves all unique-b independent constants."""
+    analyzer = ElasticConstantsAnalyzer()
+    structure = _make_atoms(3.0, 4.0, 5.0, 90, 110, 90)
+
+    tensor = analyzer._build_elastic_tensor(
+        [200, 210, 220, 80, 70, 75, 60, 65, 55, 11, 12, 13, 14],
+        ["C_11", "C_22", "C_33", "C_12", "C_13", "C_23", "C_44", "C_55", "C_66", "C_15", "C_25", "C_35", "C_46"],
+        structure,
+    )
+
+    expected = np.array(
+        [
+            [200, 80, 70, 0, 11, 0],
+            [80, 210, 75, 0, 12, 0],
+            [70, 75, 220, 0, 13, 0],
+            [0, 0, 0, 60, 0, 14],
+            [11, 12, 13, 0, 65, 0],
+            [0, 0, 0, 14, 0, 55],
+        ]
+    )
+    np.testing.assert_allclose(tensor.voigt, expected)
+
+
 def test_calculate_raises_without_required_properties(bcc_fe) -> None:
     """calculate() raises before running when required properties are unavailable."""
     from materialsframework.calculators.random import RandomCalculator

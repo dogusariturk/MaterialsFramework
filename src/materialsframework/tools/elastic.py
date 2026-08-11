@@ -181,11 +181,11 @@ def hexagonal(u: Sequence[float]) -> ndarray:
 
 
 def monoclinic(u: Sequence[float]) -> ndarray:
-    """Generate the equation matrix for the monoclinic lattice.
+    """Generate the equation matrix for monoclinic symmetry with unique axis b.
 
     The ordering of constants is:
     C_{11}, C_{22}, C_{33}, C_{12}, C_{13}, C_{23},
-    C_{44}, C_{55}, C_{66}, C_{16}, C_{26}, C_{36}, C_{45}.
+    C_{44}, C_{55}, C_{66}, C_{15}, C_{25}, C_{35}, C_{46}.
 
     Args:
         u (Sequence[float]): Deformation vector [u_xx, u_yy, u_zz, u_yz, u_xz, u_xy].
@@ -196,12 +196,12 @@ def monoclinic(u: Sequence[float]) -> ndarray:
     uxx, uyy, uzz, uyz, uxz, uxy = u[0], u[1], u[2], u[3], u[4], u[5]
     return array(
         [
-            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, uxy, 0, 0, 0],
-            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, uxy, 0, 0],
-            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, uxy, 0],
-            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, uxz],
-            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, 0, 0, 0, uyz],
-            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, uxx, uyy, uzz, 0],
+            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, 2 * uxz, 0, 0, 0],
+            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, 2 * uxz, 0, 0],
+            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, 2 * uxz, 0],
+            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, 2 * uxy],
+            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, uxx, uyy, uzz, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 2 * uyz],
         ]
     )
 
@@ -277,10 +277,10 @@ def get_cij_order(cryst: Atoms) -> tuple[str, ...]:
             "C_44",
             "C_55",
             "C_66",
-            "C_16",
-            "C_26",
-            "C_36",
-            "C_45",
+            "C_15",
+            "C_25",
+            "C_35",
+            "C_46",
         ),
         3: ("C_11", "C_22", "C_33", "C_12", "C_13", "C_23", "C_44", "C_55", "C_66"),
         4: ("C_11", "C_33", "C_12", "C_13", "C_44", "C_66"),

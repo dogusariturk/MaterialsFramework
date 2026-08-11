@@ -17,6 +17,7 @@ from materialsframework.tools.elastic import (
     get_pressure,
     get_strain,
     hexagonal,
+    monoclinic,
     orthorombic,
     regular,
     tetragonal,
@@ -121,6 +122,62 @@ def test_hexagonal_shape() -> None:
     """hexagonal() returns a (6, 5) matrix."""
     mat = hexagonal([1, 0, 0, 0, 0, 0])
     assert mat.shape == (6, 5)
+
+
+def test_monoclinic_shape() -> None:
+    """monoclinic() returns a (6, 13) matrix."""
+    mat = monoclinic([1, 0, 0, 0, 0, 0])
+    assert mat.shape == (6, 13)
+
+
+def test_monoclinic_fit_recovers_known_stiffness_tensor() -> None:
+    """Unique-b monoclinic fitting recovers all 13 independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.0, 4.0, 5.0, 90, 110, 90]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200, 210, 220, 80, 70, 75, 60, 65, 55, 11, 12, 13, 14], dtype=float)
+    stiffness = np.array(
+        [
+            [200, 80, 70, 0, 11, 0],
+            [80, 210, 75, 0, 12, 0],
+            [70, 75, 220, 0, 13, 0],
+            [0, 0, 0, 60, 0, 14],
+            [11, 12, 13, 0, 65, 0],
+            [0, 0, 0, 14, 0, 55],
+        ]
+    )
+
+    assert get_cij_order(reference) == (
+        "C_11",
+        "C_22",
+        "C_33",
+        "C_12",
+        "C_13",
+        "C_23",
+        "C_44",
+        "C_55",
+        "C_66",
+        "C_15",
+        "C_25",
+        "C_35",
+        "C_46",
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
 
 
 def test_get_pressure_hydrostatic() -> None:
