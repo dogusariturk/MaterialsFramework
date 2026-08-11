@@ -284,6 +284,42 @@ def test_cubic_fit_recovers_elastic_constants_under_hydrostatic_pressure() -> No
     np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
 
 
+def test_centered_shear_sampling_cancels_quadratic_stress_response() -> None:
+    """Opposite shear strains prevent an even-order response from biasing C44."""
+    reference = Atoms("H", positions=[[0, 0, 0]], cell=[3.0, 3.0, 3.0], pbc=True)
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200.0, 80.0, 60.0])
+    stiffness = np.array(
+        [
+            [200, 80, 80, 0, 0, 0],
+            [80, 200, 80, 0, 0, 0],
+            [80, 80, 200, 0, 0, 0],
+            [0, 0, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 0],
+            [0, 0, 0, 0, 0, 60],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=2.0)
+    shear_strains = []
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        stress = stiffness @ engineering_strain
+        stress[3] += 500.0 * engineering_strain[3] ** 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stress)
+        if engineering_strain[3] != 0:
+            shear_strains.append(engineering_strain[3])
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    assert min(shear_strains) < 0 < max(shear_strains)
+    np.testing.assert_allclose(shear_strains, -np.asarray(shear_strains)[::-1], atol=1e-12)
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
 def test_triclinic_fit_recovers_elastic_constants_under_general_initial_stress() -> None:
     """The full initial-stress correction recovers C under a non-hydrostatic load."""
     reference = Atoms(

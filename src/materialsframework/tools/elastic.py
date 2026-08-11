@@ -414,12 +414,8 @@ def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[
 
     systems = []
     for a in axis:
-        if a < 3:  # tetragonal deformation
-            for dx in linspace(-d, d, n):
-                systems.append(get_cart_deformed_cell(cryst, axis=a, size=dx))
-        elif a < 6:  # sheer deformation (skip the zero angle)
-            for dx in linspace(d / 10.0, d, n):
-                systems.append(get_cart_deformed_cell(cryst, axis=a, size=dx))
+        for dx in linspace(-d, d, n):
+            systems.append(get_cart_deformed_cell(cryst, axis=a, size=dx))
     return systems
 
 
