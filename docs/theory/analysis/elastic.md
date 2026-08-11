@@ -18,7 +18,7 @@ $$
 \sigma_i = \sum_{j=1}^{6} C_{ij}\,\varepsilon_j
 $$
 
-For each of `num_deform` deformation magnitudes (up to `max_deform`, in percent for axial strain and degrees for shear) along every Cartesian/shear direction allowed by the cell's symmetry, the analyzer records the resulting strain \(\varepsilon\) (relative to the reference cell) and stress \(\sigma\) (with the ambient pressure of the reference cell subtracted out). Stacking these into one linear system per symmetry class and solving by least squares yields the independent \(C_{ij}\) for that Bravais lattice. Constants are reported in GPa.
+For each of `num_deform` deformation magnitudes (up to `max_deform`, in percent for axial strain and degrees for shear) along every Cartesian/shear direction allowed by the cell's symmetry, the analyzer records the resulting strain \(\varepsilon\) and stress increment relative to the reference cell. If the reference cell is already under stress, the measured Cauchy-stress increment also contains a geometric initial-stress contribution from the change of reference frame. The analyzer removes the linearized Piola-transformation term, including its rotation term for non-hydrostatic stress, so the fit yields the thermodynamic elastic constants \(C_{ij}\). Stacking the corrected responses into one linear system per symmetry class and solving by least squares yields the independent \(C_{ij}\). Constants are reported in GPa.
 
 ### Letting the atoms relax during deformation
 
@@ -98,3 +98,5 @@ $$
 - Chen, X.-Q., Niu, H., Li, D., & Li, Y. (2011). Modeling hardness of polycrystalline materials and bulk metallic glasses. *Intermetallics*, 19(9), 1275-1281. <https://doi.org/10.1016/j.intermet.2011.03.026>
 - Anderson, O.L. (1963). A simplified method for calculating the Debye temperature from elastic constants. *Journal of Physics and Chemistry of Solids*, 24(7), 909-917. <https://doi.org/10.1016/0022-3697(63)90067-2>
 - Belomestnykh, V.N., & Tesleva, E.P. (2004). Interrelation between anharmonicity and lateral strain in quasi-isotropic polycrystalline solids. *Technical Physics*, 49(8), 1098-1100. <https://doi.org/10.1134/1.1787679>
+- Mouhat, F., & Coudert, F.-X. (2014). Necessary and sufficient elastic stability conditions in various crystal systems. *Physical Review B*, 90(22), 224104. <https://doi.org/10.1103/PhysRevB.90.224104>
+- Luo, C., Tromp, J., & Wentzcovitch, R.M. (2022). Ab initio calculations of third-order elastic coefficients. *Physical Review B*, 106(21), 214104. <https://doi.org/10.1103/PhysRevB.106.214104>

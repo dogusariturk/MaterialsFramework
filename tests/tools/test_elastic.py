@@ -7,6 +7,7 @@ import pytest
 from ase import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.cell import Cell
+from ase.stress import full_3x3_to_voigt_6_stress, voigt_6_to_full_3x3_stress
 
 from materialsframework.tools.elastic import (
     get_cart_deformed_cell,
@@ -242,6 +243,90 @@ def test_triclinic_fit_recovers_known_stiffness_tensor() -> None:
         engineering_strain = strain.copy()
         engineering_strain[3:] *= 2
         deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, fit = get_elastic_tensor(reference, deformations)
+
+    assert fit[2] == len(expected_constants)
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_cubic_fit_recovers_elastic_constants_under_hydrostatic_pressure() -> None:
+    """Hydrostatic initial-load corrections recover C from the fitted loaded stiffness B."""
+    reference = Atoms("H", positions=[[0, 0, 0]], cell=[3.0, 3.0, 3.0], pbc=True)
+    pressure = 2.0
+    reference_stress = np.array([-pressure, -pressure, -pressure, 0, 0, 0])
+    reference.calc = SinglePointCalculator(reference, stress=reference_stress)
+
+    expected_constants = np.array([200.0, 80.0, 60.0])
+    loaded_stiffness = np.array(
+        [
+            [198, 82, 82, 0, 0, 0],
+            [82, 198, 82, 0, 0, 0],
+            [82, 82, 198, 0, 0, 0],
+            [0, 0, 0, 58, 0, 0],
+            [0, 0, 0, 0, 58, 0],
+            [0, 0, 0, 0, 0, 58],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(
+            deformation,
+            stress=reference_stress + loaded_stiffness @ engineering_strain,
+        )
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_triclinic_fit_recovers_elastic_constants_under_general_initial_stress() -> None:
+    """The full initial-stress correction recovers C under a non-hydrostatic load."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.0, 4.0, 5.0, 80, 90, 100]),
+        pbc=True,
+    )
+    reference_stress = np.array([-2.0, -1.5, -1.0, 0.2, -0.1, 0.15])
+    reference.calc = SinglePointCalculator(reference, stress=reference_stress)
+
+    stiffness = np.array(
+        [
+            [300, 50, 40, 5, 6, 7],
+            [50, 310, 45, 8, 9, 10],
+            [40, 45, 320, 11, 12, 13],
+            [5, 8, 11, 120, 14, 15],
+            [6, 9, 12, 14, 130, 16],
+            [7, 10, 13, 15, 16, 140],
+        ],
+        dtype=float,
+    )
+    expected_constants = np.array(
+        [300, 310, 320, 50, 40, 45, 120, 130, 140, 7, 10, 13, 15, 16, 5, 6, 9, 14, 8, 11, 12],
+        dtype=float,
+    )
+    stress_tensor = voigt_6_to_full_3x3_stress(reference_stress)
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        cell_map = np.linalg.inv(reference.cell) @ deformation.cell
+        displacement_gradient = cell_map.T - np.eye(3)
+        initial_load_response = (
+            displacement_gradient @ stress_tensor
+            + stress_tensor @ displacement_gradient.T
+            - np.trace(displacement_gradient) * stress_tensor
+        )
+        deformation.calc = SinglePointCalculator(
+            deformation,
+            stress=(reference_stress + stiffness @ engineering_strain + full_3x3_to_voigt_6_stress(initial_load_response)),
+        )
 
     fitted_constants, fit = get_elastic_tensor(reference, deformations)
 

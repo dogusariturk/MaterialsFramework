@@ -47,6 +47,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ase.stress import full_3x3_to_voigt_6_stress, voigt_6_to_full_3x3_stress
 from numpy import array, diag, dot, linspace, mean, ones, reshape
 from numpy.linalg import inv
 from scipy.linalg import lstsq
@@ -367,6 +368,26 @@ def get_pressure(s: ndarray) -> float:
     return -mean(s[:3])
 
 
+def _get_initial_stress_correction(cryst: Atoms, refcell: Atoms, stress: ndarray) -> ndarray:
+    """Return the geometric initial-stress contribution to the Cauchy stress increment.
+
+    Args:
+        cryst (Atoms): Deformed structure.
+        refcell (Atoms): Reference structure.
+        stress (ndarray): Initial stress in ASE Voigt order.
+
+    Returns:
+        ndarray: Stress increment contributed by the initial load, in ASE Voigt order.
+    """
+    cell_map = dot(inv(refcell.get_cell()), cryst.get_cell())
+    displacement_gradient = cell_map.T - diag(ones(3))
+    stress_tensor = voigt_6_to_full_3x3_stress(stress)
+    correction = (
+        displacement_gradient @ stress_tensor + stress_tensor @ displacement_gradient.T - displacement_gradient.trace() * stress_tensor
+    )
+    return full_3x3_to_voigt_6_stress(correction)
+
+
 def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[Atoms]:
     """Generate elementary deformations for elastic tensor calculation based on crystal symmetry.
 
@@ -432,33 +453,17 @@ def get_elastic_tensor(cryst: Atoms, systems: list[Atoms]) -> tuple[ndarray, tup
 
     ul = []
     sl = []
-    p = get_pressure(cryst.get_stress())
+    reference_stress = cryst.get_stress()
     for g in systems:
-        ul.append(get_strain(g, refcell=cryst))
-        # Remove the ambient pressure from the stress tensor
-        sl.append(g.get_stress() - array([p, p, p, 0, 0, 0]))
+        strain = get_strain(g, refcell=cryst)
+        ul.append(strain)
+        stress_increment = g.get_stress() - reference_stress
+        sl.append(stress_increment - _get_initial_stress_correction(g, cryst, reference_stress))
     eqm = array([symm(u) for u in ul])
     eqm = reshape(eqm, (eqm.shape[0] * eqm.shape[1], eqm.shape[2]))
     slm = reshape(array(sl), (-1,))
-    bij = lstsq(eqm, slm)
-    # TODO: Check the sign of the pressure array in the B <=> C relation
-    if symm == orthorombic:
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p])
-    elif symm == tetragonal:
-        cij = bij[0] - array([-p, -p, p, p, -p, -p])
-    elif symm == regular:
-        cij = bij[0] - array([-p, p, -p])
-    elif symm == trigonal:
-        cij = bij[0] - array([-p, -p, p, p, -p, p])
-    elif symm == hexagonal:
-        cij = bij[0] - array([-p, -p, p, p, -p])
-    elif symm == monoclinic:
-        # TODO: verify this pressure array
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p])
-    elif symm == triclinic:
-        # TODO: verify this pressure array
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p, p, p, p, p, p, p, p, p])
-    return cij, bij
+    fit = lstsq(eqm, slm)
+    return fit[0], fit
 
 
 def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) -> Atoms:
