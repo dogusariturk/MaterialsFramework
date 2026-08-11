@@ -45,7 +45,7 @@ results = analyzer.calculate(structure)
 
     ---
 
-    Full elastic tensor and Voigt-Reuss-Hill averages.
+    Full elastic tensor, Voigt-Reuss-Hill averages, Debye temperature, and acoustic properties.
 
     [:octicons-arrow-right-24: Elastic Constants](elastic.md)
 

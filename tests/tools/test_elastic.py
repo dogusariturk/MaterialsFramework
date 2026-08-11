@@ -4,18 +4,26 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from ase import Atoms
+from ase.calculators.singlepoint import SinglePointCalculator
+from ase.cell import Cell
+from ase.stress import full_3x3_to_voigt_6_stress, voigt_6_to_full_3x3_stress
 
 from materialsframework.tools.elastic import (
     get_cart_deformed_cell,
     get_cij_order,
+    get_elastic_tensor,
     get_elementary_deformations,
     get_lattice_type,
     get_pressure,
     get_strain,
     hexagonal,
+    monoclinic,
     orthorombic,
     regular,
     tetragonal,
+    triclinic,
+    trigonal,
 )
 from materialsframework.utils import to_atoms
 
@@ -32,6 +40,80 @@ def test_tetragonal_shape() -> None:
     assert mat.shape == (6, 6)
 
 
+def test_tetragonal_fit_recovers_known_stiffness_tensor() -> None:
+    """Tetragonal stress-strain fitting recovers all six independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.25, 3.25, 4.95, 90, 90, 90]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200.0, 250.0, 80.0, 70.0, 60.0, 50.0])
+    stiffness = np.array(
+        [
+            [200, 80, 70, 0, 0, 0],
+            [80, 200, 70, 0, 0, 0],
+            [70, 70, 250, 0, 0, 0],
+            [0, 0, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 0],
+            [0, 0, 0, 0, 0, 50],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_trigonal_shape() -> None:
+    """trigonal() returns a (6, 6) matrix."""
+    mat = trigonal([1, 0, 0, 0, 0, 0])
+    assert mat.shape == (6, 6)
+
+
+def test_trigonal_fit_recovers_known_stiffness_tensor() -> None:
+    """Trigonal-I stress-strain fitting recovers all six independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([4.0, 4.0, 4.0, 70, 70, 70]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200.0, 250.0, 80.0, 70.0, 60.0, 12.0])
+    stiffness = np.array(
+        [
+            [200, 80, 70, 12, 0, 0],
+            [80, 200, 70, -12, 0, 0],
+            [70, 70, 250, 0, 0, 0],
+            [12, -12, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 12],
+            [0, 0, 0, 0, 12, 60],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
 def test_orthorombic_shape() -> None:
     """orthorombic() returns a (6, 9) matrix."""
     mat = orthorombic([1, 0, 0, 0, 0, 0])
@@ -42,6 +124,250 @@ def test_hexagonal_shape() -> None:
     """hexagonal() returns a (6, 5) matrix."""
     mat = hexagonal([1, 0, 0, 0, 0, 0])
     assert mat.shape == (6, 5)
+
+
+def test_monoclinic_shape() -> None:
+    """monoclinic() returns a (6, 13) matrix."""
+    mat = monoclinic([1, 0, 0, 0, 0, 0])
+    assert mat.shape == (6, 13)
+
+
+def test_monoclinic_fit_recovers_known_stiffness_tensor() -> None:
+    """Unique-b monoclinic fitting recovers all 13 independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.0, 4.0, 5.0, 90, 110, 90]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200, 210, 220, 80, 70, 75, 60, 65, 55, 11, 12, 13, 14], dtype=float)
+    stiffness = np.array(
+        [
+            [200, 80, 70, 0, 11, 0],
+            [80, 210, 75, 0, 12, 0],
+            [70, 75, 220, 0, 13, 0],
+            [0, 0, 0, 60, 0, 14],
+            [11, 12, 13, 0, 65, 0],
+            [0, 0, 0, 14, 0, 55],
+        ]
+    )
+
+    assert get_cij_order(reference) == (
+        "C_11",
+        "C_22",
+        "C_33",
+        "C_12",
+        "C_13",
+        "C_23",
+        "C_44",
+        "C_55",
+        "C_66",
+        "C_15",
+        "C_25",
+        "C_35",
+        "C_46",
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_triclinic_shape() -> None:
+    """triclinic() returns a (6, 21) matrix."""
+    mat = triclinic([1, 0, 0, 0, 0, 0])
+    assert mat.shape == (6, 21)
+
+
+def test_triclinic_fit_recovers_known_stiffness_tensor() -> None:
+    """Triclinic fitting recovers all 21 independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.0, 4.0, 5.0, 80, 90, 100]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array(
+        [300, 310, 320, 50, 40, 45, 120, 130, 140, 7, 10, 13, 15, 16, 5, 6, 9, 14, 8, 11, 12],
+        dtype=float,
+    )
+    stiffness = np.array(
+        [
+            [300, 50, 40, 5, 6, 7],
+            [50, 310, 45, 8, 9, 10],
+            [40, 45, 320, 11, 12, 13],
+            [5, 8, 11, 120, 14, 15],
+            [6, 9, 12, 14, 130, 16],
+            [7, 10, 13, 15, 16, 140],
+        ]
+    )
+
+    assert get_cij_order(reference) == (
+        "C_11",
+        "C_22",
+        "C_33",
+        "C_12",
+        "C_13",
+        "C_23",
+        "C_44",
+        "C_55",
+        "C_66",
+        "C_16",
+        "C_26",
+        "C_36",
+        "C_46",
+        "C_56",
+        "C_14",
+        "C_15",
+        "C_25",
+        "C_45",
+        "C_24",
+        "C_34",
+        "C_35",
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, fit = get_elastic_tensor(reference, deformations)
+
+    assert fit[2] == len(expected_constants)
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_cubic_fit_recovers_elastic_constants_under_hydrostatic_pressure() -> None:
+    """Hydrostatic initial-load corrections recover C from the fitted loaded stiffness B."""
+    reference = Atoms("H", positions=[[0, 0, 0]], cell=[3.0, 3.0, 3.0], pbc=True)
+    pressure = 2.0
+    reference_stress = np.array([-pressure, -pressure, -pressure, 0, 0, 0])
+    reference.calc = SinglePointCalculator(reference, stress=reference_stress)
+
+    expected_constants = np.array([200.0, 80.0, 60.0])
+    loaded_stiffness = np.array(
+        [
+            [198, 82, 82, 0, 0, 0],
+            [82, 198, 82, 0, 0, 0],
+            [82, 82, 198, 0, 0, 0],
+            [0, 0, 0, 58, 0, 0],
+            [0, 0, 0, 0, 58, 0],
+            [0, 0, 0, 0, 0, 58],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(
+            deformation,
+            stress=reference_stress + loaded_stiffness @ engineering_strain,
+        )
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_centered_shear_sampling_cancels_quadratic_stress_response() -> None:
+    """Opposite shear strains prevent an even-order response from biasing C44."""
+    reference = Atoms("H", positions=[[0, 0, 0]], cell=[3.0, 3.0, 3.0], pbc=True)
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200.0, 80.0, 60.0])
+    stiffness = np.array(
+        [
+            [200, 80, 80, 0, 0, 0],
+            [80, 200, 80, 0, 0, 0],
+            [80, 80, 200, 0, 0, 0],
+            [0, 0, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 0],
+            [0, 0, 0, 0, 0, 60],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=2.0)
+    shear_strains = []
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        stress = stiffness @ engineering_strain
+        stress[3] += 500.0 * engineering_strain[3] ** 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stress)
+        if engineering_strain[3] != 0:
+            shear_strains.append(engineering_strain[3])
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    assert min(shear_strains) < 0 < max(shear_strains)
+    np.testing.assert_allclose(shear_strains, -np.asarray(shear_strains)[::-1], atol=1e-12)
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_triclinic_fit_recovers_elastic_constants_under_general_initial_stress() -> None:
+    """The full initial-stress correction recovers C under a non-hydrostatic load."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.0, 4.0, 5.0, 80, 90, 100]),
+        pbc=True,
+    )
+    reference_stress = np.array([-2.0, -1.5, -1.0, 0.2, -0.1, 0.15])
+    reference.calc = SinglePointCalculator(reference, stress=reference_stress)
+
+    stiffness = np.array(
+        [
+            [300, 50, 40, 5, 6, 7],
+            [50, 310, 45, 8, 9, 10],
+            [40, 45, 320, 11, 12, 13],
+            [5, 8, 11, 120, 14, 15],
+            [6, 9, 12, 14, 130, 16],
+            [7, 10, 13, 15, 16, 140],
+        ],
+        dtype=float,
+    )
+    expected_constants = np.array(
+        [300, 310, 320, 50, 40, 45, 120, 130, 140, 7, 10, 13, 15, 16, 5, 6, 9, 14, 8, 11, 12],
+        dtype=float,
+    )
+    stress_tensor = voigt_6_to_full_3x3_stress(reference_stress)
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        cell_map = np.linalg.inv(reference.cell) @ deformation.cell
+        displacement_gradient = cell_map.T - np.eye(3)
+        initial_load_response = (
+            displacement_gradient @ stress_tensor
+            + stress_tensor @ displacement_gradient.T
+            - np.trace(displacement_gradient) * stress_tensor
+        )
+        deformation.calc = SinglePointCalculator(
+            deformation,
+            stress=(reference_stress + stiffness @ engineering_strain + full_3x3_to_voigt_6_stress(initial_load_response)),
+        )
+
+    fitted_constants, fit = get_elastic_tensor(reference, deformations)
+
+    assert fit[2] == len(expected_constants)
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
 
 
 def test_get_pressure_hydrostatic() -> None:
@@ -89,6 +415,17 @@ def test_get_cart_deformed_cell_preserves_sites(bcc_fe) -> None:
     assert len(deformed) == len(atoms)
 
 
+@pytest.mark.parametrize(("axis", "voigt_index"), [(3, 3), (4, 4), (5, 5)])
+def test_get_cart_deformed_cell_interprets_shear_size_as_percent(bcc_fe, axis, voigt_index) -> None:
+    """A shear size of 2 produces an engineering shear strain of 2%, not 2 degrees."""
+    atoms = to_atoms(bcc_fe)
+    deformed = get_cart_deformed_cell(atoms, axis=axis, size=2.0)
+
+    tensor_strain = get_strain(deformed, refcell=atoms)
+
+    assert 2 * tensor_strain[voigt_index] == pytest.approx(0.02)
+
+
 def test_get_strain_returns_six_components(bcc_fe) -> None:
     """get_strain returns a 6-element Voigt strain vector."""
     atoms = to_atoms(bcc_fe)
@@ -113,8 +450,6 @@ def test_get_elementary_deformations_cubic_count(bcc_fe) -> None:
 
 def test_get_elementary_deformations_returns_atoms(bcc_fe) -> None:
     """All elementary deformations are ASE Atoms objects."""
-    from ase import Atoms
-
     atoms = to_atoms(bcc_fe)
     deformations = get_elementary_deformations(atoms, n=3, d=1.0)
     for d in deformations:

@@ -47,6 +47,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ase.stress import full_3x3_to_voigt_6_stress, voigt_6_to_full_3x3_stress
 from numpy import array, diag, dot, linspace, mean, ones, reshape
 from numpy.linalg import inv
 from scipy.linalg import lstsq
@@ -99,8 +100,8 @@ def tetragonal(u: Sequence[float]) -> ndarray:
             [uxx, 0, uyy, uzz, 0, 0],
             [uyy, 0, uxx, uzz, 0, 0],
             [0, uzz, 0, uxx + uyy, 0, 0],
-            [0, 0, 0, 0, 2 * uxz, 0],
             [0, 0, 0, 0, 2 * uyz, 0],
+            [0, 0, 0, 0, 2 * uxz, 0],
             [0, 0, 0, 0, 0, 2 * uxy],
         ]
     )
@@ -132,7 +133,7 @@ def orthorombic(u: Sequence[float]) -> ndarray:
 
 
 def trigonal(u: Sequence[float]) -> ndarray:
-    """Construct the equation matrix for the trigonal lattice based on L&L using auxiliary coordinates.
+    """Construct the equation matrix for trigonal-I symmetry.
 
     The order of constants is: C_{11}, C_{33}, C_{12}, C_{13}, C_{44}, C_{14}.
 
@@ -142,17 +143,15 @@ def trigonal(u: Sequence[float]) -> ndarray:
     Returns:
         ndarray: Stress-strain equation matrix for trigonal symmetry.
     """
-    # TODO: Not tested yet.
-    # TODO: There is still some doubt about the :math:`C_{14}` constant.
     uxx, uyy, uzz, uyz, uxz, uxy = u[0], u[1], u[2], u[3], u[4], u[5]
     return array(
         [
-            [uxx, 0, uyy, uzz, 0, 2 * uxz],
-            [uyy, 0, uxx, uzz, 0, -2 * uxz],
+            [uxx, 0, uyy, uzz, 0, 2 * uyz],
+            [uyy, 0, uxx, uzz, 0, -2 * uyz],
             [0, uzz, 0, uxx + uyy, 0, 0],
-            [0, 0, 0, 0, 2 * uyz, -4 * uxy],
-            [0, 0, 0, 0, 2 * uxz, 2 * (uxx - uyy)],
-            [2 * uxy, 0, -2 * uxy, 0, 0, -4 * uyz],
+            [0, 0, 0, 0, 2 * uyz, uxx - uyy],
+            [0, 0, 0, 0, 2 * uxz, 2 * uxy],
+            [uxy, 0, -uxy, 0, 0, 2 * uxz],
         ]
     )
 
@@ -183,11 +182,11 @@ def hexagonal(u: Sequence[float]) -> ndarray:
 
 
 def monoclinic(u: Sequence[float]) -> ndarray:
-    """Generate the equation matrix for the monoclinic lattice.
+    """Generate the equation matrix for monoclinic symmetry with unique axis b.
 
     The ordering of constants is:
     C_{11}, C_{22}, C_{33}, C_{12}, C_{13}, C_{23},
-    C_{44}, C_{55}, C_{66}, C_{16}, C_{26}, C_{36}, C_{45}.
+    C_{44}, C_{55}, C_{66}, C_{15}, C_{25}, C_{35}, C_{46}.
 
     Args:
         u (Sequence[float]): Deformation vector [u_xx, u_yy, u_zz, u_yz, u_xz, u_xy].
@@ -198,12 +197,12 @@ def monoclinic(u: Sequence[float]) -> ndarray:
     uxx, uyy, uzz, uyz, uxz, uxy = u[0], u[1], u[2], u[3], u[4], u[5]
     return array(
         [
-            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, uxy, 0, 0, 0],
-            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, uxy, 0, 0],
-            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, uxy, 0],
-            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, uxz],
-            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, 0, 0, 0, uyz],
-            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, uxx, uyy, uzz, 0],
+            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, 2 * uxz, 0, 0, 0],
+            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, 2 * uxz, 0, 0],
+            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, 2 * uxz, 0],
+            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, 2 * uxy],
+            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, uxx, uyy, uzz, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 2 * uyz],
         ]
     )
 
@@ -211,14 +210,12 @@ def monoclinic(u: Sequence[float]) -> ndarray:
 def triclinic(u: Sequence[float]) -> ndarray:
     """Construct the equation matrix for triclinic crystals.
 
-    *Note*: This implementation is untested.
-
     The ordering of constants is:
     C_{11}, C_{22}, C_{33},
     C_{12}, C_{13}, C_{23},
     C_{44}, C_{55}, C_{66},
     C_{16}, C_{26}, C_{36}, C_{46}, C_{56},
-    C_{14}, C_{15}, C_{25}, C_{45}.
+    C_{14}, C_{15}, C_{25}, C_{45}, C_{24}, C_{34}, C_{35}.
 
     Args:
         u (Sequence[float]): Deformation vector [u_xx, u_yy, u_zz, u_yz, u_xz, u_xy].
@@ -229,12 +226,12 @@ def triclinic(u: Sequence[float]) -> ndarray:
     uxx, uyy, uzz, uyz, uxz, uxy = u[0], u[1], u[2], u[3], u[4], u[5]
     return array(
         [
-            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, uxy, 0, 0, 0, 0, uyz, uxz, 0, 0],
-            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, uxy, 0, 0, 0, 0, 0, uxz, 0],
-            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, uxy, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, uxy, 0, uxx, 0, 0, uxz],
-            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, 0, 0, 0, 0, uxy, 0, uxx, uyy, uyz],
-            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, uxx, uyy, uzz, uyz, uxz, 0, 0, 0, 0],
+            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 0, 2 * uyz, 2 * uxz, 0, 0, 0, 0, 0],
+            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 0, 0, 2 * uxz, 0, 2 * uyz, 0, 0],
+            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 0, 0, 0, 0, 2 * uyz, 2 * uxz],
+            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, 2 * uxy, 0, uxx, 0, 0, 2 * uxz, uyy, uzz, 0],
+            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, 0, 0, 0, 0, 2 * uxy, 0, uxx, uyy, 2 * uyz, 0, 0, uzz],
+            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, uxx, uyy, uzz, 2 * uyz, 2 * uxz, 0, 0, 0, 0, 0, 0, 0],
         ]
     )
 
@@ -268,6 +265,9 @@ def get_cij_order(cryst: Atoms) -> tuple[str, ...]:
             "C_15",
             "C_25",
             "C_45",
+            "C_24",
+            "C_34",
+            "C_35",
         ),
         2: (
             "C_11",
@@ -279,10 +279,10 @@ def get_cij_order(cryst: Atoms) -> tuple[str, ...]:
             "C_44",
             "C_55",
             "C_66",
-            "C_16",
-            "C_26",
-            "C_36",
-            "C_45",
+            "C_15",
+            "C_25",
+            "C_35",
+            "C_46",
         ),
         3: ("C_11", "C_22", "C_33", "C_12", "C_13", "C_23", "C_44", "C_55", "C_66"),
         4: ("C_11", "C_33", "C_12", "C_13", "C_44", "C_66"),
@@ -368,13 +368,33 @@ def get_pressure(s: ndarray) -> float:
     return -mean(s[:3])
 
 
+def _get_initial_stress_correction(cryst: Atoms, refcell: Atoms, stress: ndarray) -> ndarray:
+    """Return the geometric initial-stress contribution to the Cauchy stress increment.
+
+    Args:
+        cryst (Atoms): Deformed structure.
+        refcell (Atoms): Reference structure.
+        stress (ndarray): Initial stress in ASE Voigt order.
+
+    Returns:
+        ndarray: Stress increment contributed by the initial load, in ASE Voigt order.
+    """
+    cell_map = dot(inv(refcell.get_cell()), cryst.get_cell())
+    displacement_gradient = cell_map.T - diag(ones(3))
+    stress_tensor = voigt_6_to_full_3x3_stress(stress)
+    correction = (
+        displacement_gradient @ stress_tensor + stress_tensor @ displacement_gradient.T - displacement_gradient.trace() * stress_tensor
+    )
+    return full_3x3_to_voigt_6_stress(correction)
+
+
 def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[Atoms]:
     """Generate elementary deformations for elastic tensor calculation based on crystal symmetry.
 
     Args:
         cryst (Atoms): Base structure.
         n (int): Number of deformations along each axis.
-        d (float): Deformation magnitude.
+        d (float): Maximum absolute axial or engineering shear strain, in percent.
 
     Returns:
         List[Atoms]: A list of deformed structures.
@@ -394,12 +414,8 @@ def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[
 
     systems = []
     for a in axis:
-        if a < 3:  # tetragonal deformation
-            for dx in linspace(-d, d, n):
-                systems.append(get_cart_deformed_cell(cryst, axis=a, size=dx))
-        elif a < 6:  # sheer deformation (skip the zero angle)
-            for dx in linspace(d / 10.0, d, n):
-                systems.append(get_cart_deformed_cell(cryst, axis=a, size=dx))
+        for dx in linspace(-d, d, n):
+            systems.append(get_cart_deformed_cell(cryst, axis=a, size=dx))
     return systems
 
 
@@ -433,33 +449,17 @@ def get_elastic_tensor(cryst: Atoms, systems: list[Atoms]) -> tuple[ndarray, tup
 
     ul = []
     sl = []
-    p = get_pressure(cryst.get_stress())
+    reference_stress = cryst.get_stress()
     for g in systems:
-        ul.append(get_strain(g, refcell=cryst))
-        # Remove the ambient pressure from the stress tensor
-        sl.append(g.get_stress() - array([p, p, p, 0, 0, 0]))
+        strain = get_strain(g, refcell=cryst)
+        ul.append(strain)
+        stress_increment = g.get_stress() - reference_stress
+        sl.append(stress_increment - _get_initial_stress_correction(g, cryst, reference_stress))
     eqm = array([symm(u) for u in ul])
     eqm = reshape(eqm, (eqm.shape[0] * eqm.shape[1], eqm.shape[2]))
     slm = reshape(array(sl), (-1,))
-    bij = lstsq(eqm, slm)
-    # TODO: Check the sign of the pressure array in the B <=> C relation
-    if symm == orthorombic:
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p])
-    elif symm == tetragonal:
-        cij = bij[0] - array([-p, -p, p, p, -p, -p])
-    elif symm == regular:
-        cij = bij[0] - array([-p, p, -p])
-    elif symm == trigonal:
-        cij = bij[0] - array([-p, -p, p, p, -p, p])
-    elif symm == hexagonal:
-        cij = bij[0] - array([-p, -p, p, p, -p])
-    elif symm == monoclinic:
-        # TODO: verify this pressure array
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p])
-    elif symm == triclinic:
-        # TODO: verify this pressure array
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p, p, p, p, p, p])
-    return cij, bij
+    fit = lstsq(eqm, slm)
+    return fit[0], fit
 
 
 def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) -> Atoms:
@@ -471,7 +471,7 @@ def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) ->
     Args:
         base_cryst (Atoms): The base structure.
         axis (int): Deformation axis (0, 1, 2 for x, y, z; 3,4,5 for shear).
-        size (float): Magnitude of the deformation (percentage for axial deformation and degrees for shear deformation).
+        size (float): Signed axial or engineering shear strain, in percent.
 
     Returns:
         Atoms: New structure with deformed cell.

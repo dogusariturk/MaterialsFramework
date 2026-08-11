@@ -8,7 +8,7 @@ The physics and derivations behind each property analyzer. See [Usage](../../usa
 | [Bain Path](bain.md)                        | Energy along the FCC-to-BCC Bain transformation path                         |
 | [Coefficient of Thermal Expansion](cte.md)  | Coefficient of thermal expansion from NPT-MD volume trends                   |
 | [Cubic Elastic Constants](cubic_elastic.md) | Cubic elastic constants and derived moduli (B, G, E, ν)                      |
-| [Elastic Constants](elastic.md)             | Full elastic tensor and Voigt-Reuss-Hill averages                            |
+| [Elastic Constants](elastic.md)             | Full elastic tensor, Voigt-Reuss-Hill averages, Debye/acoustic properties    |
 | [Equation of State](eos.md)                 | Equation-of-state curve fitting from E-V data                                |
 | [Formation Energy](formation_energy.md)     | Formation energy per atom                                                    |
 | [H-Solubility](h_solubility.md)             | Hydrogen insertion and solution energies                                     |
