@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from ase import Atoms
+from ase.calculators.singlepoint import SinglePointCalculator
+from ase.cell import Cell
 
 from materialsframework.tools.elastic import (
     get_cart_deformed_cell,
     get_cij_order,
+    get_elastic_tensor,
     get_elementary_deformations,
     get_lattice_type,
     get_pressure,
@@ -30,6 +34,40 @@ def test_tetragonal_shape() -> None:
     """tetragonal() returns a (6, 6) matrix."""
     mat = tetragonal([1, 0, 0, 0, 0, 0])
     assert mat.shape == (6, 6)
+
+
+def test_tetragonal_fit_recovers_known_stiffness_tensor() -> None:
+    """Tetragonal stress-strain fitting recovers all six independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.25, 3.25, 4.95, 90, 90, 90]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200.0, 250.0, 80.0, 70.0, 60.0, 50.0])
+    stiffness = np.array(
+        [
+            [200, 80, 70, 0, 0, 0],
+            [80, 200, 70, 0, 0, 0],
+            [70, 70, 250, 0, 0, 0],
+            [0, 0, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 0],
+            [0, 0, 0, 0, 0, 50],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
 
 
 def test_orthorombic_shape() -> None:
@@ -113,8 +151,6 @@ def test_get_elementary_deformations_cubic_count(bcc_fe) -> None:
 
 def test_get_elementary_deformations_returns_atoms(bcc_fe) -> None:
     """All elementary deformations are ASE Atoms objects."""
-    from ase import Atoms
-
     atoms = to_atoms(bcc_fe)
     deformations = get_elementary_deformations(atoms, n=3, d=1.0)
     for d in deformations:
