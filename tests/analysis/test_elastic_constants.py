@@ -212,6 +212,30 @@ def test_build_hexagonal_elastic_tensor_derives_c66() -> None:
     np.testing.assert_allclose(tensor.voigt, expected)
 
 
+def test_build_trigonal_elastic_tensor_adds_signed_c14_equivalents() -> None:
+    """Trigonal-I symmetry derives C66 and the signed C14-equivalent entries."""
+    analyzer = ElasticConstantsAnalyzer()
+    structure = _make_atoms(4.0, 4.0, 4.0, 70, 70, 70)
+
+    tensor = analyzer._build_elastic_tensor(
+        [200.0, 250.0, 80.0, 70.0, 60.0, 12.0],
+        ["C_11", "C_33", "C_12", "C_13", "C_44", "C_14"],
+        structure,
+    )
+
+    expected = np.array(
+        [
+            [200, 80, 70, 12, 0, 0],
+            [80, 200, 70, -12, 0, 0],
+            [70, 70, 250, 0, 0, 0],
+            [12, -12, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 12],
+            [0, 0, 0, 0, 12, 60],
+        ]
+    )
+    np.testing.assert_allclose(tensor.voigt, expected)
+
+
 def test_calculate_raises_without_required_properties(bcc_fe) -> None:
     """calculate() raises before running when required properties are unavailable."""
     from materialsframework.calculators.random import RandomCalculator

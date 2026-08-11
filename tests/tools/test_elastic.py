@@ -20,6 +20,7 @@ from materialsframework.tools.elastic import (
     orthorombic,
     regular,
     tetragonal,
+    trigonal,
 )
 from materialsframework.utils import to_atoms
 
@@ -55,6 +56,46 @@ def test_tetragonal_fit_recovers_known_stiffness_tensor() -> None:
             [0, 0, 0, 60, 0, 0],
             [0, 0, 0, 0, 60, 0],
             [0, 0, 0, 0, 0, 50],
+        ]
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, _ = get_elastic_tensor(reference, deformations)
+
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_trigonal_shape() -> None:
+    """trigonal() returns a (6, 6) matrix."""
+    mat = trigonal([1, 0, 0, 0, 0, 0])
+    assert mat.shape == (6, 6)
+
+
+def test_trigonal_fit_recovers_known_stiffness_tensor() -> None:
+    """Trigonal-I stress-strain fitting recovers all six independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([4.0, 4.0, 4.0, 70, 70, 70]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array([200.0, 250.0, 80.0, 70.0, 60.0, 12.0])
+    stiffness = np.array(
+        [
+            [200, 80, 70, 12, 0, 0],
+            [80, 200, 70, -12, 0, 0],
+            [70, 70, 250, 0, 0, 0],
+            [12, -12, 0, 60, 0, 0],
+            [0, 0, 0, 0, 60, 12],
+            [0, 0, 0, 0, 12, 60],
         ]
     )
 

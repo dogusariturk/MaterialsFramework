@@ -212,4 +212,9 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         if system in {"hexagonal", "trigonal"}:
             elastic_tensor[5, 5] = 0.5 * (elastic_tensor[0, 0] - elastic_tensor[0, 1])
 
+        if system == "trigonal":
+            c14 = elastic_tensor[0, 3]
+            elastic_tensor[1, 3] = elastic_tensor[3, 1] = -c14
+            elastic_tensor[4, 5] = elastic_tensor[5, 4] = c14
+
         return ElasticTensor.from_voigt(elastic_tensor)

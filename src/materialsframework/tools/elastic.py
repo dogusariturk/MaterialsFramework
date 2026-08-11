@@ -132,7 +132,7 @@ def orthorombic(u: Sequence[float]) -> ndarray:
 
 
 def trigonal(u: Sequence[float]) -> ndarray:
-    """Construct the equation matrix for the trigonal lattice based on L&L using auxiliary coordinates.
+    """Construct the equation matrix for trigonal-I symmetry.
 
     The order of constants is: C_{11}, C_{33}, C_{12}, C_{13}, C_{44}, C_{14}.
 
@@ -142,17 +142,15 @@ def trigonal(u: Sequence[float]) -> ndarray:
     Returns:
         ndarray: Stress-strain equation matrix for trigonal symmetry.
     """
-    # TODO: Not tested yet.
-    # TODO: There is still some doubt about the :math:`C_{14}` constant.
     uxx, uyy, uzz, uyz, uxz, uxy = u[0], u[1], u[2], u[3], u[4], u[5]
     return array(
         [
-            [uxx, 0, uyy, uzz, 0, 2 * uxz],
-            [uyy, 0, uxx, uzz, 0, -2 * uxz],
+            [uxx, 0, uyy, uzz, 0, 2 * uyz],
+            [uyy, 0, uxx, uzz, 0, -2 * uyz],
             [0, uzz, 0, uxx + uyy, 0, 0],
-            [0, 0, 0, 0, 2 * uyz, -4 * uxy],
-            [0, 0, 0, 0, 2 * uxz, 2 * (uxx - uyy)],
-            [2 * uxy, 0, -2 * uxy, 0, 0, -4 * uyz],
+            [0, 0, 0, 0, 2 * uyz, uxx - uyy],
+            [0, 0, 0, 0, 2 * uxz, 2 * uxy],
+            [uxy, 0, -uxy, 0, 0, 2 * uxz],
         ]
     )
 
