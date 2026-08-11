@@ -209,14 +209,12 @@ def monoclinic(u: Sequence[float]) -> ndarray:
 def triclinic(u: Sequence[float]) -> ndarray:
     """Construct the equation matrix for triclinic crystals.
 
-    *Note*: This implementation is untested.
-
     The ordering of constants is:
     C_{11}, C_{22}, C_{33},
     C_{12}, C_{13}, C_{23},
     C_{44}, C_{55}, C_{66},
     C_{16}, C_{26}, C_{36}, C_{46}, C_{56},
-    C_{14}, C_{15}, C_{25}, C_{45}.
+    C_{14}, C_{15}, C_{25}, C_{45}, C_{24}, C_{34}, C_{35}.
 
     Args:
         u (Sequence[float]): Deformation vector [u_xx, u_yy, u_zz, u_yz, u_xz, u_xy].
@@ -227,12 +225,12 @@ def triclinic(u: Sequence[float]) -> ndarray:
     uxx, uyy, uzz, uyz, uxz, uxy = u[0], u[1], u[2], u[3], u[4], u[5]
     return array(
         [
-            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, uxy, 0, 0, 0, 0, uyz, uxz, 0, 0],
-            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, uxy, 0, 0, 0, 0, 0, uxz, 0],
-            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, uxy, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, uxy, 0, uxx, 0, 0, uxz],
-            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, 0, 0, 0, 0, uxy, 0, uxx, uyy, uyz],
-            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, uxx, uyy, uzz, uyz, uxz, 0, 0, 0, 0],
+            [uxx, 0, 0, uyy, uzz, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 0, 2 * uyz, 2 * uxz, 0, 0, 0, 0, 0],
+            [0, uyy, 0, uxx, 0, uzz, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 0, 0, 2 * uxz, 0, 2 * uyz, 0, 0],
+            [0, 0, uzz, 0, uxx, uyy, 0, 0, 0, 0, 0, 2 * uxy, 0, 0, 0, 0, 0, 0, 0, 2 * uyz, 2 * uxz],
+            [0, 0, 0, 0, 0, 0, 2 * uyz, 0, 0, 0, 0, 0, 2 * uxy, 0, uxx, 0, 0, 2 * uxz, uyy, uzz, 0],
+            [0, 0, 0, 0, 0, 0, 0, 2 * uxz, 0, 0, 0, 0, 0, 2 * uxy, 0, uxx, uyy, 2 * uyz, 0, 0, uzz],
+            [0, 0, 0, 0, 0, 0, 0, 0, 2 * uxy, uxx, uyy, uzz, 2 * uyz, 2 * uxz, 0, 0, 0, 0, 0, 0, 0],
         ]
     )
 
@@ -266,6 +264,9 @@ def get_cij_order(cryst: Atoms) -> tuple[str, ...]:
             "C_15",
             "C_25",
             "C_45",
+            "C_24",
+            "C_34",
+            "C_35",
         ),
         2: (
             "C_11",
@@ -456,7 +457,7 @@ def get_elastic_tensor(cryst: Atoms, systems: list[Atoms]) -> tuple[ndarray, tup
         cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p])
     elif symm == triclinic:
         # TODO: verify this pressure array
-        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p, p, p, p, p, p])
+        cij = bij[0] - array([-p, -p, -p, p, p, p, -p, -p, -p, p, p, p, p, p, p, p, p, p, p, p, p])
     return cij, bij
 
 

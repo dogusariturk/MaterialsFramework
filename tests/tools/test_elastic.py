@@ -21,6 +21,7 @@ from materialsframework.tools.elastic import (
     orthorombic,
     regular,
     tetragonal,
+    triclinic,
     trigonal,
 )
 from materialsframework.utils import to_atoms
@@ -177,6 +178,74 @@ def test_monoclinic_fit_recovers_known_stiffness_tensor() -> None:
 
     fitted_constants, _ = get_elastic_tensor(reference, deformations)
 
+    np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
+
+
+def test_triclinic_shape() -> None:
+    """triclinic() returns a (6, 21) matrix."""
+    mat = triclinic([1, 0, 0, 0, 0, 0])
+    assert mat.shape == (6, 21)
+
+
+def test_triclinic_fit_recovers_known_stiffness_tensor() -> None:
+    """Triclinic fitting recovers all 21 independent constants."""
+    reference = Atoms(
+        "H",
+        positions=[[0, 0, 0]],
+        cell=Cell.fromcellpar([3.0, 4.0, 5.0, 80, 90, 100]),
+        pbc=True,
+    )
+    reference.calc = SinglePointCalculator(reference, stress=np.zeros(6))
+
+    expected_constants = np.array(
+        [300, 310, 320, 50, 40, 45, 120, 130, 140, 7, 10, 13, 15, 16, 5, 6, 9, 14, 8, 11, 12],
+        dtype=float,
+    )
+    stiffness = np.array(
+        [
+            [300, 50, 40, 5, 6, 7],
+            [50, 310, 45, 8, 9, 10],
+            [40, 45, 320, 11, 12, 13],
+            [5, 8, 11, 120, 14, 15],
+            [6, 9, 12, 14, 130, 16],
+            [7, 10, 13, 15, 16, 140],
+        ]
+    )
+
+    assert get_cij_order(reference) == (
+        "C_11",
+        "C_22",
+        "C_33",
+        "C_12",
+        "C_13",
+        "C_23",
+        "C_44",
+        "C_55",
+        "C_66",
+        "C_16",
+        "C_26",
+        "C_36",
+        "C_46",
+        "C_56",
+        "C_14",
+        "C_15",
+        "C_25",
+        "C_45",
+        "C_24",
+        "C_34",
+        "C_35",
+    )
+
+    deformations = get_elementary_deformations(reference, n=5, d=1.0)
+    for deformation in deformations:
+        strain = get_strain(deformation, refcell=reference)
+        engineering_strain = strain.copy()
+        engineering_strain[3:] *= 2
+        deformation.calc = SinglePointCalculator(deformation, stress=stiffness @ engineering_strain)
+
+    fitted_constants, fit = get_elastic_tensor(reference, deformations)
+
+    assert fit[2] == len(expected_constants)
     np.testing.assert_allclose(fitted_constants, expected_constants, atol=1e-10)
 
 

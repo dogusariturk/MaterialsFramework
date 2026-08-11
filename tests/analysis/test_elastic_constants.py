@@ -260,6 +260,52 @@ def test_build_monoclinic_elastic_tensor_preserves_unique_b_constants() -> None:
     np.testing.assert_allclose(tensor.voigt, expected)
 
 
+def test_build_triclinic_elastic_tensor_preserves_all_constants() -> None:
+    """Triclinic tensor assembly preserves all 21 independent constants."""
+    analyzer = ElasticConstantsAnalyzer()
+    structure = _make_atoms(3.0, 4.0, 5.0, 80, 90, 100)
+
+    tensor = analyzer._build_elastic_tensor(
+        [300, 310, 320, 50, 40, 45, 120, 130, 140, 7, 10, 13, 15, 16, 5, 6, 9, 14, 8, 11, 12],
+        [
+            "C_11",
+            "C_22",
+            "C_33",
+            "C_12",
+            "C_13",
+            "C_23",
+            "C_44",
+            "C_55",
+            "C_66",
+            "C_16",
+            "C_26",
+            "C_36",
+            "C_46",
+            "C_56",
+            "C_14",
+            "C_15",
+            "C_25",
+            "C_45",
+            "C_24",
+            "C_34",
+            "C_35",
+        ],
+        structure,
+    )
+
+    expected = np.array(
+        [
+            [300, 50, 40, 5, 6, 7],
+            [50, 310, 45, 8, 9, 10],
+            [40, 45, 320, 11, 12, 13],
+            [5, 8, 11, 120, 14, 15],
+            [6, 9, 12, 14, 130, 16],
+            [7, 10, 13, 15, 16, 140],
+        ]
+    )
+    np.testing.assert_allclose(tensor.voigt, expected)
+
+
 def test_calculate_raises_without_required_properties(bcc_fe) -> None:
     """calculate() raises before running when required properties are unavailable."""
     from materialsframework.calculators.random import RandomCalculator
