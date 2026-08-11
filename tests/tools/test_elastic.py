@@ -415,6 +415,17 @@ def test_get_cart_deformed_cell_preserves_sites(bcc_fe) -> None:
     assert len(deformed) == len(atoms)
 
 
+@pytest.mark.parametrize(("axis", "voigt_index"), [(3, 3), (4, 4), (5, 5)])
+def test_get_cart_deformed_cell_interprets_shear_size_as_percent(bcc_fe, axis, voigt_index) -> None:
+    """A shear size of 2 produces an engineering shear strain of 2%, not 2 degrees."""
+    atoms = to_atoms(bcc_fe)
+    deformed = get_cart_deformed_cell(atoms, axis=axis, size=2.0)
+
+    tensor_strain = get_strain(deformed, refcell=atoms)
+
+    assert 2 * tensor_strain[voigt_index] == pytest.approx(0.02)
+
+
 def test_get_strain_returns_six_components(bcc_fe) -> None:
     """get_strain returns a 6-element Voigt strain vector."""
     atoms = to_atoms(bcc_fe)

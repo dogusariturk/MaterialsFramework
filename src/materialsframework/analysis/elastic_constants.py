@@ -58,7 +58,7 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
 
         Args:
             num_deform (int, optional): The number of deformations to apply. Defaults to 5.
-            max_deform (float, optional): The maximum deformation size in percent and degrees. Defaults to 2%.
+            max_deform (float, optional): The maximum axial or engineering shear strain, in percent. Defaults to 2%.
             calculator (BaseCalculator | None, optional): The calculator used for structure relaxation and
                 energy/stress calculations.
             elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The

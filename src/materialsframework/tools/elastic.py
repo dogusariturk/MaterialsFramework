@@ -394,7 +394,7 @@ def get_elementary_deformations(cryst: Atoms, n: int = 5, d: float = 2) -> list[
     Args:
         cryst (Atoms): Base structure.
         n (int): Number of deformations along each axis.
-        d (float): Deformation magnitude.
+        d (float): Maximum absolute axial or engineering shear strain, in percent.
 
     Returns:
         List[Atoms]: A list of deformed structures.
@@ -471,7 +471,7 @@ def get_cart_deformed_cell(base_cryst: Atoms, axis: int = 0, size: float = 1) ->
     Args:
         base_cryst (Atoms): The base structure.
         axis (int): Deformation axis (0, 1, 2 for x, y, z; 3,4,5 for shear).
-        size (float): Magnitude of the deformation (percentage for axial deformation and degrees for shear deformation).
+        size (float): Signed axial or engineering shear strain, in percent.
 
     Returns:
         Atoms: New structure with deformed cell.
