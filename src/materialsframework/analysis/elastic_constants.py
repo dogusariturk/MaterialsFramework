@@ -1,9 +1,8 @@
-"""This module provides a class to calculate the elastic constant tensor of a given structure.
+"""This module provides a class to calculate the elastic constants of a given structure.
 
-The `ElasticConstantsAnalyzer` class computes the elastic constant tensor of a structure using
-energy-volume data and various deformation modes. The class also computes additional mechanical
-properties such as bulk modulus, shear modulus, Poisson's ratio, and Pugh's ratio based on the
-calculated elastic constants.
+The `ElasticConstantsAnalyzer` class fits a symmetry-appropriate elastic tensor from stress-strain
+data, with optional fixed-cell ionic relaxation. It also derives polycrystalline moduli, the Debye
+temperature, a Grüneisen parameter approximation, and elastic sound velocities.
 """
 
 from __future__ import annotations
@@ -30,34 +29,23 @@ if TYPE_CHECKING:
 
     from materialsframework.tools.calculator import BaseCalculator
 
-__author__ = "Doguhan Sariturk"
+__authors__ = ["Doguhan Sariturk", "Elias P. Martin"]
 __email__ = "dogu.sariturk@gmail.com"
-__credits__ = ["Elias P. Martin (epm1337@tamu.edu)"]
-
 
 
 class ElasticConstantsAnalyzer(BaseAnalyzer):
-    """A class used to calculate the elastic constant tensor for a given structure.
-
-    Computes the elastic constant tensor from deformation and energy-volume data, along with derived
-    mechanical properties such as bulk modulus, shear modulus, Young's modulus, and Poisson's ratio.
-    """
+    """Calculate elastic constants and related properties from stress-strain data."""
 
     EQUIV = {
-        "cubic": [
-            ((0, 0), (1, 1), (2, 2)),
-            ((0, 1), (0, 2), (1, 2)),
-            ((3, 3), (4, 4), (5, 5)),
-        ],
-        "hexagonal": [((0, 0), (1, 1)), ((0, 2), (1, 2)), ((3, 3), (4, 4))],
-        "tetragonal": [((0, 0), (1, 1)), ((0, 2), (1, 2)), ((3, 3), (4, 4))],
-        "trigonal": [((0, 0), (1, 1)), ((0, 2), (1, 2)), ((3, 3), (4, 4))],
-        "orthorhombic": [],
-        "monoclinic": [],
-        "triclinic": [],
+        "cubic": {
+            (0, 0): ((1, 1), (2, 2)),
+            (0, 1): ((0, 2), (1, 2)),
+            (3, 3): ((4, 4), (5, 5)),
+        },
+        "hexagonal": {(0, 0): ((1, 1),), (0, 2): ((1, 2),), (3, 3): ((4, 4),)},
+        "tetragonal": {(0, 0): ((1, 1),), (0, 2): ((1, 2),), (3, 3): ((4, 4),)},
+        "trigonal": {(0, 0): ((1, 1),), (0, 2): ((1, 2),), (3, 3): ((4, 4),)},
     }
-
-    SPECIAL = {"hexagonal", "trigonal"}  # need C66 = 1/2(C11-C12)
 
     def __init__(
         self,
@@ -71,30 +59,30 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         Args:
             num_deform (int, optional): The number of deformations to apply. Defaults to 5.
             max_deform (float, optional): The maximum deformation size in percent and degrees. Defaults to 2%.
-            calculator (BaseCalculator | None, optional): The calculator object used for energy calculations.
+            calculator (BaseCalculator | None, optional): The calculator used for structure relaxation and
+                energy/stress calculations.
             elastic_constant_transformation (ElasticConstantsDeformationTransformation | None, optional): The
-                transformation object used to apply cubic distortions.
+                transformation used to apply the symmetry-appropriate elastic deformations.
         """
         super().__init__(calculator)
         self.num_deform = num_deform
         self.max_deform = max_deform
 
         self._elastic_constant_transformation = elastic_constant_transformation
-        self.elastic_tensor = None
 
-    @require_properties("energy", "stress")
-    def calculate(self, structure: Structure | Atoms, is_relaxed: bool = False, relax_ions: bool = True, fmax_distort: float|None = None) -> dict[str, float]:
-        """Calculates the elastic constants of a given structure.
-
-        Uses stress-strain data from a series of deformation modes to fit the elastic constants.
+    @require_properties("energy", "stress", "forces")
+    def calculate(
+        self, structure: Structure | Atoms, is_relaxed: bool = False, relax_ions: bool = False, fmax_distort: float | None = None
+    ) -> dict[str, float]:
+        """Calculate elastic constants and derived properties.
 
         Args:
             structure (Structure | Atoms): The input structure to calculate the elastic constants of.
-            is_relaxed (bool, optional): A flag to indicate whether the input structure is already relaxed. Defaults
-                to False.
-            relax_ions (bool, optional): Whether to relax the internal ionic coordinates for each deformation. True is most accurate.
-            fmax_distort (float | None, optional): Temporary different fmax setting for relaxing deformed structures.
-                Original reset after. Does not affect initial relaxation if is_relaxed=False.
+            is_relaxed (bool, optional): Whether to skip initial structure relaxation. Defaults to False.
+            relax_ions (bool, optional): Whether to relax ions within each distorted fixed cell. Defaults to False.
+            fmax_distort (float | None, optional): Force threshold in eV/Angstrom for distorted-cell relaxations.
+                None uses the calculator's existing ``fmax``. Ignored when ``relax_ions`` is False. The original
+                value is restored afterward. Defaults to None.
 
         Returns:
             dict[str, float]: Dictionary with keys:
@@ -109,14 +97,19 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
                 - ``poisson_ratio``: Poisson ratio.
                 - ``pugh_ratio``: Pugh ratio.
                 - ``chen_vickers_hardness``: Chen-Vickers hardness in GPa.
-                - ``debye_temperature``: Debye Temperature in Kelvin.
-                - ``gruneisen_approx``: Slater's approximation of the Gruneisen parameter using the Possion ratio.
-                - ``v_longitudinal``: Elastic approximation of longitudinal speed of sound in m/s. (see doi:10.1016/0022-3697(63)90067-2)
-                - ``v_transverse``: Elastic approximation of transverse speed of sound in m/s.
-                - ``v_mean``: Average speed of sound from v_longitudinal and v_transverse in m/s.
+                - ``debye_temperature``: Elastic estimate of the Debye temperature in K from the mean sound
+                  velocity and atomic volume.
+                - ``gruneisen_approx``: Dimensionless Belomestnykh–Tesleva estimate of the acoustic Grüneisen
+                  parameter from the homogeneous Poisson ratio.
+                - ``v_longitudinal``: Isotropic longitudinal sound velocity in m/s from the Voigt-Reuss-Hill bulk
+                  and shear moduli and the structure's mass density.
+                - ``v_transverse``: Isotropic transverse sound velocity in m/s from the Voigt-Reuss-Hill shear
+                  modulus and the structure's mass density.
+                - ``v_mean``: Debye mean sound velocity in m/s calculated from one longitudinal and two transverse
+                  acoustic modes.
 
         Raises:
-            ValueError: If the calculator object does not have the 'energy' and 'stress' properties implemented.
+            ValueError: If required calculator properties are unavailable or fitted moduli are negative.
         """
         structure = self._ensure_relaxed(structure, is_relaxed)
         pmg_structure = to_structure(structure)
@@ -125,8 +118,10 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         prev_relax_cell = self.calculator.relax_cell
         prev_fmax = self.calculator.fmax
         self.calculator.relax_cell = False
+
         if fmax_distort is not None:
             self.calculator.fmax = fmax_distort
+
         try:
             structure.calc = self.calculator.calculator
 
@@ -150,7 +145,6 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
         cij = np.asarray(cij, dtype=float) * EV_A3_TO_GPA
 
         elastic_tensor = self._build_elastic_tensor(cij, cij_order, structure)
-        self.elastic_tensor = elastic_tensor
 
         poisson_ratio = elastic_tensor.homogeneous_poisson
         pugh_ratio = elastic_tensor.g_vrh / elastic_tensor.k_vrh
@@ -208,13 +202,14 @@ class ElasticConstantsAnalyzer(BaseAnalyzer):
             i, j = int(sym[2]) - 1, int(sym[3]) - 1
             elastic_tensor[i, j] = elastic_tensor[j, i] = val
 
-        for block in self.EQUIV.get(sys := elastic.get_lattice_type(structure)[1].lower(), []):
-            mean_val = np.mean([elastic_tensor[p, q] for p, q in block])
-            for p, q in block:
-                elastic_tensor[p, q] = elastic_tensor[q, p] = mean_val
+        system = elastic.get_lattice_type(structure)[1].lower()
+        for source, targets in self.EQUIV.get(system, {}).items():
+            value = elastic_tensor[source]
+            for p, q in targets:
+                elastic_tensor[p, q] = elastic_tensor[q, p] = value
 
         # add the derived C66 if required
-        if sys in self.SPECIAL and elastic_tensor[5, 5] == 0:
+        if system in {"hexagonal", "trigonal"}:
             elastic_tensor[5, 5] = 0.5 * (elastic_tensor[0, 0] - elastic_tensor[0, 1])
 
         return ElasticTensor.from_voigt(elastic_tensor)
