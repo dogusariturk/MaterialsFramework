@@ -99,8 +99,8 @@ def tetragonal(u: Sequence[float]) -> ndarray:
             [uxx, 0, uyy, uzz, 0, 0],
             [uyy, 0, uxx, uzz, 0, 0],
             [0, uzz, 0, uxx + uyy, 0, 0],
-            [0, 0, 0, 0, 2 * uxz, 0],
             [0, 0, 0, 0, 2 * uyz, 0],
+            [0, 0, 0, 0, 2 * uxz, 0],
             [0, 0, 0, 0, 0, 2 * uxy],
         ]
     )
