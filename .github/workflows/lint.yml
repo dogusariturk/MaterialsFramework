@@ -30,6 +30,6 @@ jobs:
         run: uv sync
 
       - name: Run prek
-        uses: j178/prek-action@v1.1.1
+        uses: j178/prek-action@v3.0.0
         with:
           prek-version: '0.3.3'
