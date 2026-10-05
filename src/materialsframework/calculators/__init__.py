@@ -36,6 +36,7 @@ _CALCULATOR_MAP: dict[str, tuple[str, str]] = {
     "ORBCalculator": ("materialsframework.calculators.orb", "ORBCalculator"),
     "PetMadCalculator": ("materialsframework.calculators.petmad", "PetMadCalculator"),
     "PosEGNNCalculator": ("materialsframework.calculators.posegnn", "PosEGNNCalculator"),
+    "ProphetCalculator": ("materialsframework.calculators.prophet", "ProphetCalculator"),
     "RandomCalculator": ("materialsframework.calculators.random", "RandomCalculator"),
     "SevenNetCalculator": ("materialsframework.calculators.sevennet", "SevenNetCalculator"),
     "TACECalculator": ("materialsframework.calculators.tace", "TACECalculator"),
