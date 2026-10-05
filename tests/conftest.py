@@ -48,6 +48,14 @@ def l10_feni() -> Structure:
 
 
 @pytest.fixture(scope="session")
+def diamond_si() -> Structure:
+    """2-atom diamond Si primitive cell."""
+    a = 5.43
+    lattice = Lattice([[0, a / 2, a / 2], [a / 2, 0, a / 2], [a / 2, a / 2, 0]])
+    return Structure(lattice, ["Si", "Si"], [[0, 0, 0], [0.25, 0.25, 0.25]])
+
+
+@pytest.fixture(scope="session")
 def ase_bcc_fe(bcc_fe) -> Atoms:
     """ASE Atoms version of the BCC Fe structure."""
     return to_atoms(bcc_fe)
