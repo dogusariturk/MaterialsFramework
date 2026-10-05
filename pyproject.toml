@@ -179,6 +179,7 @@ markers = [
 alignn      = "materialsframework.calculators.alignn:AlignnCalculator"
 allegro     = "materialsframework.calculators.allegro:AllegroCalculator"
 alphanet    = "materialsframework.calculators.alphanet:AlphaNetCalculator"
+bam         = "materialsframework.calculators.bam:BAMCalculator"
 chgnet      = "materialsframework.calculators.chgnet:CHGNetCalculator"
 deepmd      = "materialsframework.calculators.deepmd:DeePMDCalculator"
 eqnorm      = "materialsframework.calculators.eqnorm:EqnormCalculator"

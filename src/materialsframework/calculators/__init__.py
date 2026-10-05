@@ -16,6 +16,7 @@ _CALCULATOR_MAP: dict[str, tuple[str, str]] = {
     "AlignnCalculator": ("materialsframework.calculators.alignn", "AlignnCalculator"),
     "AllegroCalculator": ("materialsframework.calculators.allegro", "AllegroCalculator"),
     "AlphaNetCalculator": ("materialsframework.calculators.alphanet", "AlphaNetCalculator"),
+    "BAMCalculator": ("materialsframework.calculators.bam", "BAMCalculator"),
     "CHGNetCalculator": ("materialsframework.calculators.chgnet", "CHGNetCalculator"),
     "DeePMDCalculator": ("materialsframework.calculators.deepmd", "DeePMDCalculator"),
     "EqnormCalculator": ("materialsframework.calculators.eqnorm", "EqnormCalculator"),
