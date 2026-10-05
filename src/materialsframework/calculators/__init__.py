@@ -13,6 +13,7 @@ __author__ = "Doguhan Sariturk"
 __email__ = "dogu.sariturk@gmail.com"
 
 _CALCULATOR_MAP: dict[str, tuple[str, str]] = {
+    "ACECalculator": ("materialsframework.calculators.ace", "ACECalculator"),
     "AlignnCalculator": ("materialsframework.calculators.alignn", "AlignnCalculator"),
     "AllegroCalculator": ("materialsframework.calculators.allegro", "AllegroCalculator"),
     "AlphaNetCalculator": ("materialsframework.calculators.alphanet", "AlphaNetCalculator"),
