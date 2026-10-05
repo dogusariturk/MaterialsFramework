@@ -239,6 +239,22 @@ jobs:
               echo "POSEGNN_MODEL=$HOME/posegnn-model.ckpt" >> "$GITHUB_ENV"
             python_path: /tmp/ibm-materials/models/pos_egnn
             tests: tests/calculators/test_posegnn.py
+          - name: bam
+            install: ""
+            cache_key: bam-65859867
+            cache_path: ~/bam-model.pkl
+            extra_install: |
+              uv pip install "BAM-torch @ git+https://github.com/myung-group/BAM-torch.git@19e11ed7c2d62a5f323293cc60f629cf679619df"
+              if [ ! -s "$HOME/bam-model.pkl" ]; then
+                curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/bam-model.pkl" "https://api.figshare.com/v2/file/download/65859867" || true
+              fi
+              if [ -s "$HOME/bam-model.pkl" ] && ! head -c 200 "$HOME/bam-model.pkl" | grep -qi "<html"; then
+                echo "BAM_MODEL=$HOME/bam-model.pkl" >> "$GITHUB_ENV"
+              else
+                echo "::warning::BAM checkpoint download from figshare failed; BAM_MODEL not set, tests will skip"
+                rm -f "$HOME/bam-model.pkl"
+              fi
+            tests: tests/calculators/test_bam.py
           - name: hienet
             install: --extra hienet --no-install-package torch-scatter
             cache_key: hienet-v3
