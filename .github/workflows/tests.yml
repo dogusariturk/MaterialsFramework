@@ -239,6 +239,22 @@ jobs:
               echo "POSEGNN_MODEL=$HOME/posegnn-model.ckpt" >> "$GITHUB_ENV"
             python_path: /tmp/ibm-materials/models/pos_egnn
             tests: tests/calculators/test_posegnn.py
+          - name: prophet
+            install: ""
+            cache_key: prophet-e22a79d16726484b7b635221cfe2b84a7bdf8a33
+            cache_path: ~/prophet-models
+            extra_install: |
+              uv pip install "prophet-mlip @ git+https://github.com/kairosmaterial/prophet.git@62bc2769fa83214fd564c7df263ee254e73fc6e9"
+              mkdir -p "$HOME/prophet-models"
+              for f in prophet-oame-mbd.pt prophet-v1-mag.pt prophet-v1-mag-head.pt; do
+                if [ ! -f "$HOME/prophet-models/$f" ]; then
+                  curl -sSL --retry 5 --retry-all-errors -C - -o "$HOME/prophet-models/$f" "https://huggingface.co/kairosmaterial/prophet/resolve/e22a79d16726484b7b635221cfe2b84a7bdf8a33/$f"
+                fi
+              done
+              echo "PROPHET_MODEL=$HOME/prophet-models/prophet-oame-mbd.pt" >> "$GITHUB_ENV"
+              echo "PROPHET_SPIN_MODEL=$HOME/prophet-models/prophet-v1-mag.pt" >> "$GITHUB_ENV"
+              echo "PROPHET_MAGMOM_HEAD=$HOME/prophet-models/prophet-v1-mag-head.pt" >> "$GITHUB_ENV"
+            tests: tests/calculators/test_prophet.py
           - name: hienet
             install: --extra hienet --no-install-package torch-scatter
             cache_key: hienet-v3
