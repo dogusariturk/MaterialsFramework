@@ -1,11 +1,12 @@
 # Calculators
 
-`MaterialsFramework` exposes 28 calculator implementations behind a largely unified interface (26 ML-backed calculators plus `RandomCalculator` and `VASPCalculator`). Every calculator except `MEGNetCalculator` inherits from `BaseCalculator`, providing `calculate()` for single-point evaluation and `relax()` for geometry optimization; `MEGNetCalculator` implements neither ABC and only exposes `calculate()`, predicting a single scalar formation energy. Most calculators also inherit from `BaseMDCalculator`, adding `run()` for molecular dynamics.
+`MaterialsFramework` exposes 29 calculator implementations behind a largely unified interface (27 ML-backed calculators plus `RandomCalculator` and `VASPCalculator`). Every calculator except `MEGNetCalculator` inherits from `BaseCalculator`, providing `calculate()` for single-point evaluation and `relax()` for geometry optimization; `MEGNetCalculator` implements neither ABC and only exposes `calculate()`, predicting a single scalar formation energy. Most calculators also inherit from `BaseMDCalculator`, adding `run()` for molecular dynamics.
 
 ## Available Calculators
 
 | Calculator   | Class                 | Backend                   |
 |--------------|-----------------------|---------------------------|
+| ACE          | `ACECalculator`       | ace-jax                   |
 | ALIGNN       | `AlignnCalculator`    | alignn                    |
 | Allegro      | `AllegroCalculator`   | nequip-allegro            |
 | AlphaNet     | `AlphaNetCalculator`  | msc-alphanet              |

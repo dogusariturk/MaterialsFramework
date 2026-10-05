@@ -73,6 +73,7 @@
 <div align="center" markdown>
 | MLIP      | Extra       | Package            | API                                 | Repository                                                         | Paper                                                       |
 |-----------|-------------|--------------------|-------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------|
+| ACE       | `ace`       | `ace-jax`          | [API](api/calculators/ace.md)       | [Repo](https://github.com/ACEsuit/ace-jax)                         | [Paper](https://doi.org/10.1103/PhysRevB.99.014104)         |
 | ALIGNN    | `alignn`    | `alignn`           | [API](api/calculators/alignn.md) | [Repo](https://github.com/usnistgov/alignn)                      | [Paper](https://arxiv.org/abs/2106.01829)                   |
 | Allegro   | `allegro`   | `nequip-allegro`   | [API](api/calculators/allegro.md)   | [Repo](https://github.com/mir-group/allegro)                       | [Paper](https://doi.org/10.1038/s41467-023-36329-y)         |
 | AlphaNet  | `alphanet`  | `msc-alphanet`     | [API](api/calculators/alphanet.md)  | [Repo](https://github.com/zmyybc/AlphaNet)                         | [Paper](https://arxiv.org/abs/2501.07155)                   |

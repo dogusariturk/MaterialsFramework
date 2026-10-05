@@ -164,6 +164,7 @@ nav:
     - Calculators:
       - api/calculators/index.md
       - Base Classes: api/calculators/base.md
+      - ACE: api/calculators/ace.md
       - ALIGNN: api/calculators/alignn.md
       - Allegro: api/calculators/allegro.md
       - AlphaNet: api/calculators/alphanet.md
