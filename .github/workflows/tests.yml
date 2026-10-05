@@ -239,6 +239,21 @@ jobs:
               echo "POSEGNN_MODEL=$HOME/posegnn-model.ckpt" >> "$GITHUB_ENV"
             python_path: /tmp/ibm-materials/models/pos_egnn
             tests: tests/calculators/test_posegnn.py
+          - name: ace
+            install: --extra ace
+            cache_key: ace-jax-0.2.1-si-44965427a0da764384c0bea7cfea79b0b943c813
+            cache_path: ~/ace-si-model.npz
+            extra_install: |
+              if [ ! -f "$HOME/ace-si-model.npz" ]; then
+                mkdir -p /tmp/ace-si
+                for f in train test; do
+                  curl -sSL --retry 5 --retry-all-errors -o "/tmp/ace-si/$f.xyz" "https://raw.githubusercontent.com/ACEsuit/ace-jax/44965427a0da764384c0bea7cfea79b0b943c813/docs/user/tutorials/data/si/$f.xyz"
+                done
+                uv run aj fit --order 3 --max-degree 10 --train /tmp/ace-si/train.xyz --test /tmp/ace-si/test.xyz --e0 lsq --m-per-species 0 --opt lbfgs --out /tmp/ace-si/fit
+                cp /tmp/ace-si/fit/model.npz "$HOME/ace-si-model.npz"
+              fi
+              echo "ACE_MODEL=$HOME/ace-si-model.npz" >> "$GITHUB_ENV"
+            tests: tests/calculators/test_ace.py
           - name: hienet
             install: --extra hienet --no-install-package torch-scatter
             cache_key: hienet-v3
