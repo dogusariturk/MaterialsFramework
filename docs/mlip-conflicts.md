@@ -6,36 +6,37 @@ Most MLIP extras install together without any issue. A handful conflict because 
 
 The list below folds together two kinds of conflict. Some are version ranges that `uv` itself won't combine, so it rejects them outright. Others are Torch, PyG, and DGL post-install stacks, or calculators with no pip package at all, that don't actually work together even though no resolver ever flags them. Either way, don't install both extras in the same environment. Any two MLIPs *not* listed against each other here can be installed together. An entry of `none` means that MLIP has no known conflicts at all.
 
-| MLIP      | Extra       | Conflicts with                                                                                       |
-|-----------|-------------|-------------------------------------------------------------------------------------------------------|
-| ALIGNN    | `alignn`    | AlphaNet, EqNorm, EquFlash, EqV2, HIENet, NewtonNet, PosEGNN                                           |
-| Allegro   | `allegro`   | MACE                                                                                                   |
-| AlphaNet  | `alphanet`  | ALIGNN, DeePMD, EquFlash, EqV2, eSEN, MatRIS, MatterSim, UMA                                           |
-| CHGNet    | `chgnet`    | none                                                                                                   |
-| DeePMD    | `deepmd`    | AlphaNet, EquFlash, EqV2, PosEGNN                                                                      |
-| EqNorm    | `eqnorm`    | ALIGNN, EquFlash, EqV2, MACE                                                                           |
-| EquFlash  | N/A         | ALIGNN, AlphaNet, DeePMD, EqNorm, eSEN, HIENet, MACE, MatRIS, MatterSim, NewtonNet, ORB, PosEGNN, UMA  |
-| EqV2      | `eqv2`      | ALIGNN, AlphaNet, DeePMD, EqNorm, eSEN, HIENet, MACE, MatRIS, MatterSim, NewtonNet, ORB, PosEGNN, UMA  |
-| eSEN      | `esen`      | AlphaNet, EquFlash, EqV2, MACE, NewtonNet, PosEGNN                                                     |
-| GPTFF     | N/A         | none                                                                                                   |
-| GRACE     | `grace`     | none                                                                                                   |
-| HIENet    | `hienet`    | ALIGNN, EquFlash, EqV2                                                                                 |
-| M3GNet    | `matgl`     | none                                                                                                   |
-| MACE      | `mace`      | Allegro, EqNorm, EquFlash, EqV2, eSEN, MatterSim, NequIP, SevenNet, UMA                                |
-| MatRIS    | `matris`    | AlphaNet, EquFlash, EqV2, NewtonNet, PosEGNN                                                           |
-| MatterSim | `mattersim` | AlphaNet, EquFlash, EqV2, MACE, NewtonNet, PosEGNN                                                     |
-| MEGNet    | `matgl`     | none                                                                                                   |
-| NequIP    | `nequip`    | MACE                                                                                                   |
-| Nequix    | `nequix`    | none                                                                                                   |
-| NewtonNet | `newtonnet` | ALIGNN, EquFlash, EqV2, eSEN, MatRIS, MatterSim, UMA                                                   |
-| ORB       | `orb`       | EquFlash, EqV2                                                                                         |
-| PetMad    | `petmad`    | none                                                                                                   |
-| PosEGNN   | N/A         | ALIGNN, DeePMD, EquFlash, EqV2, eSEN, MatRIS, MatterSim, UMA                                           |
-| SevenNet  | `sevennet`  | MACE                                                                                                   |
-| TACE      | `tace`      | none                                                                                                   |
-| UMA       | `uma`       | AlphaNet, EquFlash, EqV2, MACE, NewtonNet, PosEGNN                                                     |
+| MLIP      | Extra       | Conflicts with                                                                                             |
+|-----------|-------------|------------------------------------------------------------------------------------------------------------|
+| ALIGNN    | `alignn`    | AlphaNet, BAM, EqNorm, EquFlash, EqV2, HIENet, NewtonNet, PosEGNN                                          |
+| Allegro   | `allegro`   | MACE                                                                                                       |
+| AlphaNet  | `alphanet`  | ALIGNN, DeePMD, EquFlash, EqV2, eSEN, MatRIS, MatterSim, UMA                                               |
+| BAM       | N/A         | ALIGNN, EquFlash, EqV2, MACE                                                                               |
+| CHGNet    | `chgnet`    | none                                                                                                       |
+| DeePMD    | `deepmd`    | AlphaNet, EquFlash, EqV2, PosEGNN                                                                          |
+| EqNorm    | `eqnorm`    | ALIGNN, EquFlash, EqV2, MACE                                                                               |
+| EquFlash  | N/A         | ALIGNN, AlphaNet, BAM, DeePMD, EqNorm, eSEN, HIENet, MACE, MatRIS, MatterSim, NewtonNet, ORB, PosEGNN, UMA |
+| EqV2      | `eqv2`      | ALIGNN, AlphaNet, BAM, DeePMD, EqNorm, eSEN, HIENet, MACE, MatRIS, MatterSim, NewtonNet, ORB, PosEGNN, UMA |
+| eSEN      | `esen`      | AlphaNet, EquFlash, EqV2, MACE, NewtonNet, PosEGNN                                                         |
+| GPTFF     | N/A         | none                                                                                                       |
+| GRACE     | `grace`     | none                                                                                                       |
+| HIENet    | `hienet`    | ALIGNN, EquFlash, EqV2                                                                                     |
+| M3GNet    | `matgl`     | none                                                                                                       |
+| MACE      | `mace`      | Allegro, BAM, EqNorm, EquFlash, EqV2, eSEN, MatterSim, NequIP, SevenNet, UMA                               |
+| MatRIS    | `matris`    | AlphaNet, EquFlash, EqV2, NewtonNet, PosEGNN                                                               |
+| MatterSim | `mattersim` | AlphaNet, EquFlash, EqV2, MACE, NewtonNet, PosEGNN                                                         |
+| MEGNet    | `matgl`     | none                                                                                                       |
+| NequIP    | `nequip`    | MACE                                                                                                       |
+| Nequix    | `nequix`    | none                                                                                                       |
+| NewtonNet | `newtonnet` | ALIGNN, EquFlash, EqV2, eSEN, MatRIS, MatterSim, UMA                                                       |
+| ORB       | `orb`       | EquFlash, EqV2                                                                                             |
+| PetMad    | `petmad`    | none                                                                                                       |
+| PosEGNN   | N/A         | ALIGNN, DeePMD, EquFlash, EqV2, eSEN, MatRIS, MatterSim, UMA                                               |
+| SevenNet  | `sevennet`  | MACE                                                                                                       |
+| TACE      | `tace`      | none                                                                                                       |
+| UMA       | `uma`       | AlphaNet, EquFlash, EqV2, MACE, NewtonNet, PosEGNN                                                         |
 
-Rows with `N/A` in the Extra column (EquFlash, GPTFF, PosEGNN) have no `materialsframework` extra at all. See [Calculators Without an Extra](#calculators-without-an-extra) below for how to install them.
+Rows with `N/A` in the Extra column (BAM, EquFlash, GPTFF, PosEGNN) have no `materialsframework` extra at all. See [Calculators Without an Extra](#calculators-without-an-extra) below for how to install them.
 
 ## Examples
 
@@ -84,6 +85,9 @@ Each of these installs a different, specific Torch build (or, for `eqv2`, specif
 ## Calculators Without an Extra
 
 These calculators cannot be requested with a MaterialsFramework extra; they still appear in the table above for their practical/install-time conflicts, but nothing in `tool.uv.conflicts` covers them:
+
+`bam` (installed as `BAM-torch`)
+:   Git-only install. It declares `torch>=2.5.1` and `e3nn>=0.5.6`, which rules out MACE (`e3nn==0.4.4`) and EqV2/EquFlash (`torch<2.5`) at resolve time, and ALIGNN's manual `torch==2.3.0` install afterward.
 
 `equflash` (installed as `GGNN`)
 :   Git-only install with manually installed runtime dependencies. It uses the same `fairchem-core==1.10.0`, Torch 2.4.1, and PyG extension stack as EqV2. It can share an environment with EqV2, M3GNet, MEGNet, and the unlisted MLIPs, but not the other conflicts shown above.

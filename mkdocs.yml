@@ -167,6 +167,7 @@ nav:
       - ALIGNN: api/calculators/alignn.md
       - Allegro: api/calculators/allegro.md
       - AlphaNet: api/calculators/alphanet.md
+      - BAM: api/calculators/bam.md
       - CHGNet: api/calculators/chgnet.md
       - DeePMD: api/calculators/deepmd.md
       - EqNorm: api/calculators/eqnorm.md

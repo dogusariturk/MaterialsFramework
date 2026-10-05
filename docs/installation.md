@@ -58,33 +58,34 @@ Calculator-specific native dependencies can narrow this support. In particular, 
 
 ## MLIP Extras Overview
 
-| Calculator      | Extra       | Dependency spec                                            |
-|-----------------|-------------|------------------------------------------------------------|
-| ALIGNN          | `alignn`    | `alignn>=2025.4.1` (extra step needed; see note below)     |
-| Allegro         | `allegro`   | `nequip-allegro>=0.8.3`                                    |
-| AlphaNet        | `alphanet`  | `msc-alphanet>=0.1.3` (extra step needed; see note below)  |
-| CHGNet          | `chgnet`    | `chgnet>=0.4.2`                                            |
-| DeePMD          | `deepmd`    | `deepmd-kit[torch]>=3.1.2`                                 |
-| EqNorm          | `eqnorm`    | `eqnorm>=0.1.1` (extra step needed; see note below)        |
-| EquFlash        | N/A         | `GGNN` (git-only, no pip extra; see note below)            |
+| Calculator      | Extra       | Dependency spec                                             |
+|-----------------|-------------|-------------------------------------------------------------|
+| ALIGNN          | `alignn`    | `alignn>=2025.4.1` (extra step needed; see note below)      |
+| Allegro         | `allegro`   | `nequip-allegro>=0.8.3`                                     |
+| AlphaNet        | `alphanet`  | `msc-alphanet>=0.1.3` (extra step needed; see note below)   |
+| BAM             | N/A         | `BAM-torch` (git-only, no pip extra; see note below)        |
+| CHGNet          | `chgnet`    | `chgnet>=0.4.2`                                             |
+| DeePMD          | `deepmd`    | `deepmd-kit[torch]>=3.1.2`                                  |
+| EqNorm          | `eqnorm`    | `eqnorm>=0.1.1` (extra step needed; see note below)         |
+| EquFlash        | N/A         | `GGNN` (git-only, no pip extra; see note below)             |
 | EquiformerV2    | `eqv2`      | `fairchem-core>=1.10.0,<2.0` (extra step needed; see below) |
-| eSEN            | `esen`      | `fairchem-core>=2.0.0`                                     |
-| GPTFF           | N/A         | `gptff` (git-only, no pip extra; see note below)           |
-| GRACE           | `grace`     | `tensorpotential>=0.5.7`                                   |
-| HIENet          | `hienet`    | `hienet>=1.0.1` (extra step needed; see note below)        |
-| M3GNet / MEGNet | `matgl`     | `matgl>=2.0.0`                                             |
-| MACE            | `mace`      | `mace-torch>=0.3.15`                                       |
-| MatRIS          | `matris`    | `matris>=0.0.1`                                            |
-| MatterSim       | `mattersim` | `mattersim>=1.2.1`                                         |
-| NequIP          | `nequip`    | `nequip>=0.17.0`                                           |
-| Nequix          | `nequix`    | `nequix>=0.4.3`                                            |
-| NewtonNet       | `newtonnet` | `newtonnet>=2.0.0` (extra step needed; see note below)     |
-| ORB             | `orb`       | `orb-models>=0.5.5`                                        |
-| PET-MAD         | `petmad`    | `upet>=0.2.1`                                              |
-| PosEGNN         | N/A         | No installable package on any public index; see note below |
-| SevenNet        | `sevennet`  | `sevenn>=0.12.0`                                           |
-| TACE            | `tace`      | `TACE>=0.1.0`                                              |
-| UMA             | `uma`       | `fairchem-core>=2.0.0`                                     |
+| eSEN            | `esen`      | `fairchem-core>=2.0.0`                                      |
+| GPTFF           | N/A         | `gptff` (git-only, no pip extra; see note below)            |
+| GRACE           | `grace`     | `tensorpotential>=0.5.7`                                    |
+| HIENet          | `hienet`    | `hienet>=1.0.1` (extra step needed; see note below)         |
+| M3GNet / MEGNet | `matgl`     | `matgl>=2.0.0`                                              |
+| MACE            | `mace`      | `mace-torch>=0.3.15`                                        |
+| MatRIS          | `matris`    | `matris>=0.0.1`                                             |
+| MatterSim       | `mattersim` | `mattersim>=1.2.1`                                          |
+| NequIP          | `nequip`    | `nequip>=0.17.0`                                            |
+| Nequix          | `nequix`    | `nequix>=0.4.3`                                             |
+| NewtonNet       | `newtonnet` | `newtonnet>=2.0.0` (extra step needed; see note below)      |
+| ORB             | `orb`       | `orb-models>=0.5.5`                                         |
+| PET-MAD         | `petmad`    | `upet>=0.2.1`                                               |
+| PosEGNN         | N/A         | No installable package on any public index; see note below  |
+| SevenNet        | `sevennet`  | `sevenn>=0.12.0`                                            |
+| TACE            | `tace`      | `TACE>=0.1.0`                                               |
+| UMA             | `uma`       | `fairchem-core>=2.0.0`                                      |
 
 ### Extras Needing an Additional Install Step
 
@@ -213,6 +214,22 @@ Run the install commands for each calculator in the order shown:
         ```
 
 ### Non-Extra Calculators
+
+=== "BAM"
+
+    `BAMCalculator` is only installable from its upstream git repository.
+
+    === "uv"
+
+        ```bash
+        uv pip install "BAM-torch @ git+https://github.com/myung-group/BAM-torch.git"
+        ```
+
+    === "pip"
+
+        ```bash
+        pip install "BAM-torch @ git+https://github.com/myung-group/BAM-torch.git"
+        ```
 
 === "EquFlash"
 
