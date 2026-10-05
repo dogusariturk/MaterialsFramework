@@ -1,6 +1,6 @@
 # Calculators
 
-`MaterialsFramework` exposes 28 calculator implementations behind a largely unified interface (26 ML-backed calculators plus `RandomCalculator` and `VASPCalculator`). Every calculator except `MEGNetCalculator` inherits from `BaseCalculator`, providing `calculate()` for single-point evaluation and `relax()` for geometry optimization; `MEGNetCalculator` implements neither ABC and only exposes `calculate()`, predicting a single scalar formation energy. Most calculators also inherit from `BaseMDCalculator`, adding `run()` for molecular dynamics.
+`MaterialsFramework` exposes 29 calculator implementations behind a largely unified interface (27 ML-backed calculators plus `RandomCalculator` and `VASPCalculator`). Every calculator except `MEGNetCalculator` inherits from `BaseCalculator`, providing `calculate()` for single-point evaluation and `relax()` for geometry optimization; `MEGNetCalculator` implements neither ABC and only exposes `calculate()`, predicting a single scalar formation energy. Most calculators also inherit from `BaseMDCalculator`, adding `run()` for molecular dynamics.
 
 ## Available Calculators
 
@@ -29,6 +29,7 @@
 | ORB          | `ORBCalculator`       | orb-models                |
 | PET-MAD      | `PetMadCalculator`    | upet                      |
 | PosEGNN      | `PosEGNNCalculator`   | PosEGNN                   |
+| Prophet      | `ProphetCalculator`   | prophet-mlip              |
 | Random       | `RandomCalculator`    | (built-in, no ML backend) |
 | SevenNet     | `SevenNetCalculator`  | sevenn                    |
 | TACE         | `TACECalculator`      | TACE                      |

@@ -187,6 +187,7 @@ nav:
       - ORB: api/calculators/orb.md
       - PetMad: api/calculators/petmad.md
       - PosEGNN: api/calculators/posegnn.md
+      - Prophet: api/calculators/prophet.md
       - Random: api/calculators/random.md
       - SevenNet: api/calculators/sevennet.md
       - TACE: api/calculators/tace.md
